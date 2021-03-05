@@ -5,6 +5,7 @@ import (
 	"crypto/tls"
 	"io"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -66,20 +67,12 @@ func establishFlow(clientConn net.Conn) {
 		return
 	}
 
-	ip, err := net.LookupIP(clientHello.ServerName)
-	if err != nil {
+	saddr := clientConn.RemoteAddr().String()
+	host := backend(strings.HasPrefix(saddr, "172.16.31."), clientHello.ServerName)
+	if host == "" {
 		return
 	}
-	for i := range ip {
-		if !ip[i].IsGlobalUnicast() {
-			return
-		}
-	}
-
-	backendConn, err := net.DialTimeout("tcp", net.JoinHostPort(clientHello.ServerName, "443"), 10*time.Second)
-	if err != nil {
-		return
-	}
+	backendConn, err := net.DialTimeout("tcp", host, 10*time.Second)
 	defer backendConn.Close()
 
 	done := make(chan struct{})

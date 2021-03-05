@@ -6,25 +6,18 @@ import (
 )
 
 func main() {
+	initCheck()
 	daemon := make(chan struct{})
 
 	go func() {
-
 		handler := http.DefaultServeMux
-		handler.HandleFunc("/", handleFunc)
-
-		s := &http.Server{
-			Addr:    "127.0.0.1:9080",
-			Handler: handler,
-		}
-
-		s.ListenAndServe()
-
+		handler.HandleFunc("/", handleHTTP)
+		http.ListenAndServe(":80", handler)
 		daemon <- struct{}{}
 	}()
 
 	go func() {
-		listener, err := net.Listen("tcp", "127.0.0.1:9081")
+		listener, err := net.Listen("tcp", ":443")
 		if err != nil {
 			daemon <- struct{}{}
 		}
@@ -35,7 +28,7 @@ func main() {
 			}
 			go establishFlow(flow)
 		}
-		daemon <- struct{}{}
+		//daemon <- struct{}{}
 	}()
 
 	<-daemon

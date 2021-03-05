@@ -1,54 +1,10 @@
 
-# HAProxy as egress controller
+# Proxy
 
-Inspired by:
-- https://www.haproxy.com/user-spotlight-series/haproxy-as-egress-controller/
-- https://www.slideshare.net/roidelapluie/haproxy-as-egress-controller
+Ingress -> nftables -> proxy -> Services
 
+Egress <- proxy <- nftables <- LAN/VPN
 
-## Traffic flows
-
-Ingress -> HAProxy -> Services
-
-Egress <- httpproxy <- HAProxy <- nftables <- LAN/VPN
-
-Egress <- sniproxy <- HAProxy <- nftables <- LAN/VPN
-
-## HAProxy
-
-```
-frontend http-in
-  bind *:80
-  use_backend http-egress if { src <ranges> }
-  [...]
-
-backend http-egress
-  tcp-request content silent-drop unless { src <ranges> }
-  tcp-request content reject unless HTTP
-  server httpproxy 127.0.0.1:9080
-
-listen tls
-  bind *:443
-  mode tcp
-
-  stick-table type binary len 32 size 30k expire 30m
-
-  acl clienthello req.ssl_hello_type 1
-  acl serverhello res.ssl_hello_type 2
-
-  tcp-request inspect-delay 10s
-  tcp-request content reject unless clienthello
-
-  stick on payload_lv(43,1) if clienthello
-  stick store-response payload_lv(43,1) if serverhello
-
-  [...]
-
-  server sniproxy 127.0.0.1:9081 weight 0
-  use-server sniproxy if { src <ranges> }
-
-  [...]
-```
 
 ## nftables
 
