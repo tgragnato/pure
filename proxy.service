@@ -1,5 +1,5 @@
 [Unit]
-Description=HTTP proxy Daemon
+Description=Proxy Daemon
 Wants=network-online.target
 After=network.target network-online.target
 
@@ -18,7 +18,7 @@ NoNewPrivileges=true
 #IPAddressDeny=any
 User=proxy
 Group=proxy
-ExecStart=/usr/local/bin/httpproxy
+ExecStart=/usr/local/bin/proxy
 
 [Install]
 WantedBy=multi-user.target
