@@ -73,6 +73,9 @@ func establishFlow(clientConn net.Conn) {
 		return
 	}
 	backendConn, err := net.DialTimeout("tcp", host, 10*time.Second)
+	if err != nil {
+		return
+	}
 	defer backendConn.Close()
 
 	done := make(chan struct{})
