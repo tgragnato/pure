@@ -3,34 +3,27 @@ package main
 import (
 	"net"
 	"net/http"
+	"os"
 )
 
 func main() {
 	initCheck()
-	daemon := make(chan struct{})
 
 	go func() {
 		handler := http.DefaultServeMux
 		handler.HandleFunc("/", handleHTTP)
 		http.ListenAndServe(":80", handler)
-		daemon <- struct{}{}
 	}()
 
-	go func() {
-		listener, err := net.Listen("tcp", ":443")
+	listener, err := net.Listen("tcp", ":443")
+	if err != nil {
+		os.Exit(1)
+	}
+	for {
+		flow, err := listener.Accept()
 		if err != nil {
-			daemon <- struct{}{}
+			continue
 		}
-		for {
-			flow, err := listener.Accept()
-			if err != nil {
-				continue
-			}
-			go establishFlow(flow)
-		}
-		//daemon <- struct{}{}
-	}()
-
-	<-daemon
-	<-daemon
+		go establishFlow(flow)
+	}
 }
