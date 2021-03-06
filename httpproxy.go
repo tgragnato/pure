@@ -39,7 +39,7 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
 	if strings.HasSuffix(r.Host, ".apple.com") && r.Host != "ocsp.apple.com" || r.Host == "updates-http.cdn-apple.com" {
 
-		if !checkDomain(r.URL.Hostname()) {
+		if !checkDomain(r.Host) {
 			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), 302)
 			return
 		}
