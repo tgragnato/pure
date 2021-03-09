@@ -3,6 +3,7 @@ package main
 import (
 	"io"
 	"net/http"
+	"net/url"
 	"strings"
 )
 
@@ -37,20 +38,39 @@ func handleDirPort(w http.ResponseWriter, r *http.Request) {
 
 func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
-	if strings.HasSuffix(r.Host, ".apple.com") && r.Host != "ocsp.apple.com" || r.Host == "updates-http.cdn-apple.com" {
+	if strings.HasSuffix(r.Host, ".apple.com") && r.Host != "ocsp.apple.com" {
 
 		if !checkDomain(r.Host) {
 			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), 302)
 			return
 		}
 
-		/*proxyurl, err := url.Parse("socks5://127.0.0.1:9050")
-		  if err != nil {
-		          http.Error(w, "Could not parse proxy URL", 500)
-		          return
-		}*/
+		r.URL.Scheme = "http"
+		r.URL.Host = r.Host
+
+		resp, err := http.DefaultTransport.RoundTrip(r)
+		if err != nil {
+			http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), 302)
+			return
+		}
+		defer resp.Body.Close()
+
+		respH := w.Header()
+		for hk := range resp.Header {
+			respH[hk] = resp.Header[hk]
+		}
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
+
+	} else if r.Host == "updates-http.cdn-apple.com" {
+
+		proxyurl, err := url.Parse("socks5://127.0.0.1:9050")
+		if err != nil {
+			http.Error(w, "Could not parse proxy URL", 500)
+			return
+		}
 		httpTransport := http.DefaultTransport.(*http.Transport).Clone()
-		//httpTransport.Proxy = http.ProxyURL(proxyurl)
+		httpTransport.Proxy = http.ProxyURL(proxyurl)
 
 		r.URL.Scheme = "http"
 		r.URL.Host = r.Host
