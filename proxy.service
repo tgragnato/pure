@@ -14,10 +14,9 @@ PrivateTmp=yes
 PrivateControlGroups=yes
 RestrictSUIDSGID=true
 NoNewPrivileges=true
-#IPAddressAllow=127.0.0.1
-#IPAddressDeny=any
 User=proxy
 Group=proxy
+LimitNOFILE=16384
 ExecStart=/usr/local/bin/proxy
 
 [Install]
