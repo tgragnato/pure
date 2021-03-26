@@ -63,6 +63,12 @@ func backend(local bool, sni string) string {
 	} else {
 		if strings.HasSuffix(sni, "tgragnato.it") {
 			return "127.0.0.1:8080"
+		} else if strings.HasSuffix(sni, "awsmppl.com") ||
+			strings.HasSuffix(sni, "dnsupdate.info") ||
+			strings.HasSuffix(sni, "nerdpol.ovh") ||
+			strings.HasSuffix(sni, "nsupdate.info") ||
+			strings.HasSuffix(sni, "urown.cloud") {
+			return "127.0.0.1:8081"
 		} else {
 			return "127.0.0.1:9001"
 		}
