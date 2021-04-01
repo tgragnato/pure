@@ -1,23 +1,38 @@
 package main
 
 import (
+	"log"
 	"net"
 	"net/http"
-	"os"
+
+	"github.com/miekg/dns"
 )
 
 func main() {
 	initCheck()
 
 	go func() {
+		dns.HandleFunc(".", handleDnsRequest)
+		server := &dns.Server{Addr: "127.0.0.1:1053", Net: "udp"}
+		err := server.ListenAndServe()
+		defer server.Shutdown()
+		if err != nil {
+			log.Printf("Failed to start server: %s\n ", err.Error())
+		}
+	}()
+
+	go func() {
 		handler := http.DefaultServeMux
 		handler.HandleFunc("/", handleHTTP)
-		http.ListenAndServe(":80", handler)
+		err := http.ListenAndServe(":80", handler)
+		if err != nil {
+			log.Printf("Failed to start server: %s\n ", err.Error())
+		}
 	}()
 
 	listener, err := net.Listen("tcp", ":443")
 	if err != nil {
-		os.Exit(1)
+		log.Printf("Failed to start server: %s\n ", err.Error())
 	}
 	for {
 		flow, err := listener.Accept()

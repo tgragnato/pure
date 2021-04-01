@@ -32,18 +32,25 @@ func initCheck() {
 }
 
 func checkDomain(domain string) bool {
-	ip, err := net.LookupIP(domain)
+	ips, err := net.LookupIP(domain)
 	if err != nil {
 		return false
 	}
-	for x := range ip {
-		if !ip[x].IsGlobalUnicast() {
+	for _, ip := range ips {
+		if !checkIP(ip) {
 			return false
 		}
-		for y := range unrouteables {
-			if unrouteables[y].Contains(ip[x]) {
-				return false
-			}
+	}
+	return true
+}
+
+func checkIP(ip net.IP) bool {
+	if !ip.IsGlobalUnicast() {
+		return false
+	}
+	for _, net := range unrouteables {
+		if net.Contains(ip) {
+			return false
 		}
 	}
 	return true
