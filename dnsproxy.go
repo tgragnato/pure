@@ -104,19 +104,34 @@ func parseQuery(m *dns.Msg) {
 	for _, q := range m.Question {
 		switch q.Qtype {
 		case dns.TypeA:
-			ips, _, err := DoH(q.Name, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion")
+
+			if !checkQuery(q.Name) {
+				retNull(m, q.Name)
+				return
+			}
+
+			ips, cnames, err := DoH(q.Name, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion")
 			if err != nil {
 				retNull(m, q.Name)
-			} else {
-				for _, ip := range ips {
-					if !checkIP(ip) {
-						retNull(m, q.Name)
-						return
-					} else {
-						addIP(m, q.Name, ip)
-					}
+				return
+			}
+
+			for _, cname := range cnames {
+				if !checkQuery(cname) {
+					retNull(m, q.Name)
+					return
 				}
 			}
+
+			for i := range ips {
+				if !checkIP(ips[i]) {
+					retNull(m, q.Name)
+					return
+				} else {
+					addIP(m, q.Name, ips[i])
+				}
+			}
+
 		}
 	}
 }

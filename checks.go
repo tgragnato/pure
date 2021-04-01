@@ -13,6 +13,7 @@ var (
 	blackhole    []net.IP
 	blacklist    []string
 	whitelist    []string
+	prefixes     []string
 )
 
 func initCheck() {
@@ -55,6 +56,7 @@ func initCheck() {
 
 	blacklist = populateCheck("/etc/blocked.names")
 	whitelist = populateCheck("/etc/allowed.names")
+	prefixes = populateCheck("/etc/prefixes.names")
 
 }
 
@@ -79,13 +81,15 @@ func populateCheck(conf string) []string {
 		if err := snl.Err(); err == nil {
 			txt := snl.Text()
 			if !strings.HasPrefix(txt, "#") && txt != "" {
+				if !strings.HasSuffix(txt, ".") {
+					txt = txt + "."
+				}
 				dNames = append(dNames, txt)
-			} else {
-				log.Printf("Error reading newline in file %s : %s", conf, err.Error())
-				break
 			}
+		} else {
+			log.Printf("Error reading newline in file %s : %s", conf, err.Error())
+			break
 		}
-
 	}
 
 	return dNames
@@ -93,8 +97,13 @@ func populateCheck(conf string) []string {
 
 func checkQuery(domain string) bool {
 	for i := range whitelist {
-		if domain == whitelist[i] {
+		if strings.HasSuffix(domain, whitelist[i]) {
 			return true
+		}
+	}
+	for i := range prefixes {
+		if strings.HasPrefix(domain, prefixes[i]) {
+			return false
 		}
 	}
 	for i := range blacklist {
