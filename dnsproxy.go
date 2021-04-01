@@ -8,7 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
-	"strings"
+	"time"
 
 	"github.com/miekg/dns"
 )
@@ -33,16 +33,20 @@ func DoH(qName string, trr string) ([]net.IP, []string, error) {
 	}
 	req.Header.Set("content-type", "application/dns-message")
 
-	httpClient := &http.Client{Transport: http.DefaultTransport}
-	if strings.HasSuffix(trr, ".onion") {
-		proxyurl, err := url.Parse("socks5://127.0.0.1:9050")
-		if err != nil {
-			return ips, cnames, errors.New("Invalid socks5 proxy")
-		}
-		httpTransport := http.DefaultTransport.(*http.Transport).Clone()
-		httpTransport.Proxy = http.ProxyURL(proxyurl)
-		httpClient = &http.Client{Transport: httpTransport}
+	proxyurl, err := url.Parse("socks5://127.0.0.1:9050")
+	if err != nil {
+		return ips, cnames, errors.New("Invalid socks5 proxy")
 	}
+	httpTransport := http.DefaultTransport.(*http.Transport).Clone()
+	httpTransport.Proxy = http.ProxyURL(proxyurl)
+	httpTransport.DisableKeepAlives = false
+	httpTransport.DisableCompression = true
+	httpTransport.MaxIdleConns = 1
+	httpTransport.IdleConnTimeout = 30 * time.Second
+	httpTransport.ResponseHeaderTimeout = 5 * time.Second
+	httpTransport.ExpectContinueTimeout = 5 * time.Second
+	httpTransport.MaxResponseHeaderBytes = 4096
+	httpClient := &http.Client{Transport: httpTransport}
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
