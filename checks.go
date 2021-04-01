@@ -91,6 +91,20 @@ func populateCheck(conf string) []string {
 	return dNames
 }
 
+func checkQuery(domain string) bool {
+	for i := range whitelist {
+		if domain == whitelist[i] {
+			return true
+		}
+	}
+	for i := range blacklist {
+		if strings.HasSuffix(domain, blacklist[i]) {
+			return false
+		}
+	}
+	return true
+}
+
 func checkDomain(domain string) bool {
 	ips, err := net.LookupIP(domain)
 	if err != nil {
@@ -108,8 +122,13 @@ func checkIP(ip net.IP) bool {
 	if !ip.IsGlobalUnicast() {
 		return false
 	}
-	for _, net := range unrouteables {
-		if net.Contains(ip) {
+	for i := range unrouteables {
+		if unrouteables[i].Contains(ip) {
+			return false
+		}
+	}
+	for i := range blackhole {
+		if blackhole[i].Equal(ip) {
 			return false
 		}
 	}
