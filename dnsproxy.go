@@ -14,6 +14,13 @@ import (
 	"github.com/miekg/dns"
 )
 
+var trr = []string{
+	"dns.digitale-gesellschaft.ch",
+	"odvr.nic.cz",
+	"dns.njal.la",
+	"mozilla.cloudflare-dns.com",
+}
+
 func DoH(qName string, trr string) ([]net.IP, []string, error) {
 	var (
 		ips    []net.IP
@@ -112,6 +119,13 @@ func parseQuery(m *dns.Msg) {
 			}
 
 			ips, cnames, err := DoH(q.Name, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion")
+			if err != nil {
+				for i := range trr {
+					if ips, cnames, err = DoH(q.Name, trr[i]); err == nil {
+						break
+					}
+				}
+			}
 			if err != nil {
 				retNull(m, q.Name)
 				return
