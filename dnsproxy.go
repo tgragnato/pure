@@ -8,6 +8,7 @@ import (
 	"net"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/miekg/dns"
@@ -117,7 +118,7 @@ func parseQuery(m *dns.Msg) {
 			}
 
 			for _, cname := range cnames {
-				if !checkQuery(cname) {
+				if !checkQuery(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
 					retNull(m, q.Name)
 					return
 				}
