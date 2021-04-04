@@ -147,6 +147,7 @@ func parseQuery(m *dns.Msg) {
 				}
 			}
 
+			go IncDNS(q.Name[:len(q.Name)-1])
 		}
 	}
 }

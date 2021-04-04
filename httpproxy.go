@@ -96,6 +96,7 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
 func handleHTTP(w http.ResponseWriter, r *http.Request) {
 	if strings.HasPrefix(r.RemoteAddr, "172.16.31.") {
+		go IncHTTP(r.Host)
 		handleHTTPForward(w, r)
 	} else {
 		handleDirPort(w, r)

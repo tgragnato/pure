@@ -12,6 +12,15 @@ func main() {
 	initCheck()
 
 	go func() {
+		muxAnalytics := http.NewServeMux()
+		muxAnalytics.HandleFunc("/", handleAnalytics)
+		err := http.ListenAndServe("127.0.0.1:1080", muxAnalytics)
+		if err != nil {
+			log.Printf("Failed to start server: %s\n ", err.Error())
+		}
+	}()
+
+	go func() {
 		dns.HandleFunc(".", handleDnsRequest)
 		server := &dns.Server{Addr: "127.0.0.1:1053", Net: "udp"}
 		err := server.ListenAndServe()

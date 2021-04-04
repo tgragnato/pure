@@ -98,9 +98,11 @@ func establishFlow(clientConn net.Conn) {
 func backend(local bool, sni string) string {
 	if local {
 		if strings.HasSuffix(sni, "tgragnato.it") && sni != "status.tgragnato.it" {
+			go IncTLS(sni)
 			return "127.0.0.1:8080"
 		} else {
 			if checkDomain(sni) {
+				go IncTLS(sni)
 				return net.JoinHostPort(sni, "443")
 			} else {
 				return ""
