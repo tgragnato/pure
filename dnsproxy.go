@@ -113,6 +113,8 @@ func parseQuery(m *dns.Msg) {
 		switch q.Qtype {
 		case dns.TypeA:
 
+			q.Name = strings.ToLower(q.Name)
+
 			if !checkQuery(q.Name) {
 				retNull(m, q.Name)
 				return
