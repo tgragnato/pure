@@ -108,17 +108,38 @@ func parseQuery(m *dns.Msg) {
 		switch q.Qtype {
 		case dns.TypeA:
 
-			q.Name = strings.ToLower(q.Name)
+			qName := strings.ToLower(q.Name)
+			if strings.HasSuffix(qName, "youtube.com.") {
+				switch qName {
+				case "youtube.com.":
+					qName = "restrictmoderate.youtube.com."
+				case "www.youtube.com.":
+					qName = "restrictmoderate.youtube.com."
+				case "m.youtube.com.":
+					qName = "restrictmoderate.youtube.com."
+				case "youtubei.googleapis.com.":
+					qName = "restrictmoderate.youtube.com."
+				case "youtube.googleapis.com.":
+					qName = "restrictmoderate.youtube.com."
+				case "www.youtube-nocookie.com.":
+					qName = "restrictmoderate.youtube.com."
+				case "consent.youtube.com.":
+					qName = "consent.youtube.com."
+				default:
+					retNull(m, q.Name)
+					return
+				}
+			}
 
-			if !checkQuery(q.Name) {
+			if !checkQuery(qName) {
 				retNull(m, q.Name)
 				return
 			}
 
-			ips, cnames, err := DoH(q.Name, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion")
+			ips, cnames, err := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion")
 			if err != nil {
 				for i := range trr {
-					if ips, cnames, err = DoH(q.Name, trr[i]); err == nil {
+					if ips, cnames, err = DoH(qName, trr[i]); err == nil {
 						break
 					}
 				}
@@ -144,7 +165,7 @@ func parseQuery(m *dns.Msg) {
 				}
 			}
 
-			go IncDNS(q.Name[:len(q.Name)-1])
+			go IncDNS(qName[:len(qName)-1])
 		}
 	}
 }
