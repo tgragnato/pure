@@ -1,13 +1,55 @@
 package main
 
 import (
+	"bufio"
 	"bytes"
 	"crypto/tls"
 	"io"
+	"log"
 	"net"
+	"net/url"
+	"os"
 	"strings"
 	"time"
+
+	"golang.org/x/net/proxy"
 )
+
+var (
+	proxyurl, _ = url.Parse("socks5://127.0.0.1:9050")
+	perhost     *proxy.PerHost
+)
+
+func initProxy() {
+	socks5, _ := proxy.FromURL(proxyurl, proxy.Direct)
+	perhost = proxy.NewPerHost(proxy.Direct, socks5)
+
+	conf := "/etc/proxied.names"
+	buf, err := os.Open(conf)
+	if err != nil {
+		log.Printf("Error opening file %s", conf)
+	}
+
+	defer func() {
+		if err = buf.Close(); err != nil {
+			log.Printf("Error closing file %s : %s", conf, err.Error())
+		}
+	}()
+
+	snl := bufio.NewScanner(buf)
+	for snl.Scan() {
+
+		if err := snl.Err(); err == nil {
+			txt := snl.Text()
+			if !strings.HasPrefix(txt, "#") && txt != "" {
+				perhost.AddZone(txt)
+			}
+		} else {
+			log.Printf("Error reading newline in file %s : %s", conf, err.Error())
+			break
+		}
+	}
+}
 
 func peekClientHello(reader io.Reader) (*tls.ClientHelloInfo, io.Reader, error) {
 	peekedBytes := new(bytes.Buffer)
@@ -67,12 +109,18 @@ func establishFlow(clientConn net.Conn) {
 		return
 	}
 
-	saddr := clientConn.RemoteAddr().String()
-	host := backend(strings.HasPrefix(saddr, "172.16.31."), clientHello.ServerName)
-	if host == "" {
-		return
+	var backendConn net.Conn
+	if strings.HasPrefix(clientConn.RemoteAddr().String(), "172.16.31.") {
+		host := forward(clientHello.ServerName)
+		if host == "" {
+			return
+		}
+		backendConn, err = perhost.Dial("tcp", host)
+	} else {
+		host := backend(clientHello.ServerName)
+		backendConn, err = net.DialTimeout("tcp", host, 5*time.Second)
 	}
-	backendConn, err := net.DialTimeout("tcp", host, 10*time.Second)
+
 	if err != nil {
 		return
 	}
@@ -95,30 +143,30 @@ func establishFlow(clientConn net.Conn) {
 	<-done
 }
 
-func backend(local bool, sni string) string {
-	if local {
-		if strings.HasSuffix(sni, "tgragnato.it") && sni != "status.tgragnato.it" {
-			go IncTLS(sni)
-			return "127.0.0.1:8080"
-		} else {
-			if checkDomain(sni) {
-				go IncTLS(sni)
-				return net.JoinHostPort(sni, "443")
-			} else {
-				return ""
-			}
-		}
+func forward(sni string) string {
+	if strings.HasSuffix(sni, "tgragnato.it") && sni != "status.tgragnato.it" {
+		go IncTLS(sni)
+		return "127.0.0.1:8080"
 	} else {
-		if strings.HasSuffix(sni, "tgragnato.it") {
-			return "127.0.0.1:8080"
-		} else if strings.HasSuffix(sni, "awsmppl.com") ||
-			strings.HasSuffix(sni, "dnsupdate.info") ||
-			strings.HasSuffix(sni, "nerdpol.ovh") ||
-			strings.HasSuffix(sni, "nsupdate.info") ||
-			strings.HasSuffix(sni, "urown.cloud") {
-			return "127.0.0.1:8081"
+		if checkDomain(sni) {
+			go IncTLS(sni)
+			return net.JoinHostPort(sni, "443")
 		} else {
-			return "127.0.0.1:9001"
+			return ""
 		}
+	}
+}
+
+func backend(sni string) string {
+	if strings.HasSuffix(sni, "tgragnato.it") {
+		return "127.0.0.1:8080"
+	} else if strings.HasSuffix(sni, "awsmppl.com") ||
+		strings.HasSuffix(sni, "dnsupdate.info") ||
+		strings.HasSuffix(sni, "nerdpol.ovh") ||
+		strings.HasSuffix(sni, "nsupdate.info") ||
+		strings.HasSuffix(sni, "urown.cloud") {
+		return "127.0.0.1:8081"
+	} else {
+		return "127.0.0.1:9001"
 	}
 }

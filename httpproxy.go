@@ -3,7 +3,6 @@ package main
 import (
 	"io"
 	"net/http"
-	"net/url"
 	"strings"
 )
 
@@ -64,11 +63,6 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
 	} else if r.Host == "updates-http.cdn-apple.com" {
 
-		proxyurl, err := url.Parse("socks5://127.0.0.1:9050")
-		if err != nil {
-			http.Error(w, "Could not parse proxy URL", 500)
-			return
-		}
 		httpTransport := http.DefaultTransport.(*http.Transport).Clone()
 		httpTransport.Proxy = http.ProxyURL(proxyurl)
 

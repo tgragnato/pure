@@ -7,7 +7,6 @@ import (
 	"io/ioutil"
 	"net"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
 
@@ -41,10 +40,6 @@ func DoH(qName string, trr string) ([]net.IP, []string, error) {
 	}
 	req.Header.Set("content-type", "application/dns-message")
 
-	proxyurl, err := url.Parse("socks5://127.0.0.1:9050")
-	if err != nil {
-		return ips, cnames, errors.New("Invalid socks5 proxy")
-	}
 	httpTransport := http.DefaultTransport.(*http.Transport).Clone()
 	httpTransport.Proxy = http.ProxyURL(proxyurl)
 	httpTransport.DisableKeepAlives = false

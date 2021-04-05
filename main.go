@@ -10,6 +10,7 @@ import (
 
 func main() {
 	initCheck()
+	initProxy()
 
 	go func() {
 		muxAnalytics := http.NewServeMux()
