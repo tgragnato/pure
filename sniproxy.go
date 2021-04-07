@@ -110,12 +110,22 @@ func establishFlow(clientConn net.Conn) {
 	}
 
 	var backendConn net.Conn
+
 	if strings.HasPrefix(clientConn.RemoteAddr().String(), "172.16.31.") {
-		host := forward(clientHello.ServerName)
-		if host == "" {
-			return
+
+		if strings.HasSuffix(clientHello.ServerName, "tgragnato.it") &&
+			clientHello.ServerName != "status.tgragnato.it" {
+			go IncTLS(clientHello.ServerName)
+			backendConn, err = net.DialTimeout("tcp", "127.0.0.1:8080", 10*time.Second)
+
+		} else if checkDomain(clientHello.ServerName) {
+			go IncTLS(clientHello.ServerName)
+			backendConn, err = perhost.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
+
+		} else {
+				return
 		}
-		backendConn, err = perhost.Dial("tcp", host)
+
 	} else {
 		host := backend(clientHello.ServerName)
 		backendConn, err = net.DialTimeout("tcp", host, 5*time.Second)
@@ -141,20 +151,6 @@ func establishFlow(clientConn net.Conn) {
 
 	<-done
 	<-done
-}
-
-func forward(sni string) string {
-	if strings.HasSuffix(sni, "tgragnato.it") && sni != "status.tgragnato.it" {
-		go IncTLS(sni)
-		return "127.0.0.1:8080"
-	} else {
-		if checkDomain(sni) {
-			go IncTLS(sni)
-			return net.JoinHostPort(sni, "443")
-		} else {
-			return ""
-		}
-	}
 }
 
 func backend(sni string) string {
