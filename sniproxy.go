@@ -22,7 +22,7 @@ var (
 
 func initProxy() {
 	socks5, _ := proxy.FromURL(proxyurl, proxy.Direct)
-	perhost = proxy.NewPerHost(proxy.Direct, socks5)
+	perhost = proxy.NewPerHost(socks5, proxy.Direct)
 
 	conf := "/etc/proxied.names"
 	buf, err := os.Open(conf)
