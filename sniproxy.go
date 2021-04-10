@@ -24,7 +24,7 @@ func initProxy() {
 	socks5, _ := proxy.FromURL(proxyurl, proxy.Direct)
 	perhost = proxy.NewPerHost(socks5, proxy.Direct)
 
-	conf := "/etc/proxied.names"
+	conf := "/etc/proxy/bypass.names"
 	buf, err := os.Open(conf)
 	if err != nil {
 		log.Printf("Error opening file %s", conf)

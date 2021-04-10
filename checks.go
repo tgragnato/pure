@@ -62,9 +62,9 @@ func initCheck() {
 		blackhole = append(blackhole, net.ParseIP(blackholestrings[i]))
 	}
 
-	blacklist = populateCheck("/etc/blocked.names")
-	whitelist = populateCheck("/etc/allowed.names")
-	prefixes = populateCheck("/etc/prefixes.names")
+	blacklist = populateCheck("/etc/proxy/blocked.names")
+	whitelist = populateCheck("/etc/proxy/allowed.names")
+	prefixes = populateCheck("/etc/proxy/prefixes.names")
 
 }
 
