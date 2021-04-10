@@ -123,7 +123,7 @@ func establishFlow(clientConn net.Conn) {
 			backendConn, err = perhost.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
 
 		} else {
-				return
+			return
 		}
 
 	} else {
@@ -154,14 +154,13 @@ func establishFlow(clientConn net.Conn) {
 }
 
 func backend(sni string) string {
-	if strings.HasSuffix(sni, "tgragnato.it") {
-		return "127.0.0.1:8080"
-	} else if strings.HasSuffix(sni, "awsmppl.com") ||
+	if strings.HasSuffix(sni, "tgragnato.it") ||
+		strings.HasSuffix(sni, "awsmppl.com") ||
 		strings.HasSuffix(sni, "dnsupdate.info") ||
 		strings.HasSuffix(sni, "nerdpol.ovh") ||
 		strings.HasSuffix(sni, "nsupdate.info") ||
 		strings.HasSuffix(sni, "urown.cloud") {
-		return "127.0.0.1:8081"
+		return "127.0.0.1:8080"
 	} else {
 		return "127.0.0.1:9001"
 	}
