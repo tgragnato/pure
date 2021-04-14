@@ -34,13 +34,13 @@ func main() {
 	go func() {
 		handler := http.DefaultServeMux
 		handler.HandleFunc("/", handleHTTP)
-		err := http.ListenAndServe(":80", handler)
+		err := http.ListenAndServe("172.16.31.0:80", handler)
 		if err != nil {
 			log.Printf("Failed to start server: %s\n ", err.Error())
 		}
 	}()
 
-	listener, err := net.Listen("tcp", ":443")
+	listener, err := net.Listen("tcp", "172.16.31.0:443")
 	if err != nil {
 		log.Printf("Failed to start server: %s\n ", err.Error())
 	}

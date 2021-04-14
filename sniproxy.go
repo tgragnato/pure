@@ -111,24 +111,17 @@ func establishFlow(clientConn net.Conn) {
 
 	var backendConn net.Conn
 
-	if strings.HasPrefix(clientConn.RemoteAddr().String(), "172.16.31.") {
+	if strings.HasSuffix(clientHello.ServerName, "tgragnato.it") &&
+		clientHello.ServerName != "status.tgragnato.it" {
+		go IncTLS(clientHello.ServerName)
+		backendConn, err = net.DialTimeout("tcp", "127.0.0.1:8080", 10*time.Second)
 
-		if strings.HasSuffix(clientHello.ServerName, "tgragnato.it") &&
-			clientHello.ServerName != "status.tgragnato.it" {
-			go IncTLS(clientHello.ServerName)
-			backendConn, err = net.DialTimeout("tcp", "127.0.0.1:8080", 10*time.Second)
-
-		} else if checkDomain(clientHello.ServerName) {
-			go IncTLS(clientHello.ServerName)
-			backendConn, err = perhost.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
-
-		} else {
-			return
-		}
+	} else if checkDomain(clientHello.ServerName) {
+		go IncTLS(clientHello.ServerName)
+		backendConn, err = perhost.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
 
 	} else {
-		host := backend(clientHello.ServerName)
-		backendConn, err = net.DialTimeout("tcp", host, 5*time.Second)
+		return
 	}
 
 	if err != nil {
@@ -151,17 +144,4 @@ func establishFlow(clientConn net.Conn) {
 
 	<-done
 	<-done
-}
-
-func backend(sni string) string {
-	if strings.HasSuffix(sni, "tgragnato.it") ||
-		strings.HasSuffix(sni, "awsmppl.com") ||
-		strings.HasSuffix(sni, "dnsupdate.info") ||
-		strings.HasSuffix(sni, "nerdpol.ovh") ||
-		strings.HasSuffix(sni, "nsupdate.info") ||
-		strings.HasSuffix(sni, "urown.cloud") {
-		return "127.0.0.1:8080"
-	} else {
-		return "127.0.0.1:9001"
-	}
 }
