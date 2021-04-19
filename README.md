@@ -1,9 +1,15 @@
 
 # Proxy
 
-Ingress -> nftables -> proxy -> Services
+This is a proxy for TLS and HTTP.
+Ingress traffic is captured by nftables.
 
-Egress <- proxy <- nftables <- LAN/VPN
+Most HTTP traffic is upgraded to HTTPS with a redirect.
+
+The SNI field of the TLS is read.
+The connection is forwarded to the local socks proxy, or handled directly if a bypass is set.
+
+Filtering is performed at the DNS and SNI layers.
 
 
 ## nftables
