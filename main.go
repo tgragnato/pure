@@ -33,7 +33,7 @@ func main() {
 
 	go func() {
 		handler := http.DefaultServeMux
-		handler.HandleFunc("/", handleHTTP)
+		handler.HandleFunc("/", handleHTTPForward)
 		err := http.ListenAndServe("172.16.31.0:80", handler)
 		if err != nil {
 			log.Printf("Failed to start server: %s\n ", err.Error())
