@@ -2,13 +2,16 @@ package main
 
 import (
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
+	"time"
 
 	"github.com/miekg/dns"
 )
 
 func main() {
+	rand.Seed(time.Now().Unix())
 	initCheck()
 	initProxy()
 
