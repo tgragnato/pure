@@ -18,13 +18,17 @@ func redirectScheme(w http.ResponseWriter, r *http.Request) {
 }
 
 func httpProxy(w http.ResponseWriter, r *http.Request, socks bool, ua bool) {
-	if !checkDomain(r.Host) {
+	if r.Host != "gs.apple.com:80" && !checkDomain(r.Host) {
 		http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), 302)
 		return
 	}
 
 	r.URL.Scheme = "http"
-	r.URL.Host = r.Host
+	if r.Host == "gs.apple.com:80" {
+		r.URL.Host = "gs.apple.com"
+	} else {
+		r.URL.Host = r.Host
+	}
 
 	if ua {
 		index := rand.Int() % len(uastrings)
@@ -64,6 +68,8 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 		httpProxy(w, r, false, false)
 	} else if r.Host == "updates-http.cdn-apple.com" {
 		httpProxy(w, r, true, false)
+	} else if r.Host == "gs.apple.com:80" {
+		httpProxy(w, r, false, false)
 	} else {
 		redirectScheme(w, r)
 	}

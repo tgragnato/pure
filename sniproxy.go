@@ -111,8 +111,7 @@ func establishFlow(clientConn net.Conn) {
 
 	var backendConn net.Conn
 
-	if strings.HasSuffix(clientHello.ServerName, "tgragnato.it") &&
-		clientHello.ServerName != "status.tgragnato.it" {
+	if strings.HasSuffix(clientHello.ServerName, "tgragnato.it") {
 		go IncTLS(clientHello.ServerName)
 		backendConn, err = net.DialTimeout("tcp", "127.0.0.1:8080", 10*time.Second)
 
