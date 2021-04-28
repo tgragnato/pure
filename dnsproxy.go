@@ -20,14 +20,18 @@ var trr = []string{
 	"mozilla.cloudflare-dns.com",
 }
 
-func DoH(qName string, trr string) ([]net.IP, []string, error) {
+func DoH(qName string, trr string, ipv6 bool) ([]net.IP, []string, error) {
 	var (
 		ips    []net.IP
 		cnames []string
 	)
 
 	m := new(dns.Msg)
-	m.SetQuestion(qName, dns.TypeA)
+	if ipv6 {
+		m.SetQuestion(qName, dns.TypeAAAA)
+	} else {
+		m.SetQuestion(qName, dns.TypeA)
+	}
 	m.SetEdns0(4096, true)
 	out, err := m.Pack()
 	if err != nil {
@@ -74,6 +78,8 @@ func DoH(qName string, trr string) ([]net.IP, []string, error) {
 		switch ansb := ansa.(type) {
 		case *dns.A:
 			ips = append(ips, ansb.A)
+		case *dns.AAAA:
+			ips = append(ips, ansb.AAAA)
 		case *dns.CNAME:
 			cnames = append(cnames, ansb.Target)
 		case *dns.DNAME:
@@ -94,6 +100,10 @@ func retNull(m *dns.Msg, qName string) {
 		m.Answer = nil
 		m.Answer = append(m.Answer, newRR)
 	}
+	newRR, err = dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, "0000:0000:0000:0000:0000:0000:0000:0000"))
+	if err == nil {
+		m.Answer = append(m.Answer, newRR)
+	}
 }
 
 func addIP(m *dns.Msg, qName string, ip net.IP) {
@@ -103,10 +113,17 @@ func addIP(m *dns.Msg, qName string, ip net.IP) {
 	}
 }
 
+func addIPv6(m *dns.Msg, qName string, ip net.IP) {
+	rr, err := dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, ip.String()))
+	if err == nil {
+		m.Answer = append(m.Answer, rr)
+	}
+}
+
 func parseQuery(m *dns.Msg) {
 	for _, q := range m.Question {
 		switch q.Qtype {
-		case dns.TypeA:
+		case dns.TypeA, dns.TypeAAAA:
 
 			qName := strings.ToLower(q.Name)
 			if strings.HasSuffix(qName, "youtube.com.") {
@@ -136,15 +153,18 @@ func parseQuery(m *dns.Msg) {
 				return
 			}
 
-			ips, cnames, err := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion")
+			ips, cnames, err := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", q.Qtype == dns.TypeAAAA)
 			if err != nil {
 				for i := range trr {
-					if ips, cnames, err = DoH(qName, trr[i]); err == nil {
+					if ips, cnames, err = DoH(qName, trr[i], q.Qtype == dns.TypeAAAA); err == nil {
 						break
 					}
 				}
 			}
 			if err != nil {
+				if err.Error() == "No IP addresses in response" {
+					return
+				}
 				retNull(m, q.Name)
 				return
 			}
@@ -160,6 +180,8 @@ func parseQuery(m *dns.Msg) {
 				if !checkIP(ips[i]) {
 					retNull(m, q.Name)
 					return
+				} else if q.Qtype == dns.TypeAAAA {
+					addIPv6(m, q.Name, ips[i])
 				} else {
 					addIP(m, q.Name, ips[i])
 				}
