@@ -43,6 +43,29 @@ func main() {
 		}
 	}()
 
+	go func() {
+		IPv6handler := http.NewServeMux()
+		IPv6handler.HandleFunc("/", handleIPv6Forward)
+		err := http.ListenAndServe("[fd76:abcd:ef90::]:80", IPv6handler)
+		if err != nil {
+			log.Printf("Failed to start server: %s\n ", err.Error())
+		}
+	}()
+
+	go func() {
+		listener, err := net.Listen("tcp", "[fd76:abcd:ef90::]:443")
+		if err != nil {
+			log.Printf("Failed to start server: %s\n ", err.Error())
+		}
+		for {
+			flow, err := listener.Accept()
+			if err != nil {
+				continue
+			}
+			go establishFlow(flow)
+		}
+	}()
+
 	listener, err := net.Listen("tcp", "172.16.31.0:443")
 	if err != nil {
 		log.Printf("Failed to start server: %s\n ", err.Error())
