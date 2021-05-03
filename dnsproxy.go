@@ -49,9 +49,9 @@ func DoH(qName string, trr string, ipv6 bool) ([]net.IP, []string, error) {
 	httpTransport.DisableKeepAlives = false
 	httpTransport.DisableCompression = true
 	httpTransport.MaxIdleConns = 1
-	httpTransport.IdleConnTimeout = 30 * time.Second
-	httpTransport.ResponseHeaderTimeout = 5 * time.Second
-	httpTransport.ExpectContinueTimeout = 5 * time.Second
+	httpTransport.IdleConnTimeout = 5 * time.Second
+	httpTransport.ResponseHeaderTimeout = 2 * time.Second
+	httpTransport.ExpectContinueTimeout = 2 * time.Second
 	httpTransport.MaxResponseHeaderBytes = 4096
 	httpClient := &http.Client{Transport: httpTransport}
 
