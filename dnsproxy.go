@@ -13,12 +13,16 @@ import (
 	"github.com/miekg/dns"
 )
 
-var trr = []string{
-	"dns.digitale-gesellschaft.ch",
-	"odvr.nic.cz",
-	"dns.njal.la",
-	"mozilla.cloudflare-dns.com",
-}
+var (
+	trr = []string{
+		"dns.digitale-gesellschaft.ch",
+		"odvr.nic.cz",
+		"dns.njal.la",
+		"mozilla.cloudflare-dns.com",
+	}
+	cache4 = NewCache(3600 * time.Second)
+	cache6 = NewCache(3600 * time.Second)
+)
 
 func DoH(qName string, trr string, ipv6 bool) ([]net.IP, []string, error) {
 	var (
@@ -148,6 +152,22 @@ func parseQuery(m *dns.Msg) {
 				}
 			}
 
+			if q.Qtype == dns.TypeAAAA {
+				if data, found := cache6.Get(qName); found {
+					for i := range data {
+						addIPv6(m, q.Name, data[i])
+					}
+					return
+				}
+			} else {
+				if data, found := cache4.Get(qName); found {
+					for i := range data {
+						addIP(m, q.Name, data[i])
+					}
+					return
+				}
+			}
+
 			if !checkQuery(qName) {
 				retNull(m, q.Name)
 				return
@@ -172,6 +192,8 @@ func parseQuery(m *dns.Msg) {
 			for _, cname := range cnames {
 				if !checkQuery(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
 					retNull(m, q.Name)
+					cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
+					cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
 					return
 				}
 			}
@@ -179,15 +201,27 @@ func parseQuery(m *dns.Msg) {
 			for i := range ips {
 				if !checkIP(ips[i]) {
 					retNull(m, q.Name)
+					cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
+					cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
 					return
 				} else if q.Qtype == dns.TypeAAAA {
 					addIPv6(m, q.Name, ips[i])
+					if data, found := cache6.Get(qName); found {
+						cache6.Set(qName, append(data, ips[i]))
+					} else {
+						cache6.Set(qName, []net.IP{ips[i]})
+					}
 				} else {
 					addIP(m, q.Name, ips[i])
+					if data, found := cache4.Get(qName); found {
+						cache4.Set(qName, append(data, ips[i]))
+					} else {
+						cache4.Set(qName, []net.IP{ips[i]})
+					}
 				}
 			}
 
-			go IncDNS(qName[:len(qName)-1])
+			go IncDNS(strings.ToLower(q.Name[:len(q.Name)-1]))
 		}
 	}
 }

@@ -26,9 +26,19 @@ func main() {
 
 	go func() {
 		dns.HandleFunc(".", handleDnsRequest)
-		server := &dns.Server{Addr: "127.0.0.1:1053", Net: "udp"}
-		err := server.ListenAndServe()
-		defer server.Shutdown()
+		udp := &dns.Server{Addr: ":53", Net: "udp"}
+		err := udp.ListenAndServe()
+		defer udp.Shutdown()
+		if err != nil {
+			log.Printf("Failed to start server: %s\n ", err.Error())
+		}
+	}()
+
+	go func() {
+		dns.HandleFunc(".", handleDnsRequest)
+		tcp := &dns.Server{Addr: ":53", Net: "tcp"}
+		err := tcp.ListenAndServe()
+		defer tcp.Shutdown()
 		if err != nil {
 			log.Printf("Failed to start server: %s\n ", err.Error())
 		}
