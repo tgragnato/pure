@@ -55,7 +55,7 @@ func main() {
 
 	go func() {
 		IPv6handler := http.NewServeMux()
-		IPv6handler.HandleFunc("/", handleIPv6Forward)
+		IPv6handler.HandleFunc("/", handleHTTPForward)
 		err := http.ListenAndServe("[fd76:abcd:ef90::]:80", IPv6handler)
 		if err != nil {
 			log.Printf("Failed to start server: %s\n ", err.Error())

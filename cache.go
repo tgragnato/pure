@@ -37,11 +37,25 @@ type Cache struct {
 	items map[string]*Item
 }
 
-func (cache *Cache) Set(key string, data []net.IP) {
+func (cache *Cache) Set(key string, data net.IP) {
 	cache.mutex.Lock()
-	item := &Item{data: data}
-	item.touch(cache.ttl)
-	cache.items[key] = item
+	if _, keyexists := cache.items[key]; keyexists {
+		duplicated := false
+		for i := range cache.items[key].data {
+			if cache.items[key].data[i].Equal(data) {
+				duplicated = true
+			}
+		}
+		if !duplicated {
+			item := &Item{data: append(cache.items[key].data, data)}
+			item.touch(cache.ttl)
+			cache.items[key] = item
+		}
+	} else {
+		item := &Item{data: []net.IP{data}}
+		item.touch(cache.ttl)
+		cache.items[key] = item
+	}
 	cache.mutex.Unlock()
 }
 

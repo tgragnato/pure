@@ -64,6 +64,8 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
 	if strings.HasPrefix(r.RemoteAddr, "172.16.31.0:") {
 		httpProxy(w, r, false, true)
+	} else if strings.HasPrefix(r.RemoteAddr, "[fd76:abcd:ef90::]:") {
+		httpProxy(w, r, false, true)
 	} else if strings.HasSuffix(r.Host, ".apple.com") && r.Host != "ocsp.apple.com" {
 		httpProxy(w, r, false, false)
 	} else if r.Host == "updates-http.cdn-apple.com" {
@@ -73,21 +75,4 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 	} else {
 		redirectScheme(w, r)
 	}
-}
-
-func handleIPv6Forward(w http.ResponseWriter, r *http.Request) {
-
-	go IncHTTP(r.Host)
-
-	if strings.HasPrefix(r.RemoteAddr, "[fd76:abcd:ef90::]:") {
-                httpProxy(w, r, false, true)
-        } else if strings.HasSuffix(r.Host, ".apple.com") && r.Host != "ocsp.apple.com" {
-                httpProxy(w, r, false, false)
-        } else if r.Host == "updates-http.cdn-apple.com" {
-                httpProxy(w, r, true, false)
-        } else if r.Host == "gs.apple.com:80" {
-                httpProxy(w, r, false, false)
-        } else {
-                redirectScheme(w, r)
-        }
 }
