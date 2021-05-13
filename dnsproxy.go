@@ -20,8 +20,27 @@ var (
 		"dns.njal.la",
 		"mozilla.cloudflare-dns.com",
 	}
-	cache4 = NewCache(3600 * time.Second)
-	cache6 = NewCache(3600 * time.Second)
+	cache4     = NewCache(3600 * time.Second)
+	cache6     = NewCache(3600 * time.Second)
+	httpClient = &http.Client{Transport: &http.Transport{
+		Proxy: http.ProxyURL(proxyurl),
+		DialContext: (&net.Dialer{
+			Timeout:   30 * time.Second,
+			KeepAlive: 30 * time.Second,
+			DualStack: true,
+		}).DialContext,
+		ForceAttemptHTTP2:      true,
+		MaxIdleConns:           10,
+		MaxIdleConnsPerHost:    2,
+		MaxConnsPerHost:        2,
+		IdleConnTimeout:        90 * time.Second,
+		TLSHandshakeTimeout:    10 * time.Second,
+		ExpectContinueTimeout:  2 * time.Second,
+		ResponseHeaderTimeout:  2 * time.Second,
+		DisableKeepAlives:      false,
+		DisableCompression:     true,
+		MaxResponseHeaderBytes: 4096,
+	}}
 )
 
 func DoH(qName string, trr string, ipv6 bool) ([]net.IP, []string, error) {
@@ -47,17 +66,6 @@ func DoH(qName string, trr string, ipv6 bool) ([]net.IP, []string, error) {
 		return ips, cnames, errors.New("Invalid HTTP request")
 	}
 	req.Header.Set("content-type", "application/dns-message")
-
-	httpTransport := http.DefaultTransport.(*http.Transport).Clone()
-	httpTransport.Proxy = http.ProxyURL(proxyurl)
-	httpTransport.DisableKeepAlives = false
-	httpTransport.DisableCompression = true
-	httpTransport.MaxIdleConns = 1
-	httpTransport.IdleConnTimeout = 5 * time.Second
-	httpTransport.ResponseHeaderTimeout = 2 * time.Second
-	httpTransport.ExpectContinueTimeout = 2 * time.Second
-	httpTransport.MaxResponseHeaderBytes = 4096
-	httpClient := &http.Client{Transport: httpTransport}
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
