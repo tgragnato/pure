@@ -190,10 +190,6 @@ func parseQuery(m *dns.Msg) {
 				}
 			}
 			if err != nil {
-				if err.Error() == "No IP addresses in response" {
-					return
-				}
-				retNull(m, q.Name)
 				return
 			}
 

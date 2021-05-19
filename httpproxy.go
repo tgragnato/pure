@@ -1,14 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
 	"strings"
 )
 
-var uastrings = [3]string{
-	"Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:66.0) Gecko/20100101 Firefox/66.0",
+var uastrings = [2]string{
 	"Mozilla/5.0 (Windows NT 10.0; rv:68.0) Gecko/20100101 Firefox/68.0",
 	"Mozilla/5.0 (Windows NT 10.0; rv:78.0) Gecko/20100101 Firefox/78.0",
 }
@@ -18,17 +18,13 @@ func redirectScheme(w http.ResponseWriter, r *http.Request) {
 }
 
 func httpProxy(w http.ResponseWriter, r *http.Request, socks bool, ua bool) {
-	if r.Host != "gs.apple.com:80" && !checkDomain(r.Host) {
+	if !checkDomain(r.Host) {
 		http.Redirect(w, r, "https://"+r.Host+r.URL.RequestURI(), 302)
 		return
 	}
 
 	r.URL.Scheme = "http"
-	if r.Host == "gs.apple.com:80" {
-		r.URL.Host = "gs.apple.com"
-	} else {
-		r.URL.Host = r.Host
-	}
+	r.URL.Host = r.Host
 
 	if ua {
 		index := rand.Int() % len(uastrings)
@@ -60,6 +56,11 @@ func httpProxy(w http.ResponseWriter, r *http.Request, socks bool, ua bool) {
 
 func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
+	r.Host = strings.TrimSuffix(r.Host, ":80")
+	if r.Host == "static.ess.apple.com" && r.URL.Path == "/connectivity.txt" {
+		fmt.Fprint(w, "AV was here!")
+		return
+	}
 	go IncHTTP(r.Host)
 
 	if strings.HasPrefix(r.RemoteAddr, "172.16.31.0:") {
@@ -70,8 +71,6 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 		httpProxy(w, r, false, false)
 	} else if r.Host == "updates-http.cdn-apple.com" {
 		httpProxy(w, r, true, false)
-	} else if r.Host == "gs.apple.com:80" {
-		httpProxy(w, r, false, false)
 	} else {
 		redirectScheme(w, r)
 	}

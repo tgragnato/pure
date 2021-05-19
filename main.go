@@ -45,6 +45,23 @@ func main() {
 	}()
 
 	go func() {
+		listener, err := net.ListenUDP("udp", &net.UDPAddr{Port: 123})
+		if err != nil {
+			log.Printf("Failed to start server: %s\n ", err.Error())
+		}
+		for {
+			request := make([]byte, 512)
+			rlen, remote, err := listener.ReadFromUDP(request[0:])
+			if err != nil {
+				continue
+			}
+			if rlen > 0 && validFormat(request) {
+				go listener.WriteTo(generate(request), remote)
+			}
+		}
+	}()
+
+	go func() {
 		handler := http.DefaultServeMux
 		handler.HandleFunc("/", handleHTTPForward)
 		err := http.ListenAndServe("172.16.31.0:80", handler)
