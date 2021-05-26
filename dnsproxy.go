@@ -20,8 +20,6 @@ var (
 		"dns.njal.la",
 		"mozilla.cloudflare-dns.com",
 	}
-	cache4     = NewCache(3600 * time.Second)
-	cache6     = NewCache(3600 * time.Second)
 	httpClient = &http.Client{Transport: &http.Transport{
 		Proxy: http.ProxyURL(proxyurl),
 		DialContext: (&net.Dialer{
