@@ -124,6 +124,8 @@ func establishFlow(clientConn net.Conn) {
 	}
 
 	if err != nil {
+		log.Printf("Error making TCP connection to %s:443", clientHello.ServerName)
+		log.Printf("   Printing error: %s", err.Error())
 		return
 	}
 	defer backendConn.Close()

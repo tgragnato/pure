@@ -25,7 +25,7 @@ var (
 	httpClient = &http.Client{Transport: &http.Transport{
 		Proxy: http.ProxyURL(proxyurl),
 		DialContext: (&net.Dialer{
-			Timeout:   30 * time.Second,
+			Timeout:   500 * time.Millisecond,
 			KeepAlive: 30 * time.Second,
 			DualStack: true,
 		}).DialContext,
@@ -158,6 +158,11 @@ func parseQuery(m *dns.Msg) {
 					retNull(m, q.Name)
 					return
 				}
+			}
+			if strings.HasSuffix(qName, "tgragnato.it.") {
+				addIPv6(m, q.Name, net.ParseIP("fd76:abcd:ef90::"))
+				addIP(m, q.Name, net.ParseIP("172.16.31.0"))
+				return
 			}
 
 			if q.Qtype == dns.TypeAAAA {
