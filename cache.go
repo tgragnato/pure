@@ -49,25 +49,11 @@ type Cache struct {
 	ipv6  bool
 }
 
-func (cache *Cache) Set(key string, data net.IP) {
+func (cache *Cache) Set(key string, data []net.IP) {
 	cache.mutex.Lock()
-	if _, keyexists := cache.items[key]; keyexists {
-		duplicated := false
-		for i := range cache.items[key].data {
-			if cache.items[key].data[i].Equal(data) {
-				duplicated = true
-			}
-		}
-		if !duplicated {
-			item := &Item{data: append(cache.items[key].data, data)}
-			item.touch(cache.ttl)
-			cache.items[key] = item
-		}
-	} else {
-		item := &Item{data: []net.IP{data}}
-		item.touch(cache.ttl)
-		cache.items[key] = item
-	}
+	item := &Item{data: data}
+	item.touch(cache.ttl)
+	cache.items[key] = item
 	cache.mutex.Unlock()
 }
 
@@ -94,11 +80,8 @@ func (cache *Cache) cleanup() {
 		if err != nil {
 			continue
 		}
-		cache.mutex.Lock()
-		item := &Item{data: ips}
-		item.touch(cache.ttl)
-		cache.items[key] = item
-		cache.mutex.Unlock()
+		go cache.Set(key, ips)
+		time.Sleep(100 * time.Millisecond)
 	}
 }
 

@@ -153,30 +153,30 @@ func checkQuery(domain string) bool {
 }
 
 func checkDomain(domain string) bool {
+	if !checkQuery(domain) {
+		return false
+	}
 	ips, err := net.LookupIP(domain)
 	if err != nil {
 		return false
 	}
-	for _, ip := range ips {
-		if !checkIP(ip) {
-			return false
-		}
-	}
-	return true
+	return checkIPs(ips)
 }
 
-func checkIP(ip net.IP) bool {
-	if !ip.IsGlobalUnicast() {
-		return false
-	}
-	for i := range unrouteables {
-		if unrouteables[i].Contains(ip) {
+func checkIPs(ips []net.IP) bool {
+	for x := range ips {
+		if !ips[x].IsGlobalUnicast() {
 			return false
 		}
-	}
-	for i := range blackhole {
-		if blackhole[i].Equal(ip) {
-			return false
+		for y := range unrouteables {
+			if unrouteables[y].Contains(ips[x]) {
+				return false
+			}
+		}
+		for y := range blackhole {
+			if blackhole[y].Equal(ips[x]) {
+				return false
+			}
 		}
 	}
 	return true

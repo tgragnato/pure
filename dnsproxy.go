@@ -116,17 +116,21 @@ func retNull(m *dns.Msg, qName string) {
 	}
 }
 
-func addIP(m *dns.Msg, qName string, ip net.IP) {
-	rr, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, ip.String()))
-	if err == nil {
-		m.Answer = append(m.Answer, rr)
+func addIP(m *dns.Msg, qName string, ip []net.IP) {
+	for i := range ip {
+		rr, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, ip[i].String()))
+		if err == nil {
+			m.Answer = append(m.Answer, rr)
+		}
 	}
 }
 
-func addIPv6(m *dns.Msg, qName string, ip net.IP) {
-	rr, err := dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, ip.String()))
-	if err == nil {
-		m.Answer = append(m.Answer, rr)
+func addIPv6(m *dns.Msg, qName string, ip []net.IP) {
+	for i := range ip {
+		rr, err := dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, ip[i].String()))
+		if err == nil {
+			m.Answer = append(m.Answer, rr)
+		}
 	}
 }
 
@@ -158,23 +162,19 @@ func parseQuery(m *dns.Msg) {
 				}
 			}
 			if strings.HasSuffix(qName, "tgragnato.it.") {
-				addIPv6(m, q.Name, net.ParseIP("fd76:abcd:ef90::"))
-				addIP(m, q.Name, net.ParseIP("172.16.31.0"))
+				addIPv6(m, q.Name, []net.IP{net.ParseIP("fd76:abcd:ef90::")})
+				addIP(m, q.Name, []net.IP{net.ParseIP("172.16.31.0")})
 				return
 			}
 
 			if q.Qtype == dns.TypeAAAA {
 				if data, found := cache6.Get(qName); found {
-					for i := range data {
-						addIPv6(m, q.Name, data[i])
-					}
+					addIPv6(m, q.Name, data)
 					return
 				}
 			} else {
 				if data, found := cache4.Get(qName); found {
-					for i := range data {
-						addIP(m, q.Name, data[i])
-					}
+					addIP(m, q.Name, data)
 					return
 				}
 			}
@@ -199,27 +199,26 @@ func parseQuery(m *dns.Msg) {
 			for _, cname := range cnames {
 				if !checkQuery(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
 					retNull(m, q.Name)
-					go cache4.Set(qName, net.ParseIP("0.0.0.0"))
-					go cache6.Set(qName, net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000"))
+					go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
+					go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
 					return
 				}
 			}
 
-			for i := range ips {
-				if !checkIP(ips[i]) {
-					retNull(m, q.Name)
-					go cache4.Set(qName, net.ParseIP("0.0.0.0"))
-					go cache6.Set(qName, net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000"))
-					return
-				} else if q.Qtype == dns.TypeAAAA {
-					addIPv6(m, q.Name, ips[i])
-					go cache6.Set(qName, ips[i])
-				} else {
-					addIP(m, q.Name, ips[i])
-					go cache4.Set(qName, ips[i])
-				}
+			if !checkIPs(ips) {
+				retNull(m, q.Name)
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
+				return
 			}
 
+			if q.Qtype == dns.TypeAAAA {
+				go cache6.Set(qName, ips)
+				addIPv6(m, q.Name, ips)
+			} else {
+				go cache4.Set(qName, ips)
+				addIP(m, q.Name, ips)
+			}
 			go IncDNS(strings.ToLower(q.Name[:len(q.Name)-1]))
 		}
 	}
