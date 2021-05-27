@@ -68,7 +68,10 @@ func httpProxy(w http.ResponseWriter, r *http.Request, socks bool, ua bool) {
 		for {
 			select {
 			case <-time.Tick(10 * time.Millisecond):
-				w.(http.Flusher).Flush()
+				f, ok := w.(http.Flusher)
+				if ok {
+					f.Flush()
+				}
 			case <-done:
 				return
 			}
