@@ -10,6 +10,7 @@ import (
 	"net/url"
 	"os"
 	"strings"
+	"sync"
 	"time"
 
 	"golang.org/x/net/proxy"
@@ -130,19 +131,19 @@ func establishFlow(clientConn net.Conn) {
 	}
 	defer backendConn.Close()
 
-	done := make(chan struct{})
+	var wg sync.WaitGroup
+	wg.Add(2)
 
 	go func() {
 		io.Copy(clientConn, backendConn)
 		clientConn.(*net.TCPConn).CloseWrite()
-		done <- struct{}{}
+		wg.Done()
 	}()
 	go func() {
 		io.Copy(backendConn, clientReader)
 		backendConn.(*net.TCPConn).CloseWrite()
-		done <- struct{}{}
+		wg.Done()
 	}()
 
-	<-done
-	<-done
+	wg.Wait()
 }

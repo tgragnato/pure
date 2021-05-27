@@ -63,27 +63,31 @@ func httpProxy(w http.ResponseWriter, r *http.Request, socks bool, ua bool) {
 		respH[hk] = resp.Header[hk]
 	}
 
-	done := make(chan bool)
-	go func() {
-		for {
-			select {
-			case <-time.Tick(10 * time.Millisecond):
-				f, ok := w.(http.Flusher)
-				if ok {
-					f.Flush()
+	if socks || ua {
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
+	} else {
+		done := make(chan bool)
+		go func() {
+			for {
+				select {
+				case <-time.Tick(10 * time.Millisecond):
+					f, ok := w.(http.Flusher)
+					if ok {
+						f.Flush()
+					}
+				case <-done:
+					return
 				}
-			case <-done:
-				return
 			}
-		}
-	}()
-	w.WriteHeader(resp.StatusCode)
-	io.Copy(w, resp.Body)
-	close(done)
+		}()
+		w.WriteHeader(resp.StatusCode)
+		io.Copy(w, resp.Body)
+		close(done)
+	}
 }
 
 func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
-
 	host := strings.TrimSuffix(r.Host, ":80")
 	if host == "static.ess.apple.com" && r.URL.Path == "/connectivity.txt" {
 		fmt.Fprint(w, "AV was here!")
