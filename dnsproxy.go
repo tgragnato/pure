@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math/rand"
 	"net"
 	"net/http"
 	"strings"
@@ -14,7 +15,8 @@ import (
 )
 
 var (
-	trr = []string{
+	trr = [5]string{
+		"dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion",
 		"dns.digitale-gesellschaft.ch",
 		"odvr.nic.cz",
 		"dns.njal.la",
@@ -23,7 +25,7 @@ var (
 	httpClient = &http.Client{Transport: &http.Transport{
 		Proxy: http.ProxyURL(proxyurl),
 		DialContext: (&net.Dialer{
-			Timeout:   500 * time.Millisecond,
+			Timeout:   100 * time.Millisecond,
 			KeepAlive: 30 * time.Second,
 			DualStack: true,
 		}).DialContext,
@@ -172,9 +174,15 @@ func parseQuery(m *dns.Msg) {
 					addIPv6(m, q.Name, data)
 					return
 				}
+				if _, found := cache4.Get(qName); found && analytics[q.Name].dns > 5 {
+					return
+				}
 			} else {
 				if data, found := cache4.Get(qName); found {
 					addIP(m, q.Name, data)
+					return
+				}
+				if _, found := cache6.Get(qName); found && analytics[q.Name].dns > 5 {
 					return
 				}
 			}
@@ -184,16 +192,24 @@ func parseQuery(m *dns.Msg) {
 				return
 			}
 
-			ips, cnames, err := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", q.Qtype == dns.TypeAAAA)
-			if err != nil {
-				for i := range trr {
-					if ips, cnames, err = DoH(qName, trr[i], q.Qtype == dns.TypeAAAA); err == nil {
-						break
+			var (
+				ips    []net.IP
+				cnames []string
+				err    error
+			)
+			bsl := rand.Float64() * float64(len(trr))
+			for i := 0; i < len(trr); i++ {
+				index := (int(bsl) + i) % len(uastrings)
+				ips, cnames, err = DoH(qName, trr[index], q.Qtype == dns.TypeAAAA)
+				if err != nil {
+					if err.Error() == "No IP addresses in response" {
+						return
+					} else {
+						continue
 					}
+				} else {
+					break
 				}
-			}
-			if err != nil {
-				return
 			}
 
 			for _, cname := range cnames {

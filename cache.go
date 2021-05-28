@@ -4,7 +4,6 @@ import (
 	"log"
 	"math"
 	"net"
-	"sync"
 	"time"
 )
 
@@ -14,38 +13,22 @@ var (
 )
 
 type Item struct {
-	sync.RWMutex
 	data    []net.IP
 	expires *time.Time
 }
 
-func (item *Item) touch(duration time.Duration) {
-	item.Lock()
-	expiration := time.Now().Add(duration)
-	item.expires = &expiration
-	item.Unlock()
-}
-
 func (item *Item) expired() bool {
-	var value bool
-	item.RLock()
-	if item.expires == nil {
-		value = true
-	} else {
-		value = item.expires.Before(time.Now())
+	if item.data == nil || item.expires == nil {
+		return true
 	}
-	if net.ParseIP("0.0.0.0").Equal(item.data[0]) {
-		value = false
+	if net.ParseIP("0.0.0.0").Equal(item.data[0]) ||
+		net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000").Equal(item.data[0]) {
+		return false
 	}
-	if net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000").Equal(item.data[0]) {
-		value = false
-	}
-	item.RUnlock()
-	return value
+	return item.expires.Before(time.Now().Add(900 * time.Second))
 }
 
 type Cache struct {
-	mutex sync.RWMutex
 	ttl   time.Duration
 	items map[string]*Item
 	ipv6  bool
@@ -53,24 +36,22 @@ type Cache struct {
 }
 
 func (cache *Cache) Set(key string, data []net.IP) {
-	cache.mutex.Lock()
-	item := &Item{data: data}
-	item.touch(cache.ttl)
-	cache.items[key] = item
-	cache.mutex.Unlock()
+	expiration := time.Now().Add(cache.ttl)
+	cache.items[key] = &Item{
+		data:    data,
+		expires: &expiration,
+	}
 }
 
 func (cache *Cache) Get(key string) (data []net.IP, found bool) {
-	cache.mutex.RLock()
 	item, exists := cache.items[key]
-	if !exists || item.expired() {
-		data = []net.IP{}
-		found = false
-	} else {
+	if exists {
 		data = item.data
 		found = true
+	} else {
+		data = []net.IP{}
+		found = false
 	}
-	cache.mutex.RUnlock()
 	return
 }
 
@@ -80,18 +61,22 @@ func (cache *Cache) cleanup() {
 	}
 	cache.fetch = true
 
+	IPvX := "IPv4"
+	if cache.ipv6 {
+		IPvX = "IPv6"
+	}
+	log.Printf("Info: starting cache cleanup, %d items in cache (%s)", len(cache.items), IPvX)
 	errors := 0
+	counter := 0
+
 	for key := range cache.items {
+
 		if !cache.items[key].expired() {
 			continue
 		}
 
 		ips, _, err := DoH(key, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", cache.ipv6)
 		if err != nil {
-			IPvX := "IPv4"
-			if cache.ipv6 {
-				IPvX = "IPv6"
-			}
 			log.Printf("Error during cleanup for query name: %s (%s)", key, IPvX)
 			log.Printf("   Printing error: %s", err.Error())
 
@@ -103,7 +88,7 @@ func (cache *Cache) cleanup() {
 			} else if errors < 20 {
 				exp_backoff = time.Minute
 			} else {
-				log.Printf("Too many consecutive errors during cleanup, abort")
+				log.Printf("Too many consecutive errors during cleanup, aborting %s", IPvX)
 				cache.fetch = false
 				return
 			}
@@ -117,15 +102,18 @@ func (cache *Cache) cleanup() {
 		if errors > 0 {
 			errors--
 		}
+		counter++
 		time.Sleep(100 * time.Millisecond)
 	}
+
 	cache.fetch = false
+	log.Printf("Info: cache cleanup completed, %d items updated (%s)", counter, IPvX)
 }
 
 func (cache *Cache) startCleanupTimer() {
-	duration := cache.ttl / 4
-	if duration < time.Second {
-		duration = time.Second
+	duration := cache.ttl / 12
+	if duration < time.Minute {
+		duration = time.Minute
 	}
 	ticker := time.Tick(duration)
 	go (func() {
