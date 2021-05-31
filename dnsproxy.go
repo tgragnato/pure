@@ -187,6 +187,8 @@ func parseQuery(m *dns.Msg) {
 				}
 			}
 
+			go preload.Push(qName)
+
 			if !checkQuery(qName) {
 				retNull(m, q.Name)
 				return
