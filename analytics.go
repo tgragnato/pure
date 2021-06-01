@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"sort"
 	"strings"
+	"sync"
 )
 
 type Hits struct {
@@ -18,12 +19,22 @@ type Express struct {
 	counter uint
 }
 
+type Analytics struct {
+	sync.Mutex
+	data map[string]Hits
+}
+
+type SafeExpress struct {
+	sync.Mutex
+	data map[string]uint
+}
+
 var (
-	analytics = map[string]Hits{}
-	express   = map[string]uint{}
+	analytics = &Analytics{data: map[string]Hits{}}
+	express   = &SafeExpress{data: map[string]uint{}}
 )
 
-func IncExpress(dName string) {
+func (e *SafeExpress) IncExpress(dName string) {
 	split := strings.Split(dName, ".")
 	var truncated string
 	if len(split) > 1 {
@@ -32,44 +43,52 @@ func IncExpress(dName string) {
 		truncated = split[len(split)-1]
 	}
 
-	_, exist := express[truncated]
+	e.Lock()
+	_, exist := e.data[truncated]
 	if exist {
-		express[truncated]++
+		e.data[truncated]++
 	} else {
-		express[truncated] = 1
+		e.data[truncated] = 1
 	}
+	e.Unlock()
 }
 
-func IncDNS(dName string) {
-	hit, exist := analytics[dName]
+func (a *Analytics) IncDNS(dName string) {
+	a.Lock()
+	hit, exist := a.data[dName]
 	if exist {
-		hit.dns += 1
-		analytics[dName] = hit
+		hit.dns++
+		a.data[dName] = hit
 	} else {
-		analytics[dName] = Hits{dns: 1, http: 0, tls: 0}
+		a.data[dName] = Hits{dns: 1, http: 0, tls: 0}
 	}
+	a.Unlock()
 }
 
-func IncHTTP(dName string) {
-	hit, exist := analytics[dName]
+func (a *Analytics) IncHTTP(dName string) {
+	go express.IncExpress(dName)
+	a.Lock()
+	hit, exist := a.data[dName]
 	if exist {
-		hit.http += 1
-		analytics[dName] = hit
+		hit.http++
+		a.data[dName] = hit
 	} else {
-		analytics[dName] = Hits{dns: 0, http: 1, tls: 0}
+		a.data[dName] = Hits{dns: 0, http: 1, tls: 0}
 	}
-	IncExpress(dName)
+	a.Unlock()
 }
 
-func IncTLS(dName string) {
-	hit, exist := analytics[dName]
+func (a *Analytics) IncTLS(dName string) {
+	go express.IncExpress(dName)
+	a.Lock()
+	hit, exist := a.data[dName]
 	if exist {
-		hit.tls += 1
-		analytics[dName] = hit
+		hit.tls++
+		a.data[dName] = hit
 	} else {
-		analytics[dName] = Hits{dns: 0, http: 0, tls: 1}
+		a.data[dName] = Hits{dns: 0, http: 0, tls: 1}
 	}
-	IncExpress(dName)
+	a.Unlock()
 }
 
 func handleAnalytics(w http.ResponseWriter, r *http.Request) {
@@ -80,16 +99,16 @@ func handleAnalytics(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, "<html><head><title>Proxy analytics</title></head><body><table style='float: left;'>"+
 		"<thead><th>fqdn</th><th>dns</th><th>http</th><th>tls</th><th>total</th></thead>"+
 		"<tbody>")
-	for key := range analytics {
+	for key := range analytics.data {
 		fmt.Fprintf(w, "<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td></tr>",
-			key, analytics[key].dns, analytics[key].http, analytics[key].tls,
-			analytics[key].dns+analytics[key].http+analytics[key].tls)
+			key, analytics.data[key].dns, analytics.data[key].http, analytics.data[key].tls,
+			analytics.data[key].dns+analytics.data[key].http+analytics.data[key].tls)
 	}
 	fmt.Fprint(w, "</tbody></table>")
 
 	slice := []Express{}
-	for key := range express {
-		slice = append(slice, Express{domain: key, counter: express[key]})
+	for key := range express.data {
+		slice = append(slice, Express{domain: key, counter: express.data[key]})
 	}
 	sort.Slice(slice, func(i int, j int) bool {
 		return slice[i].counter > slice[j].counter

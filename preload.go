@@ -35,7 +35,7 @@ func (p *Preload) Load() {
 		time.Sleep(time.Second)
 
 		if err4 == nil && err6 == nil {
-			ok := true
+			ok := checkIPs(ip4) && checkIPs(ip6)
 			for t := range cname4 {
 				ok = ok && checkQuery(cname4[t])
 			}
@@ -49,7 +49,7 @@ func (p *Preload) Load() {
 			}
 
 		} else if err4 == nil && err6 != nil {
-			ok := true
+			ok := checkIPs(ip4)
 			for t := range cname4 {
 				ok = ok && checkQuery(cname4[t])
 			}
@@ -59,7 +59,7 @@ func (p *Preload) Load() {
 			}
 
 		} else if err4 != nil && err6 == nil {
-			ok := true
+			ok := checkIPs(ip6)
 			for t := range cname6 {
 				ok = ok && checkQuery(cname6[t])
 			}

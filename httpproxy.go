@@ -93,7 +93,7 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprint(w, "AV was here!")
 		return
 	}
-	go IncHTTP(host)
+	go analytics.IncHTTP(host)
 
 	if strings.HasPrefix(r.RemoteAddr, "172.16.31.0:") {
 		httpProxy(w, r, false, true)

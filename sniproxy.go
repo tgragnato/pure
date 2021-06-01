@@ -113,13 +113,9 @@ func establishFlow(clientConn net.Conn) {
 	var backendConn net.Conn
 
 	if strings.HasSuffix(clientHello.ServerName, "tgragnato.it") {
-		go IncTLS(clientHello.ServerName)
 		backendConn, err = net.DialTimeout("tcp", "127.0.0.1:8080", 10*time.Second)
-
 	} else if checkDomain(clientHello.ServerName) {
-		go IncTLS(clientHello.ServerName)
 		backendConn, err = perhost.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
-
 	} else {
 		return
 	}
@@ -130,6 +126,8 @@ func establishFlow(clientConn net.Conn) {
 		return
 	}
 	defer backendConn.Close()
+
+	go analytics.IncTLS(clientHello.ServerName)
 
 	var wg sync.WaitGroup
 	wg.Add(2)

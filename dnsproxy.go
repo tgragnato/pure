@@ -174,7 +174,7 @@ func parseQuery(m *dns.Msg) {
 					addIPv6(m, q.Name, data)
 					return
 				}
-				if _, found := cache4.Get(qName); found && analytics[q.Name].dns > 5 {
+				if _, found := cache4.Get(qName); found && analytics.data[strings.ToLower(q.Name[:len(q.Name)-1])].dns > 5 {
 					return
 				}
 			} else {
@@ -182,7 +182,7 @@ func parseQuery(m *dns.Msg) {
 					addIP(m, q.Name, data)
 					return
 				}
-				if _, found := cache6.Get(qName); found && analytics[q.Name].dns > 5 {
+				if _, found := cache6.Get(qName); found && analytics.data[strings.ToLower(q.Name[:len(q.Name)-1])].dns > 5 {
 					return
 				}
 			}
@@ -237,7 +237,7 @@ func parseQuery(m *dns.Msg) {
 				go cache4.Set(qName, ips)
 				addIP(m, q.Name, ips)
 			}
-			go IncDNS(strings.ToLower(q.Name[:len(q.Name)-1]))
+			go analytics.IncDNS(strings.ToLower(q.Name[:len(q.Name)-1]))
 		}
 	}
 }
