@@ -4,6 +4,7 @@ import (
 	"log"
 	"math"
 	"net"
+	"strings"
 	"time"
 )
 
@@ -18,7 +19,7 @@ type Item struct {
 }
 
 func (item *Item) expired() bool {
-	if item.data == nil || item.expires == nil {
+	if item.data == nil || item.expires == nil || len(item.data) == 0 {
 		return true
 	}
 	if net.ParseIP("0.0.0.0").Equal(item.data[0]) ||
@@ -72,6 +73,16 @@ func (cache *Cache) cleanup() {
 	for key := range cache.items {
 
 		if !cache.items[key].expired() {
+			continue
+		}
+
+		if strings.HasSuffix(key, "googleapis.com.") {
+			go func() {
+				ips, err := Cleartext(key, cache.ipv6)
+				if err == nil {
+					cache.Set(key, ips)
+				}
+			}()
 			continue
 		}
 

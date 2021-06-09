@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"os"
+	"strings"
 	"sync"
 	"time"
 )
@@ -95,6 +96,9 @@ func (p *Preload) Write() {
 }
 
 func (p *Preload) Push(domain string) {
+	if strings.HasSuffix(domain, "googleapis.com.") {
+		return
+	}
 	p.Lock()
 	if _, found := p.data[domain]; !found {
 		p.data[domain] = false

@@ -14,6 +14,7 @@ func main() {
 	rand.Seed(time.Now().Unix())
 	initCheck()
 	initProxy()
+	go InitCleartext()
 
 	go func() {
 		muxAnalytics := http.NewServeMux()
