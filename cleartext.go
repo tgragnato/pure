@@ -22,22 +22,35 @@ var dnsClient = &dns.Client{
 }
 
 func InitCleartext() {
-	for i := 0; i < 100000; i++ {
-		for _, cc := range [3]string{"us", "eu", "asia"} {
-			for _, ud := range [2]string{"upload", "download"} {
-				qname := strconv.FormatInt(int64(i), 10)
-				for t := 5 - len(qname); t > 0; t-- {
-					qname = "0" + qname
+	ticker := time.Tick(time.Hour / 100000)
+	i := 0
+	for {
+		select {
+		case <-ticker:
+			for _, cc := range [3]string{"us", "eu", "asia"} {
+				for _, ud := range [2]string{"upload", "download"} {
+					qname := strconv.FormatInt(int64(i), 10)
+					for t := 5 - len(qname); t > 0; t-- {
+						qname = "0" + qname
+					}
+					qname = "gcs-" + cc + "-" + qname + ".content-storage-" + ud + ".googleapis.com."
+					go func() {
+						ip4, err4 := Cleartext(qname, false)
+						if err4 == nil {
+							cache4.Set(qname, ip4)
+						}
+					}()
+					go func() {
+						ip6, err6 := Cleartext(qname, true)
+						if err6 == nil {
+							cache6.Set(qname, ip6)
+						}
+					}()
 				}
-				qname = "gcs-" + cc + "-" + qname + ".content-storage-" + ud + ".googleapis.com."
-				ip4, err4 := Cleartext(qname, false)
-				if err4 == nil {
-					go cache4.Set(qname, ip4)
-				}
-				ip6, err6 := Cleartext(qname, true)
-				if err6 == nil {
-					go cache6.Set(qname, ip6)
-				}
+			}
+			i++
+			if i >= 100000 {
+				i = 0
 			}
 		}
 	}

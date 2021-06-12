@@ -1,10 +1,10 @@
 package main
 
 import (
-	"log"
 	"math"
 	"net"
 	"strings"
+	"sync"
 	"time"
 )
 
@@ -30,21 +30,24 @@ func (item *Item) expired() bool {
 }
 
 type Cache struct {
+	sync.RWMutex
 	ttl   time.Duration
 	items map[string]*Item
 	ipv6  bool
-	fetch bool
 }
 
 func (cache *Cache) Set(key string, data []net.IP) {
+	cache.Lock()
 	expiration := time.Now().Add(cache.ttl)
 	cache.items[key] = &Item{
 		data:    data,
 		expires: &expiration,
 	}
+	cache.Unlock()
 }
 
 func (cache *Cache) Get(key string) (data []net.IP, found bool) {
+	cache.RLock()
 	item, exists := cache.items[key]
 	if exists {
 		data = item.data
@@ -53,44 +56,15 @@ func (cache *Cache) Get(key string) (data []net.IP, found bool) {
 		data = []net.IP{}
 		found = false
 	}
+	cache.RUnlock()
 	return
 }
 
-func (cache *Cache) cleanup() {
-	if cache.fetch {
-		return
-	}
-	cache.fetch = true
-
-	IPvX := "IPv4"
-	if cache.ipv6 {
-		IPvX = "IPv6"
-	}
-	log.Printf("Info: starting cache cleanup, %d items in cache (%s)", len(cache.items), IPvX)
+func (cache *Cache) Cleanup(keys []string) {
 	errors := 0
-	counter := 0
-
-	for key := range cache.items {
-
-		if !cache.items[key].expired() {
-			continue
-		}
-
-		if strings.HasSuffix(key, "googleapis.com.") {
-			go func() {
-				ips, err := Cleartext(key, cache.ipv6)
-				if err == nil {
-					cache.Set(key, ips)
-				}
-			}()
-			continue
-		}
-
-		ips, _, err := DoH(key, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", cache.ipv6)
+	for i := range keys {
+		ips, _, err := DoH(keys[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", cache.ipv6)
 		if err != nil {
-			log.Printf("Error during cleanup for query name: %s (%s)", key, IPvX)
-			log.Printf("   Printing error: %s", err.Error())
-
 			var exp_backoff time.Duration
 			if errors < 7 {
 				exp_backoff = 100 * time.Millisecond
@@ -99,42 +73,44 @@ func (cache *Cache) cleanup() {
 			} else if errors < 20 {
 				exp_backoff = time.Minute
 			} else {
-				log.Printf("Too many consecutive errors during cleanup, aborting %s", IPvX)
-				cache.fetch = false
 				return
 			}
-
 			time.Sleep(exp_backoff)
 			errors++
 			continue
 		}
-
-		go cache.Set(key, ips)
+		go cache.Set(keys[i], ips)
 		if errors > 0 {
 			errors--
 		}
-		counter++
 		time.Sleep(100 * time.Millisecond)
 	}
-
-	cache.fetch = false
-	log.Printf("Info: cache cleanup completed, %d items updated (%s)", counter, IPvX)
 }
 
-func (cache *Cache) startCleanupTimer() {
+func (cache *Cache) CleanupTimer() {
 	duration := cache.ttl / 12
 	if duration < time.Minute {
 		duration = time.Minute
 	}
 	ticker := time.Tick(duration)
-	go (func() {
-		for {
-			select {
-			case <-ticker:
-				cache.cleanup()
+	for {
+		select {
+		case <-ticker:
+			cleanupkeys := []string{}
+			cache.RLock()
+			for key := range cache.items {
+				if strings.HasSuffix(key, "googleapis.com") {
+					continue
+				}
+				if !cache.items[key].expired() {
+					continue
+				}
+				cleanupkeys = append(cleanupkeys, key)
 			}
+			cache.RUnlock()
+			cache.Cleanup(cleanupkeys)
 		}
-	})()
+	}
 }
 
 func NewCache(duration time.Duration, v6 bool) *Cache {
@@ -142,8 +118,7 @@ func NewCache(duration time.Duration, v6 bool) *Cache {
 		ttl:   duration,
 		items: map[string]*Item{},
 		ipv6:  v6,
-		fetch: false,
 	}
-	cache.startCleanupTimer()
+	go cache.CleanupTimer()
 	return cache
 }
