@@ -34,18 +34,18 @@ func InitCleartext() {
 						qname = "0" + qname
 					}
 					qname = "gcs-" + cc + "-" + qname + ".content-storage-" + ud + ".googleapis.com."
-					go func() {
+					go func(qname string) {
 						ip4, err4 := Cleartext(qname, false)
 						if err4 == nil {
 							cache4.Set(qname, ip4)
 						}
-					}()
-					go func() {
+					}(qname)
+					go func(qname string) {
 						ip6, err6 := Cleartext(qname, true)
 						if err6 == nil {
 							cache6.Set(qname, ip6)
 						}
-					}()
+					}(qname)
 				}
 			}
 			i++

@@ -33,7 +33,7 @@ func (p *Preload) Load() {
 
 		ip4, cname4, err4 := DoH(domains[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", false)
 		ip6, cname6, err6 := DoH(domains[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", true)
-		time.Sleep(time.Second)
+		time.Sleep(time.Second / 4)
 
 		if err4 == nil && err6 == nil {
 			ok := checkIPs(ip4) && checkIPs(ip6)
@@ -106,16 +106,14 @@ func (p *Preload) Push(domain string) {
 	p.Unlock()
 }
 
-func (p *Preload) startPeriodicWrite() {
+func (p *Preload) PeriodicWrite() {
 	ticker := time.Tick(p.duration)
-	go func() {
-		for {
-			select {
-			case <-ticker:
-				p.Write()
-			}
+	for {
+		select {
+		case <-ticker:
+			p.Write()
 		}
-	}()
+	}
 }
 
 func NewPreload(dur time.Duration, configuration string) *Preload {
@@ -125,6 +123,6 @@ func NewPreload(dur time.Duration, configuration string) *Preload {
 		data:     map[string]bool{},
 	}
 	go preload.Load()
-	preload.startPeriodicWrite()
+	go preload.PeriodicWrite()
 	return preload
 }

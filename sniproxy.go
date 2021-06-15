@@ -92,6 +92,21 @@ func readClientHello(reader io.Reader) (*tls.ClientHelloInfo, error) {
 	return hello, nil
 }
 
+func SafeCopy(dst net.Conn, src io.Reader, wg *sync.WaitGroup, errc chan error) {
+	defer wg.Done()
+	select {
+	case <-errc:
+		return
+	default:
+		_, err := io.Copy(dst, src)
+		if err == nil {
+			dst.(*net.TCPConn).CloseWrite()
+		} else {
+			errc <- err
+		}
+	}
+}
+
 func establishFlow(clientConn net.Conn) {
 	defer clientConn.Close()
 
@@ -121,8 +136,7 @@ func establishFlow(clientConn net.Conn) {
 	}
 
 	if err != nil {
-		log.Printf("Error making TCP connection to %s:443", clientHello.ServerName)
-		log.Printf("   Printing error: %s", err.Error())
+		log.Printf("Error: %s", err.Error())
 		return
 	}
 	defer backendConn.Close()
@@ -131,17 +145,10 @@ func establishFlow(clientConn net.Conn) {
 
 	var wg sync.WaitGroup
 	wg.Add(2)
+	errc := make(chan error, 1)
 
-	go func() {
-		io.Copy(clientConn, backendConn)
-		clientConn.(*net.TCPConn).CloseWrite()
-		wg.Done()
-	}()
-	go func() {
-		io.Copy(backendConn, clientReader)
-		backendConn.(*net.TCPConn).CloseWrite()
-		wg.Done()
-	}()
+	go SafeCopy(clientConn, backendConn, &wg, errc)
+	go SafeCopy(backendConn, clientReader, &wg, errc)
 
 	wg.Wait()
 }
