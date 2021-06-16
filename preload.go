@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"net"
 	"os"
 	"strings"
 	"sync"
@@ -31,42 +32,64 @@ func (p *Preload) Load() {
 			continue
 		}
 
-		ip4, cname4, err4 := DoH(domains[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", false)
-		ip6, cname6, err6 := DoH(domains[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", true)
+		qName := Cloaking(domains[i])
+		if qName == "tgragnato.it." {
+			continue
+		}
+
+		ip4, cname4, err4 := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", false)
+		ip6, cname6, err6 := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", true)
 		time.Sleep(time.Second / 4)
 
 		if err4 == nil && err6 == nil {
 			ok := checkIPs(ip4) && checkIPs(ip6)
 			for t := range cname4 {
-				ok = ok && checkQuery(cname4[t])
+				if !strings.HasSuffix(cname4[t], "cloudfront.net.") {
+					ok = ok && checkQuery(cname4[t])
+				}
 			}
 			for t := range cname6 {
-				ok = ok && checkQuery(cname6[t])
+				if !strings.HasSuffix(cname6[t], "cloudfront.net.") {
+					ok = ok && checkQuery(cname6[t])
+				}
 			}
 
 			if ok {
-				go cache4.Set(domains[i], ip4)
-				go cache6.Set(domains[i], ip6)
+				go cache4.Set(qName, ip4)
+				go cache6.Set(qName, ip6)
+			} else {
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
 			}
 
 		} else if err4 == nil && err6 != nil {
 			ok := checkIPs(ip4)
 			for t := range cname4 {
-				ok = ok && checkQuery(cname4[t])
+				if !strings.HasSuffix(cname4[t], "cloudfront.net.") {
+					ok = ok && checkQuery(cname4[t])
+				}
 			}
 
 			if ok {
-				go cache4.Set(domains[i], ip4)
+				go cache4.Set(qName, ip4)
+			} else {
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
 			}
 
 		} else if err4 != nil && err6 == nil {
 			ok := checkIPs(ip6)
 			for t := range cname6 {
-				ok = ok && checkQuery(cname6[t])
+				if !strings.HasSuffix(cname6[t], "cloudfront.net.") {
+					ok = ok && checkQuery(cname6[t])
+				}
 			}
 
 			if ok {
-				go cache6.Set(domains[i], ip6)
+				go cache6.Set(qName, ip6)
+			} else {
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
 			}
 		}
 	}
