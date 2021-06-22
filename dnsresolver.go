@@ -83,7 +83,7 @@ func parseQuery(m *dns.Msg) {
 			)
 			bsl := rand.Float64() * float64(len(trr))
 			for i := 0; i < len(trr); i++ {
-				index := (int(bsl) + i) % len(uastrings)
+				index := (int(bsl) + i) % len(trr)
 				ips, cnames, err = DoH(qName, trr[index], q.Qtype == dns.TypeAAAA)
 				if err != nil {
 					if err.Error() == "No IP addresses in response" {
