@@ -13,6 +13,9 @@ import (
 func main() {
 	rand.Seed(time.Now().Unix())
 	initCheck()
+	if dbreader != nil {
+		defer dbreader.Close()
+	}
 	initProxy()
 	go InitCleartext()
 

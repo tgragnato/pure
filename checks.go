@@ -6,6 +6,8 @@ import (
 	"net"
 	"os"
 	"strings"
+
+	"github.com/oschwald/maxminddb-golang"
 )
 
 var (
@@ -14,6 +16,7 @@ var (
 	blacklist    []string
 	whitelist    []string
 	prefixes     []string
+	dbreader     *maxminddb.Reader
 )
 
 func initCheck() {
@@ -76,6 +79,7 @@ func initCheck() {
 		"139.45.197.238",
 		"139.45.197.239",
 		"139.45.197.243",
+		"173.214.252.167",
 		"188.42.218.242",
 		"188.42.224.45",
 		"188.42.224.57",
@@ -100,7 +104,7 @@ func initCheck() {
 	blacklist = populateCheck("/etc/proxy/blocked.names")
 	whitelist = populateCheck("/etc/proxy/allowed.names")
 	prefixes = populateCheck("/etc/proxy/prefixes.names")
-
+	dbreader, _ = maxminddb.Open("/etc/proxy/GeoLite2-Country.mmdb")
 }
 
 func populateCheck(conf string) []string {
@@ -183,6 +187,26 @@ func checkIPs(ips []net.IP) bool {
 				return false
 			}
 		}
+
+		if dbreader != nil {
+			var record struct {
+				Country struct {
+					ISOCode string `maxminddb:"iso_code"`
+				} `maxminddb:"country"`
+			}
+			err := dbreader.Lookup(ips[x], &record)
+			if err == nil {
+				switch record.Country.ISOCode {
+				case "CN":
+					return false
+				case "HK":
+					return false
+				case "MO":
+					return false
+				}
+			}
+		}
 	}
+
 	return true
 }
