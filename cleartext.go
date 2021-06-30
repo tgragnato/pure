@@ -4,6 +4,7 @@ import (
 	"errors"
 	"net"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/miekg/dns"
@@ -22,36 +23,44 @@ var dnsClient = &dns.Client{
 }
 
 func InitCleartext() {
-	ticker := time.Tick(time.Hour / 100000)
 	i := 0
 	for {
-		select {
-		case <-ticker:
-			for _, cc := range [3]string{"us", "eu", "asia"} {
-				for _, ud := range [2]string{"upload", "download"} {
-					qname := strconv.FormatInt(int64(i), 10)
-					for t := 5 - len(qname); t > 0; t-- {
-						qname = "0" + qname
-					}
-					qname = "gcs-" + cc + "-" + qname + ".content-storage-" + ud + ".googleapis.com."
-					go func(qname string) {
-						ip4, err4 := Cleartext(qname, false)
-						if err4 == nil {
-							cache4.Set(qname, ip4)
-						}
-					}(qname)
-					go func(qname string) {
-						ip6, err6 := Cleartext(qname, true)
-						if err6 == nil {
-							cache6.Set(qname, ip6)
-						}
-					}(qname)
+
+		var wg sync.WaitGroup
+		wg.Add(12)
+
+		for _, cc := range [3]string{"us", "eu", "asia"} {
+			for _, ud := range [2]string{"upload", "download"} {
+
+				qname := strconv.FormatInt(int64(i), 10)
+				for t := 5 - len(qname); t > 0; t-- {
+					qname = "0" + qname
 				}
+				qname = "gcs-" + cc + "-" + qname + ".content-storage-" + ud + ".googleapis.com."
+
+				go func(qname string) {
+					ip4, err4 := Cleartext(qname, false)
+					if err4 == nil {
+						cache4.Set(qname, ip4)
+					}
+					wg.Done()
+				}(qname)
+				go func(qname string) {
+					ip6, err6 := Cleartext(qname, true)
+					if err6 == nil {
+						cache6.Set(qname, ip6)
+					}
+					wg.Done()
+				}(qname)
+
 			}
-			i++
-			if i >= 100000 {
-				i = 0
-			}
+		}
+
+		wg.Wait()
+
+		i++
+		if i >= 100000 {
+			i = 0
 		}
 	}
 }

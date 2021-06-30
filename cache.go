@@ -34,6 +34,7 @@ type Cache struct {
 	ttl   time.Duration
 	items map[string]*Item
 	ipv6  bool
+	cln   bool
 }
 
 func (cache *Cache) Set(key string, data []net.IP) {
@@ -96,19 +97,21 @@ func (cache *Cache) CleanupTimer() {
 	for {
 		select {
 		case <-ticker:
+			if cache.cln {
+				continue
+			}
+			cache.cln = true
 			cleanupkeys := []string{}
 			cache.RLock()
 			for key := range cache.items {
-				if strings.HasSuffix(key, "googleapis.com") {
-					continue
-				}
-				if !cache.items[key].expired() {
+				if strings.HasSuffix(key, "googleapis.com") || !cache.items[key].expired() {
 					continue
 				}
 				cleanupkeys = append(cleanupkeys, key)
 			}
 			cache.RUnlock()
 			cache.Cleanup(cleanupkeys)
+			cache.cln = false
 		}
 	}
 }
@@ -118,6 +121,7 @@ func NewCache(duration time.Duration, v6 bool) *Cache {
 		ttl:   duration,
 		items: map[string]*Item{},
 		ipv6:  v6,
+		cln:   false,
 	}
 	go cache.CleanupTimer()
 	return cache
