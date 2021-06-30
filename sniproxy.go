@@ -3,6 +3,7 @@ package main
 import (
 	"bufio"
 	"bytes"
+	"context"
 	"crypto/tls"
 	"io"
 	"log"
@@ -92,18 +93,25 @@ func readClientHello(reader io.Reader) (*tls.ClientHelloInfo, error) {
 	return hello, nil
 }
 
-func SafeCopy(dst net.Conn, src io.Reader, wg *sync.WaitGroup, errc chan error) {
+type readerCtx struct {
+	ctx context.Context
+	r   io.Reader
+}
+
+func (r *readerCtx) Read(p []byte) (n int, err error) {
+	if err := r.ctx.Err(); err != nil {
+		return 0, err
+	}
+	return r.r.Read(p)
+}
+
+func SafeCopy(dst net.Conn, src io.Reader, wg *sync.WaitGroup, ctx context.Context, cancel context.CancelFunc) {
 	defer wg.Done()
-	select {
-	case <-errc:
-		return
-	default:
-		_, err := io.Copy(dst, src)
-		if err == nil {
-			dst.(*net.TCPConn).CloseWrite()
-		} else {
-			errc <- err
-		}
+	r := &readerCtx{ctx: ctx, r: src}
+	_, err := io.Copy(dst, r)
+	dst.(*net.TCPConn).CloseWrite()
+	if err != nil {
+		cancel()
 	}
 }
 
@@ -145,10 +153,11 @@ func establishFlow(clientConn net.Conn) {
 
 	var wg sync.WaitGroup
 	wg.Add(2)
-	errc := make(chan error, 1)
 
-	go SafeCopy(clientConn, backendConn, &wg, errc)
-	go SafeCopy(backendConn, clientReader, &wg, errc)
+	ctx, cancel := context.WithCancel(context.Background())
+
+	go SafeCopy(clientConn, backendConn, &wg, ctx, cancel)
+	go SafeCopy(backendConn, clientReader, &wg, ctx, cancel)
 
 	wg.Wait()
 }
