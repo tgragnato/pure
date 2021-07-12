@@ -75,7 +75,7 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		for {
 			select {
-			case <-time.Tick(10 * time.Millisecond):
+			case <-time.Tick(time.Second / 3):
 				f, ok := w.(http.Flusher)
 				if ok {
 					f.Flush()

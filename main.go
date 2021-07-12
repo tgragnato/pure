@@ -24,7 +24,7 @@ func main() {
 		muxAnalytics.HandleFunc("/", handleAnalytics)
 		err := http.ListenAndServe("127.0.0.1:1080", muxAnalytics)
 		if err != nil {
-			log.Printf("Failed to start server: %s\n ", err.Error())
+			log.Printf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
@@ -34,7 +34,7 @@ func main() {
 		err := udp.ListenAndServe()
 		defer udp.Shutdown()
 		if err != nil {
-			log.Printf("Failed to start server: %s\n ", err.Error())
+			log.Printf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
@@ -44,14 +44,15 @@ func main() {
 		err := tcp.ListenAndServe()
 		defer tcp.Shutdown()
 		if err != nil {
-			log.Printf("Failed to start server: %s\n ", err.Error())
+			log.Printf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
 	go func() {
 		listener, err := net.ListenUDP("udp", &net.UDPAddr{Port: 123})
 		if err != nil {
-			log.Printf("Failed to start server: %s\n ", err.Error())
+			log.Printf("Failed to start server: %s\n", err.Error())
+			return
 		}
 		for {
 			request := make([]byte, 512)
@@ -70,7 +71,7 @@ func main() {
 		handler.HandleFunc("/", handleHTTPForward)
 		err := http.ListenAndServe("172.16.31.0:80", handler)
 		if err != nil {
-			log.Printf("Failed to start server: %s\n ", err.Error())
+			log.Printf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
@@ -79,33 +80,35 @@ func main() {
 		IPv6handler.HandleFunc("/", handleHTTPForward)
 		err := http.ListenAndServe("[fd76:abcd:ef90::]:80", IPv6handler)
 		if err != nil {
-			log.Printf("Failed to start server: %s\n ", err.Error())
+			log.Printf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
 	go func() {
-		listener, err := net.Listen("tcp", "[fd76:abcd:ef90::]:443")
+		listener, err := net.Listen("tcp", "172.16.31.0:9040")
 		if err != nil {
-			log.Printf("Failed to start server: %s\n ", err.Error())
+			log.Printf("Failed to start server: %s\n", err.Error())
+			return
 		}
 		for {
 			flow, err := listener.Accept()
 			if err != nil {
 				continue
 			}
-			go establishFlow(flow)
+			go EstablishFlow(flow)
 		}
 	}()
 
-	listener, err := net.Listen("tcp", "172.16.31.0:443")
+	listener, err := net.Listen("tcp", "[fd76:abcd:ef90::]:9040")
 	if err != nil {
-		log.Printf("Failed to start server: %s\n ", err.Error())
+		log.Printf("Failed to start server: %s\n", err.Error())
+		return
 	}
 	for {
 		flow, err := listener.Accept()
 		if err != nil {
 			continue
 		}
-		go establishFlow(flow)
+		go EstablishFlow(flow)
 	}
 }

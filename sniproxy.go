@@ -12,18 +12,22 @@ import (
 	"os"
 	"strings"
 	"sync"
+	"syscall"
 	"time"
+	"unsafe"
 
 	"golang.org/x/net/proxy"
 )
 
 var (
 	proxyurl, _ = url.Parse("socks5://127.0.0.1:9050")
+	socks5, _   = proxy.FromURL(proxyurl, proxy.Direct)
 	perhost     *proxy.PerHost
 )
 
+const SO_ORIGINAL_DST = 80
+
 func initProxy() {
-	socks5, _ := proxy.FromURL(proxyurl, proxy.Direct)
 	perhost = proxy.NewPerHost(socks5, proxy.Direct)
 
 	conf := "/etc/proxy/bypass.names"
@@ -115,49 +119,52 @@ func SafeCopy(dst net.Conn, src io.Reader, wg *sync.WaitGroup, ctx context.Conte
 	}
 }
 
-func establishFlow(clientConn net.Conn) {
-	defer clientConn.Close()
+func IPAddress(ip []byte) net.IP {
+	switch len(ip) {
 
-	err := clientConn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	case 4:
+		return net.IPv4(ip[0], ip[1], ip[2], ip[3])
+
+	case 16:
+		if bytes.Equal(ip[:12], []byte{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0xff, 0xff}) {
+			return IPAddress(ip[12:16])
+		}
+		return net.IP([]byte{
+			ip[0], ip[1], ip[2], ip[3],
+			ip[4], ip[5], ip[6], ip[7],
+			ip[8], ip[9], ip[10], ip[11],
+			ip[12], ip[13], ip[14], ip[15],
+		})
+
+	default:
+		return nil
+	}
+}
+
+func OriginalAddress(conn *net.TCPConn) (destIP net.IP, destPort int) {
+	f, err := conn.File()
+	if err != nil {
+		return
+	}
+	defer f.Close()
+	fd := int(f.Fd())
+
+	level := syscall.IPPROTO_IP
+	if conn.RemoteAddr().String()[0] == '[' {
+		level = syscall.IPPROTO_IPV6
+	}
+	addr, err := syscall.GetsockoptIPv6MTUInfo(fd, level, SO_ORIGINAL_DST)
 	if err != nil {
 		return
 	}
 
-	clientHello, clientReader, err := peekClientHello(clientConn)
-	if err != nil {
-		return
+	ip := (*[4]byte)(unsafe.Pointer(&addr.Addr.Flowinfo))[:4]
+	if level == syscall.IPPROTO_IPV6 {
+		ip = addr.Addr.Addr[:]
 	}
+	port := (*[2]byte)(unsafe.Pointer(&addr.Addr.Port))[:2]
 
-	err = clientConn.SetReadDeadline(time.Time{})
-	if err != nil {
-		return
-	}
-
-	var backendConn net.Conn
-
-	if strings.HasSuffix(clientHello.ServerName, "tgragnato.it") {
-		backendConn, err = net.DialTimeout("tcp", "127.0.0.1:8080", 10*time.Second)
-	} else if checkDomain(clientHello.ServerName) {
-		backendConn, err = perhost.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
-	} else {
-		return
-	}
-
-	if err != nil {
-		log.Printf("Error: %s", err.Error())
-		return
-	}
-	defer backendConn.Close()
-
-	go analytics.IncTLS(clientHello.ServerName)
-
-	var wg sync.WaitGroup
-	wg.Add(2)
-
-	ctx, cancel := context.WithCancel(context.Background())
-
-	go SafeCopy(clientConn, backendConn, &wg, ctx, cancel)
-	go SafeCopy(backendConn, clientReader, &wg, ctx, cancel)
-
-	wg.Wait()
+	destIP = IPAddress(ip)
+	destPort = int(port[0])*256 + int(port[1])
+	return
 }
