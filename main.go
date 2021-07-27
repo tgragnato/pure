@@ -16,6 +16,9 @@ func main() {
 	if dbreader != nil {
 		defer dbreader.Close()
 	}
+	if asnreader != nil {
+		defer asnreader.Close()
+	}
 	initProxy()
 	go InitCleartext()
 
@@ -69,37 +72,13 @@ func main() {
 	go func() {
 		handler := http.DefaultServeMux
 		handler.HandleFunc("/", handleHTTPForward)
-		err := http.ListenAndServe("172.16.31.0:80", handler)
+		err := http.ListenAndServe(":80", handler)
 		if err != nil {
 			log.Printf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
-	go func() {
-		IPv6handler := http.NewServeMux()
-		IPv6handler.HandleFunc("/", handleHTTPForward)
-		err := http.ListenAndServe("[fd76:abcd:ef90::]:80", IPv6handler)
-		if err != nil {
-			log.Printf("Failed to start server: %s\n", err.Error())
-		}
-	}()
-
-	go func() {
-		listener, err := net.Listen("tcp", "172.16.31.0:9040")
-		if err != nil {
-			log.Printf("Failed to start server: %s\n", err.Error())
-			return
-		}
-		for {
-			flow, err := listener.Accept()
-			if err != nil {
-				continue
-			}
-			go EstablishFlow(flow)
-		}
-	}()
-
-	listener, err := net.Listen("tcp", "[fd76:abcd:ef90::]:9040")
+	listener, err := net.Listen("tcp", ":443")
 	if err != nil {
 		log.Printf("Failed to start server: %s\n", err.Error())
 		return

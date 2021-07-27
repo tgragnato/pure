@@ -17,6 +17,7 @@ var (
 	whitelist    []string
 	prefixes     []string
 	dbreader     *maxminddb.Reader
+	asnreader    *maxminddb.Reader
 )
 
 func initCheck() {
@@ -105,6 +106,7 @@ func initCheck() {
 	whitelist = populateCheck("/etc/proxy/allowed.names")
 	prefixes = populateCheck("/etc/proxy/prefixes.names")
 	dbreader, _ = maxminddb.Open("/etc/proxy/GeoLite2-Country.mmdb")
+	asnreader, _ = maxminddb.Open("/etc/proxy/GeoLite2-ASN.mmdb")
 }
 
 func populateCheck(conf string) []string {
@@ -209,4 +211,18 @@ func checkIPs(ips []net.IP) bool {
 	}
 
 	return true
+}
+
+func IP2ASN(ip net.IP) uint {
+	if asnreader == nil {
+		return 0
+	}
+	var record struct {
+		AutonomousSystemNumber uint `maxminddb:"autonomous_system_number"`
+	}
+	err := asnreader.Lookup(ip, &record)
+	if err == nil {
+		return record.AutonomousSystemNumber
+	}
+	return 0
 }

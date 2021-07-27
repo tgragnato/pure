@@ -28,9 +28,17 @@ var (
 const SO_ORIGINAL_DST = 80
 
 func initProxy() {
-	perhost = proxy.NewPerHost(socks5, proxy.Direct)
+	cfurl, _ := url.Parse("socks5://127.0.0.1:9040")
+	cfsocks, _ := proxy.FromURL(cfurl, proxy.Direct)
 
-	conf := "/etc/proxy/bypass.names"
+	cfproxy := proxy.NewPerHost(cfsocks, proxy.Direct)
+	SetBypass("/etc/proxy/fallback.names", cfproxy)
+
+	perhost = proxy.NewPerHost(socks5, cfproxy)
+	SetBypass("/etc/proxy/bypass.names", perhost)
+}
+
+func SetBypass(conf string, newproxy *proxy.PerHost) {
 	buf, err := os.Open(conf)
 	if err != nil {
 		log.Printf("Error opening file %s", conf)
@@ -48,7 +56,7 @@ func initProxy() {
 		if err := snl.Err(); err == nil {
 			txt := snl.Text()
 			if !strings.HasPrefix(txt, "#") && txt != "" {
-				perhost.AddZone(txt)
+				newproxy.AddZone(txt)
 			}
 		} else {
 			log.Printf("Error reading newline in file %s : %s", conf, err.Error())

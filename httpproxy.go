@@ -31,31 +31,36 @@ var (
 
 func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 	host := strings.TrimSuffix(r.Host, ":80")
-	go analytics.IncHTTP(host)
-
-	if host == "static.ess.apple.com" && r.URL.Path == "/connectivity.txt" {
-		fmt.Fprint(w, "AV was here!")
-		return
-	}
-
-	is_apple := strings.HasSuffix(host, ".apple.com") && host != "ocsp.apple.com"
-	is_updates := r.Host == "updates-http.cdn-apple.com"
-
-	if !is_apple && !is_updates {
-		http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), 301)
-		return
-	}
-
-	if !checkDomain(host) {
-		http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), 302)
-		return
-	}
-
 	r.URL.Scheme = "http"
-	r.URL.Host = r.Host
 	r.RequestURI = ""
+	var httpclient *http.Client
 
-	resp, err := httpSocks.Do(r)
+	if !strings.HasPrefix(r.RemoteAddr, "172.16.31.") &&
+		!strings.HasPrefix(r.RemoteAddr, "fd76:abcd:ef90:") {
+		r.URL.Host = "127.0.0.1:9030"
+		httpclient = http.DefaultClient
+
+	} else {
+		go analytics.IncHTTP(host)
+		if host == "static.ess.apple.com" && r.URL.Path == "/connectivity.txt" {
+			fmt.Fprint(w, "AV was here!")
+			return
+		}
+		is_apple := strings.HasSuffix(host, ".apple.com") && host != "ocsp.apple.com"
+		is_updates := r.Host == "updates-http.cdn-apple.com"
+		if !is_apple && !is_updates {
+			http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), 301)
+			return
+		}
+		if !checkDomain(host) {
+			http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), 302)
+			return
+		}
+		r.URL.Host = r.Host
+		httpclient = httpSocks
+	}
+
+	resp, err := httpclient.Do(r)
 	if err != nil {
 		log.Printf("Error doing HTTP request http://%s%s", host, r.URL.RequestURI())
 		log.Printf("   Printing error: %s", err.Error())
