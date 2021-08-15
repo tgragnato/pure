@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math/rand"
 	"net"
 	"net/http"
 	"strings"
@@ -27,6 +28,11 @@ var (
 		},
 		Timeout: 5 * time.Minute,
 	}
+	chars = [64]string{
+		"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p", "q", "r", "s", "t", "u", "v", "w", "x", "y", "z",
+		"A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z",
+		"0", "1", "2", "3", "4", "5", "6", "7", "8", "9", ",", "-",
+	}
 )
 
 func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
@@ -37,6 +43,26 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
 	if !strings.HasPrefix(r.RemoteAddr, "172.16.31.") &&
 		!strings.HasPrefix(r.RemoteAddr, "fd76:abcd:ef90:") {
+
+		if !strings.HasPrefix(r.URL.RequestURI(), "/tor/") {
+			es := ""
+			for i := 0; i < 26; i++ {
+				es += chars[rand.Int()%len(chars)]
+			}
+			w.Header().Set("Server", "Apache/2.2.15 (RedStar4.0)")
+			w.Header().Set("X-Powered-By", "PHP/5.3.5")
+			http.SetCookie(w, &http.Cookie{
+				Name:  "PHPSESSID",
+				Value: es,
+				Path:  "/",
+			})
+			w.Header().Set("Cache-Control", "max-age=1, private, must-revalidate")
+			w.Header().Set("Expires", "Thu, 19 Nov 1981 08:52:00 GMT")
+			w.Header().Set("Pragma", "no-cache")
+			http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), 301)
+			return
+		}
+
 		r.URL.Host = "127.0.0.1:9030"
 		httpclient = http.DefaultClient
 
