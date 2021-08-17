@@ -37,9 +37,13 @@ type Cache struct {
 	cln   bool
 }
 
-func (cache *Cache) Set(key string, data []net.IP) {
+func (cache *Cache) Set(key string, data []net.IP, ttl uint32) {
 	cache.Lock()
-	expiration := time.Now().Add(cache.ttl)
+	duration := time.Duration(ttl) * time.Second
+	if duration < cache.ttl {
+		duration = cache.ttl
+	}
+	expiration := time.Now().Add(duration)
 	cache.items[key] = &Item{
 		data:    data,
 		expires: &expiration,
@@ -64,7 +68,7 @@ func (cache *Cache) Get(key string) (data []net.IP, found bool) {
 func (cache *Cache) Cleanup(keys []string) {
 	errors := 0
 	for i := range keys {
-		ips, _, err := DoH(keys[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", cache.ipv6)
+		ips, _, ttl, err := DoH(keys[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", cache.ipv6)
 		if err != nil {
 			var exp_backoff time.Duration
 			if errors < 7 {
@@ -80,7 +84,7 @@ func (cache *Cache) Cleanup(keys []string) {
 			errors++
 			continue
 		}
-		go cache.Set(keys[i], ips)
+		go cache.Set(keys[i], ips, ttl)
 		if errors > 0 {
 			errors--
 		}

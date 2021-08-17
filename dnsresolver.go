@@ -79,12 +79,13 @@ func parseQuery(m *dns.Msg) {
 			var (
 				ips    []net.IP
 				cnames []string
+				ttl    uint32
 				err    error
 			)
 			bsl := rand.Float64() * float64(len(trr))
 			for i := 0; i < len(trr); i++ {
 				index := (int(bsl) + i) % len(trr)
-				ips, cnames, err = DoH(qName, trr[index], q.Qtype == dns.TypeAAAA)
+				ips, cnames, ttl, err = DoH(qName, trr[index], q.Qtype == dns.TypeAAAA)
 				if err != nil {
 					if err.Error() == "No IP addresses in response" {
 						return
@@ -99,24 +100,24 @@ func parseQuery(m *dns.Msg) {
 			for _, cname := range cnames {
 				if !checkQuery(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
 					retNull(m, q.Name)
-					go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
-					go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
+					go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")}, 0)
+					go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
 					return
 				}
 			}
 
 			if !checkIPs(ips) {
 				retNull(m, q.Name)
-				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
-				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")}, 0)
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
 				return
 			}
 
 			if q.Qtype == dns.TypeAAAA {
-				go cache6.Set(qName, ips)
+				go cache6.Set(qName, ips, ttl)
 				addIPv6(m, q.Name, ips)
 			} else {
-				go cache4.Set(qName, ips)
+				go cache4.Set(qName, ips, ttl)
 				addIP(m, q.Name, ips)
 			}
 			go analytics.IncDNS(strings.ToLower(q.Name[:len(q.Name)-1]))

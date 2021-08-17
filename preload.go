@@ -37,8 +37,8 @@ func (p *Preload) Load() {
 			continue
 		}
 
-		ip4, cname4, err4 := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", false)
-		ip6, cname6, err6 := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", true)
+		ip4, cname4, ttl4, err4 := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", false)
+		ip6, cname6, ttl6, err6 := DoH(qName, "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", true)
 		time.Sleep(time.Second / 4)
 
 		if err4 == nil && err6 == nil {
@@ -55,11 +55,11 @@ func (p *Preload) Load() {
 			}
 
 			if ok {
-				go cache4.Set(qName, ip4)
-				go cache6.Set(qName, ip6)
+				go cache4.Set(qName, ip4, ttl4)
+				go cache6.Set(qName, ip6, ttl6)
 			} else {
-				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
-				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")}, ttl4)
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, ttl6)
 			}
 
 		} else if err4 == nil && err6 != nil {
@@ -71,10 +71,10 @@ func (p *Preload) Load() {
 			}
 
 			if ok {
-				go cache4.Set(qName, ip4)
+				go cache4.Set(qName, ip4, ttl4)
 			} else {
-				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
-				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")}, ttl4)
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, ttl6)
 			}
 
 		} else if err4 != nil && err6 == nil {
@@ -86,10 +86,10 @@ func (p *Preload) Load() {
 			}
 
 			if ok {
-				go cache6.Set(qName, ip6)
+				go cache6.Set(qName, ip6, ttl6)
 			} else {
-				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")})
-				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")})
+				go cache4.Set(qName, []net.IP{net.ParseIP("0.0.0.0")}, ttl4)
+				go cache6.Set(qName, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, ttl6)
 			}
 		}
 	}

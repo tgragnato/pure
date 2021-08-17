@@ -41,14 +41,14 @@ func InitCleartext() {
 				go func(qname string) {
 					ip4, err4 := Cleartext(qname, false)
 					if err4 == nil {
-						cache4.Set(qname, ip4)
+						cache4.Set(qname, ip4, 0)
 					}
 					wg.Done()
 				}(qname)
 				go func(qname string) {
 					ip6, err6 := Cleartext(qname, true)
 					if err6 == nil {
-						cache6.Set(qname, ip6)
+						cache6.Set(qname, ip6, 0)
 					}
 					wg.Done()
 				}(qname)
@@ -57,6 +57,8 @@ func InitCleartext() {
 		}
 
 		wg.Wait()
+
+		time.Sleep(time.Second)
 
 		i++
 		if i >= 100000 {
