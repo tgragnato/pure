@@ -41,8 +41,18 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 	r.RequestURI = ""
 	var httpclient *http.Client
 
-	if !strings.HasPrefix(r.RemoteAddr, "172.16.31.") &&
-		!strings.HasPrefix(r.RemoteAddr, "fd76:abcd:ef90:") {
+	ipstring, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err != nil {
+		log.Printf("Error: %s", err.Error())
+		return
+	}
+	ip := net.ParseIP(ipstring)
+	if ip == nil {
+		log.Print("Error: ip == nil")
+		return
+	}
+
+	if !private4.Contains(ip) && !private6.Contains(ip) {
 
 		if !strings.HasPrefix(r.URL.RequestURI(), "/tor/") {
 			es := ""

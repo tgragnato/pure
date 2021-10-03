@@ -11,8 +11,8 @@ import (
 )
 
 var (
-	unrouteables [25]*net.IPNet
-	blackhole    []net.IP
+	unrouteables [26]*net.IPNet
+	blackhole    [26]net.IP
 	blacklist    []string
 	whitelist    []string
 	prefixes     []string
@@ -21,7 +21,7 @@ var (
 )
 
 func initCheck() {
-	cidrstrings := [25]string{
+	cidrstrings := [26]string{
 		"127.0.0.0/8",
 		"10.0.0.0/8",
 		"172.16.0.0/12",
@@ -49,37 +49,24 @@ func initCheck() {
 		"2001:20::/28",
 		"2001:db8::/32",
 		"2002::/16",
+		"139.45.192.0/18",
 	}
 
-	blackholestrings := []string{
+	blackholestrings := [26]string{
+		"34.217.236.88",
 		"35.190.64.11",
+		"35.190.74.49",
 		"35.190.74.222",
 		"35.201.98.64",
 		"35.201.103.212",
+		"54.200.164.214",
 		"72.52.178.23",
 		"74.117.179.8",
 		"88.85.66.220",
-		"139.45.196.140",
-		"139.45.196.145",
-		"139.45.196.200",
-		"139.45.196.206",
-		"139.45.197.14",
-		"139.45.197.64",
-		"139.45.197.66",
-		"139.45.197.67",
-		"139.45.197.81",
-		"139.45.197.82",
-		"139.45.197.90",
-		"139.45.197.105",
-		"139.45.197.108",
-		"139.45.197.116",
-		"139.45.197.178",
-		"139.45.197.235",
-		"139.45.197.236",
-		"139.45.197.237",
-		"139.45.197.238",
-		"139.45.197.239",
-		"139.45.197.243",
+		"109.206.162.83",
+		"109.206.169.172",
+		"162.252.21.21",
+		"173.214.252.142",
 		"173.214.252.167",
 		"188.42.218.242",
 		"188.42.224.45",
@@ -99,7 +86,7 @@ func initCheck() {
 	}
 
 	for i := range blackholestrings {
-		blackhole = append(blackhole, net.ParseIP(blackholestrings[i]))
+		blackhole[i] = net.ParseIP(blackholestrings[i])
 	}
 
 	blacklist = populateCheck("/etc/proxy/blocked.names")
@@ -145,6 +132,9 @@ func populateCheck(conf string) []string {
 }
 
 func checkQuery(domain string) bool {
+	if !strings.HasSuffix(domain, ".") {
+		domain = domain + "."
+	}
 	for i := range whitelist {
 		if strings.HasSuffix(domain, whitelist[i]) {
 			return true
@@ -164,14 +154,24 @@ func checkQuery(domain string) bool {
 }
 
 func checkDomain(domain string) bool {
+	if !strings.HasSuffix(domain, ".") {
+		domain = domain + "."
+	}
 	if !checkQuery(domain) {
 		return false
 	}
-	ips, err := net.LookupIP(domain)
-	if err != nil {
+	ip4, found4 := cache4.Get(domain)
+	ip6, found6 := cache6.Get(domain)
+	if !found4 && !found6 {
 		return false
 	}
-	return checkIPs(ips)
+	if found4 && !found6 {
+		return checkIPs(ip4)
+	}
+	if !found4 && found6 {
+		return checkIPs(ip6)
+	}
+	return checkIPs(ip4) && checkIPs(ip6)
 }
 
 func checkIPs(ips []net.IP) bool {
@@ -189,7 +189,6 @@ func checkIPs(ips []net.IP) bool {
 				return false
 			}
 		}
-
 		if dbreader != nil {
 			var record struct {
 				Country struct {
@@ -199,17 +198,12 @@ func checkIPs(ips []net.IP) bool {
 			err := dbreader.Lookup(ips[x], &record)
 			if err == nil {
 				switch record.Country.ISOCode {
-				case "CN":
-					return false
-				case "HK":
-					return false
-				case "MO":
+				case "CN", "HK", "MO":
 					return false
 				}
 			}
 		}
 	}
-
 	return true
 }
 
@@ -225,4 +219,27 @@ func IP2ASN(ip net.IP) uint {
 		return record.AutonomousSystemNumber
 	}
 	return 0
+}
+
+func CheckCF(domain string) bool {
+	if !strings.HasSuffix(domain, ".") {
+		domain = domain + "."
+	}
+	ip4, found4 := cache4.Get(domain)
+	ip6, found6 := cache6.Get(domain)
+	if !found4 && !found6 {
+		return false
+	}
+	ret := true
+	if found4 {
+		for i := range ip4 {
+			ret = ret && IP2ASN(ip4[i]) == 13335
+		}
+	}
+	if found6 {
+		for i := range ip6 {
+			ret = ret && IP2ASN(ip6[i]) == 13335
+		}
+	}
+	return ret
 }

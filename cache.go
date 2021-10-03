@@ -66,6 +66,7 @@ func (cache *Cache) Get(key string) (data []net.IP, found bool) {
 }
 
 func (cache *Cache) Cleanup(keys []string) {
+	cache.cln = true
 	errors := 0
 	for i := range keys {
 		ips, _, ttl, err := DoH(keys[i], "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion", cache.ipv6)
@@ -90,6 +91,7 @@ func (cache *Cache) Cleanup(keys []string) {
 		}
 		time.Sleep(100 * time.Millisecond)
 	}
+	cache.cln = false
 }
 
 func (cache *Cache) CleanupTimer() {
@@ -114,8 +116,8 @@ func (cache *Cache) CleanupTimer() {
 				cleanupkeys = append(cleanupkeys, key)
 			}
 			cache.RUnlock()
-			cache.Cleanup(cleanupkeys)
 			cache.cln = false
+			go cache.Cleanup(cleanupkeys)
 		}
 	}
 }

@@ -21,19 +21,16 @@ import (
 
 var (
 	proxyurl, _ = url.Parse("socks5://127.0.0.1:9050")
-	socks5, _   = proxy.FromURL(proxyurl, proxy.Direct)
+	socks5, _   = proxy.SOCKS5("tcp", "127.0.0.1:9050", nil, &net.Dialer{Timeout: time.Second})
 	perhost     *proxy.PerHost
 )
 
 const SO_ORIGINAL_DST = 80
 
 func initProxy() {
-	cfurl, _ := url.Parse("socks5://127.0.0.1:9040")
-	cfsocks, _ := proxy.FromURL(cfurl, proxy.Direct)
-
+	cfsocks, _ := proxy.SOCKS5("tcp", "127.0.0.1:9040", nil, &net.Dialer{Timeout: 10 * time.Second})
 	cfproxy := proxy.NewPerHost(cfsocks, proxy.Direct)
 	SetBypass("/etc/proxy/fallback.names", cfproxy)
-
 	perhost = proxy.NewPerHost(socks5, cfproxy)
 	SetBypass("/etc/proxy/bypass.names", perhost)
 }
@@ -63,6 +60,46 @@ func SetBypass(conf string, newproxy *proxy.PerHost) {
 			break
 		}
 	}
+}
+
+func ReadLine(conf string) string {
+	buf, err := os.Open(conf)
+	if err != nil {
+		log.Printf("Error opening file %s", conf)
+	}
+
+	defer func() {
+		if err = buf.Close(); err != nil {
+			log.Printf("Error closing file %s : %s", conf, err.Error())
+		}
+	}()
+
+	snl := bufio.NewScanner(buf)
+	snl.Scan()
+	err = snl.Err()
+	if err == nil {
+		return snl.Text()
+	}
+	return ""
+}
+
+func HandleClientHello(clientConn net.Conn) (clientHello *tls.ClientHelloInfo, clientReader io.Reader, err error) {
+	err = clientConn.SetReadDeadline(time.Now().Add(10 * time.Second))
+	if err != nil {
+		return
+	}
+
+	clientHello, clientReader, err = peekClientHello(clientConn)
+	if err != nil {
+		return
+	}
+
+	err = clientConn.SetReadDeadline(time.Time{})
+	if err != nil {
+		return
+	}
+
+	return
 }
 
 func peekClientHello(reader io.Reader) (*tls.ClientHelloInfo, io.Reader, error) {
@@ -125,6 +162,15 @@ func SafeCopy(dst net.Conn, src io.Reader, wg *sync.WaitGroup, ctx context.Conte
 	if err != nil {
 		cancel()
 	}
+}
+
+func CopyLoop(clientR io.Reader, clientW net.Conn, backend net.Conn) {
+	var wg sync.WaitGroup
+	wg.Add(2)
+	ctx, cancel := context.WithCancel(context.Background())
+	go SafeCopy(clientW, backend, &wg, ctx, cancel)
+	go SafeCopy(backend, clientR, &wg, ctx, cancel)
+	wg.Wait()
 }
 
 func IPAddress(ip []byte) net.IP {

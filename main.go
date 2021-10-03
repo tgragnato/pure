@@ -19,6 +19,7 @@ func main() {
 	if asnreader != nil {
 		defer asnreader.Close()
 	}
+	InitCloaking()
 	initProxy()
 	go InitCleartext()
 
