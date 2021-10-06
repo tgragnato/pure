@@ -12,7 +12,7 @@ import (
 
 var (
 	unrouteables [26]*net.IPNet
-	blackhole    [26]net.IP
+	blackhole    [27]net.IP
 	blacklist    []string
 	whitelist    []string
 	prefixes     []string
@@ -52,7 +52,7 @@ func initCheck() {
 		"139.45.192.0/18",
 	}
 
-	blackholestrings := [26]string{
+	blackholestrings := [27]string{
 		"34.217.236.88",
 		"35.190.64.11",
 		"35.190.74.49",
@@ -64,6 +64,7 @@ func initCheck() {
 		"74.117.179.8",
 		"88.85.66.220",
 		"109.206.162.83",
+		"109.206.162.85",
 		"109.206.169.172",
 		"162.252.21.21",
 		"173.214.252.142",
