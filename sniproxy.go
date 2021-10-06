@@ -32,6 +32,7 @@ func initProxy() {
 	cfproxy := proxy.NewPerHost(cfsocks, proxy.Direct)
 	SetBypass("/etc/proxy/fallback.names", cfproxy)
 	perhost = proxy.NewPerHost(socks5, cfproxy)
+	SetBypass("/etc/proxy/fallback.names", perhost)
 	SetBypass("/etc/proxy/bypass.names", perhost)
 }
 
