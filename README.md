@@ -11,7 +11,7 @@ The connection is forwarded to the local socks proxy, or handled directly if a b
 
 Filtering is performed at the DNS and SNI layers.
 
-It also able to handle IMAPS and APNS traffic of Apple devices, WhatsApp and SMB.
+It's also able to handle IMAPS and APNS traffic of Apple devices, WhatsApp and SMB.
 It's open source, but addresses and strings are hardcoded, you'll need to adapt the codebase to your needs.
 
 ## nftables
