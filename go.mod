@@ -1,10 +1,16 @@
 module tgragnato.it/proxy
 
-go 1.16
+go 1.17
 
 require (
-	github.com/miekg/dns v1.1.43
+	github.com/miekg/dns v1.1.45
 	github.com/oschwald/maxminddb-golang v1.8.0
-	golang.org/x/net v0.0.0-20211020060615-d418f374d309
-	golang.org/x/sys v0.0.0-20211023085530-d6a326fbbf70 // indirect
+	golang.org/x/net v0.0.0-20220107192237-5cfca573fb4d
+)
+
+require (
+	golang.org/x/mod v0.5.1 // indirect
+	golang.org/x/sys v0.0.0-20211216021012-1d35b9e2eb4e // indirect
+	golang.org/x/tools v0.1.8 // indirect
+	golang.org/x/xerrors v0.0.0-20200804184101-5ec99f83aff1 // indirect
 )
