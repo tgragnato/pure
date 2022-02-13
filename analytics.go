@@ -9,7 +9,6 @@ import (
 )
 
 type Hits struct {
-	dns  uint
 	http uint
 	tls  uint
 }
@@ -28,11 +27,6 @@ type SafeExpress struct {
 	sync.Mutex
 	data map[string]uint
 }
-
-var (
-	analytics = &Analytics{data: map[string]Hits{}}
-	express   = &SafeExpress{data: map[string]uint{}}
-)
 
 func (e *SafeExpress) IncExpress(dName string) {
 	split := strings.Split(dName, ".")
@@ -53,18 +47,6 @@ func (e *SafeExpress) IncExpress(dName string) {
 	e.Unlock()
 }
 
-func (a *Analytics) IncDNS(dName string) {
-	a.Lock()
-	hit, exist := a.data[dName]
-	if exist {
-		hit.dns++
-		a.data[dName] = hit
-	} else {
-		a.data[dName] = Hits{dns: 1, http: 0, tls: 0}
-	}
-	a.Unlock()
-}
-
 func (a *Analytics) IncHTTP(dName string) {
 	go express.IncExpress(dName)
 	a.Lock()
@@ -73,7 +55,7 @@ func (a *Analytics) IncHTTP(dName string) {
 		hit.http++
 		a.data[dName] = hit
 	} else {
-		a.data[dName] = Hits{dns: 0, http: 1, tls: 0}
+		a.data[dName] = Hits{http: 1, tls: 0}
 	}
 	a.Unlock()
 }
@@ -86,7 +68,7 @@ func (a *Analytics) IncTLS(dName string) {
 		hit.tls++
 		a.data[dName] = hit
 	} else {
-		a.data[dName] = Hits{dns: 0, http: 0, tls: 1}
+		a.data[dName] = Hits{http: 0, tls: 1}
 	}
 	a.Unlock()
 }
@@ -97,12 +79,12 @@ func handleAnalytics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	fmt.Fprint(w, "<html><head><title>Proxy analytics</title></head><body><table style='float: left;'>"+
-		"<thead><th>fqdn</th><th>dns</th><th>http</th><th>tls</th><th>total</th></thead>"+
+		"<thead><th>fqdn</th><th>http</th><th>tls</th><th>total</th></thead>"+
 		"<tbody>")
 	for key := range analytics.data {
-		fmt.Fprintf(w, "<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td><td>%d</td></tr>",
-			key, analytics.data[key].dns, analytics.data[key].http, analytics.data[key].tls,
-			analytics.data[key].dns+analytics.data[key].http+analytics.data[key].tls)
+		fmt.Fprintf(w, "<tr><td>%s</td><td>%d</td><td>%d</td><td>%d</td></tr>",
+			key, analytics.data[key].http, analytics.data[key].tls,
+			analytics.data[key].http+analytics.data[key].tls)
 	}
 	fmt.Fprint(w, "</tbody></table>")
 
