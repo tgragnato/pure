@@ -29,7 +29,7 @@ func CheckDomain(domain string) bool {
 			err := dbreader.Lookup(ips[x], &record)
 			if err == nil {
 				switch record.Country.ISOCode {
-				case "CN", "HK", "MO":
+				case "CN", "HK", "MO", "RU":
 					return false
 				}
 			}
