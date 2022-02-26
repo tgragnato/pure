@@ -29,6 +29,9 @@ var (
 			ResponseHeaderTimeout: 2 * time.Second,
 		},
 		Timeout: 5 * time.Minute,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
 	}
 )
 
