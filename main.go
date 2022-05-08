@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"log/syslog"
 	"math/rand"
 	"net"
 	"net/http"
@@ -37,6 +38,13 @@ var (
 
 func main() {
 	rand.Seed(time.Now().Unix())
+
+	syslogger, err := syslog.New(syslog.LOG_INFO, "syslog_example")
+	if err != nil {
+		log.Printf("Failed to use syslog: %s\n", err.Error())
+	}
+	log.SetOutput(syslogger)
+
 	if dbreader != nil {
 		defer dbreader.Close()
 	}
