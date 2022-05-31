@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"io"
 	"log"
 	"net"
@@ -41,6 +42,19 @@ func CheckDomain(domain string) bool {
 
 func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 	host := strings.TrimSuffix(r.Host, ":80")
+
+	if host == "static.ess.apple.com" && r.URL.Path == "/connectivity.txt" {
+		fmt.Fprint(w, "AV was here!")
+		return
+	}
+
+	is_apple := strings.HasSuffix(host, ".apple.com") && host != "ocsp.apple.com"
+	is_updates := r.Host == "updates-http.cdn-apple.com"
+	if !is_apple && !is_updates {
+		http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), http.StatusMovedPermanently)
+		return
+	}
+
 	if !CheckDomain(host) {
 		return
 	}

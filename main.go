@@ -39,9 +39,9 @@ var (
 func main() {
 	rand.Seed(time.Now().Unix())
 
-	syslogger, err := syslog.New(syslog.LOG_INFO, "syslog_example")
+	syslogger, err := syslog.Dial("unixgram", "/dev/log", syslog.LOG_INFO, "proxy")
 	if err != nil {
-		log.Printf("Failed to use syslog: %s\n", err.Error())
+		log.Fatalf("Failed to use syslog: %s\n", err.Error())
 	}
 	log.SetOutput(syslogger)
 
@@ -53,27 +53,18 @@ func main() {
 	}
 
 	go func() {
-		muxAnalytics := http.NewServeMux()
-		muxAnalytics.HandleFunc("/", handleAnalytics)
-		err := http.ListenAndServe("172.16.33.1:8080", muxAnalytics)
-		if err != nil {
-			log.Printf("Failed to start server: %s\n", err.Error())
-		}
-	}()
-
-	go func() {
 		handler := http.DefaultServeMux
 		handler.HandleFunc("/", handleHTTPForward)
-		err := http.ListenAndServe(":1080", handler)
+		handler.HandleFunc("172.16.33.1/", handleAnalytics)
+		err := http.ListenAndServe("172.16.33.1:1080", handler)
 		if err != nil {
-			log.Printf("Failed to start server: %s\n", err.Error())
+			log.Fatalf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
-	listener, err := net.Listen("tcp", ":1443")
+	listener, err := net.Listen("tcp", "172.16.33.1:1443")
 	if err != nil {
-		log.Printf("Failed to start server: %s\n", err.Error())
-		return
+		log.Fatalf("Failed to start server: %s\n", err.Error())
 	}
 	for {
 		flow, err := listener.Accept()
