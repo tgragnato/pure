@@ -49,7 +49,7 @@ func main() {
 	flag.StringVar(&countryPath, "countryPath", "/var/db/GeoIP/GeoLite2-Country.mmdb", "The path of the GeoIP2 County DataBase")
 	flag.BoolVar(&disableSyslog, "disableSyslog", false, "Set this to disable the log redirection to syslog")
 	flag.StringVar(&interfaceIP, "interfaceIP", "172.16.33.1", "Set here the IP of the interface to bind to")
-	flag.BoolVar(&disableAppleOnly, "disableAppleOnly", true, "Set this to disable the pass filter inside unencrypted HTTP for Apple only")
+	flag.BoolVar(&disableAppleOnly, "disableAppleOnly", false, "Set this to disable the pass filter inside unencrypted HTTP for Apple only")
 	flag.Parse()
 
 	if !disableSyslog {
