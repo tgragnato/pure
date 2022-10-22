@@ -1,7 +1,7 @@
 module tgragnato.it/proxy
 
-go 1.18
+go 1.19
 
-require github.com/oschwald/maxminddb-golang v1.9.0
+require github.com/oschwald/maxminddb-golang v1.10.0
 
-require golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
+require golang.org/x/sys v0.1.0 // indirect
