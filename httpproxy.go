@@ -50,7 +50,7 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
 	is_apple := strings.HasSuffix(host, ".apple.com") && host != "ocsp.apple.com"
 	is_updates := r.Host == "updates-http.cdn-apple.com"
-	if !is_apple && !is_updates {
+	if !disableAppleOnly && !is_apple && !is_updates {
 		http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), http.StatusMovedPermanently)
 		return
 	}

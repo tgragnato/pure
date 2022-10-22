@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"log"
 	"log/syslog"
 	"math/rand"
@@ -12,11 +13,12 @@ import (
 )
 
 var (
-	analytics    = &Analytics{data: map[string]Hits{}}
-	express      = &SafeExpress{data: map[string]uint{}}
-	asnreader, _ = maxminddb.Open("/var/db/GeoIP/GeoLite2-ASN.mmdb")
-	dbreader, _  = maxminddb.Open("/var/db/GeoIP/GeoLite2-Country.mmdb")
-	httpclient   = &http.Client{
+	analytics               = &Analytics{data: map[string]Hits{}}
+	express                 = &SafeExpress{data: map[string]uint{}}
+	disableSyslog    bool   = false
+	disableAppleOnly bool   = false
+	interfaceIP      string = "172.16.33.1"
+	httpclient              = &http.Client{
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
 				Timeout:   5 * time.Minute,
@@ -34,35 +36,52 @@ var (
 			return http.ErrUseLastResponse
 		},
 	}
+	asnPath     string
+	countryPath string
+	asnreader   *maxminddb.Reader
+	dbreader    *maxminddb.Reader
 )
 
 func main() {
 	rand.Seed(time.Now().Unix())
 
-	syslogger, err := syslog.Dial("unixgram", "/dev/log", syslog.LOG_INFO, "proxy")
-	if err != nil {
-		log.Fatalf("Failed to use syslog: %s\n", err.Error())
-	}
-	log.SetOutput(syslogger)
+	flag.StringVar(&asnPath, "asnPath", "/var/db/GeoIP/GeoLite2-ASN.mmdb", "The path of the GeoIP2 ASN DataBase")
+	flag.StringVar(&countryPath, "countryPath", "/var/db/GeoIP/GeoLite2-Country.mmdb", "The path of the GeoIP2 County DataBase")
+	flag.BoolVar(&disableSyslog, "disableSyslog", false, "Set this to disable the log redirection to syslog")
+	flag.StringVar(&interfaceIP, "interfaceIP", "172.16.33.1", "Set here the IP of the interface to bind to")
+	flag.BoolVar(&disableAppleOnly, "disableAppleOnly", true, "Set this to disable the pass filter inside unencrypted HTTP for Apple only")
+	flag.Parse()
 
+	if !disableSyslog {
+		syslogger, err := syslog.Dial("unixgram", "/dev/log", syslog.LOG_INFO, "proxy")
+		if err != nil {
+			log.Fatalf("Failed to use syslog: %s\n", err.Error())
+		}
+		log.SetOutput(syslogger)
+	}
+
+	dbreader, _ = maxminddb.Open(countryPath)
 	if dbreader != nil {
 		defer dbreader.Close()
+		log.Printf("Error opening %s\n", countryPath)
 	}
+	asnreader, _ = maxminddb.Open(asnPath)
 	if asnreader != nil {
 		defer asnreader.Close()
+		log.Printf("Error opening %s\n", asnPath)
 	}
 
 	go func() {
 		handler := http.DefaultServeMux
 		handler.HandleFunc("/", handleHTTPForward)
-		handler.HandleFunc("172.16.33.1/", handleAnalytics)
-		err := http.ListenAndServe("172.16.33.1:1080", handler)
+		handler.HandleFunc(interfaceIP+"/", handleAnalytics)
+		err := http.ListenAndServe(interfaceIP+":1080", handler)
 		if err != nil {
 			log.Fatalf("Failed to start server: %s\n", err.Error())
 		}
 	}()
 
-	listener, err := net.Listen("tcp", "172.16.33.1:1443")
+	listener, err := net.Listen("tcp", interfaceIP+":1443")
 	if err != nil {
 		log.Fatalf("Failed to start server: %s\n", err.Error())
 	}
