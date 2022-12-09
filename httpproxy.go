@@ -11,6 +11,10 @@ import (
 )
 
 func CheckDomain(domain string) bool {
+	if net.ParseIP(domain) != nil {
+		return false
+	}
+
 	ips, err := net.LookupIP(domain)
 	if err != nil {
 		return false
