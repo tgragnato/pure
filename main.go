@@ -7,6 +7,7 @@ import (
 	"math/rand"
 	"net"
 	"net/http"
+	"net/url"
 	"time"
 
 	"github.com/oschwald/maxminddb-golang"
@@ -18,6 +19,7 @@ var (
 	disableSyslog    bool   = false
 	disableAppleOnly bool   = false
 	interfaceIP      string = "172.16.33.0"
+	socks5           string = ""
 	httpclient              = &http.Client{
 		Transport: &http.Transport{
 			DialContext: (&net.Dialer{
@@ -47,6 +49,7 @@ func main() {
 	flag.BoolVar(&disableSyslog, "disableSyslog", false, "Set this to disable the log redirection to syslog")
 	flag.StringVar(&interfaceIP, "interfaceIP", "172.16.33.0", "Set here the IP of the interface to bind to")
 	flag.BoolVar(&disableAppleOnly, "disableAppleOnly", false, "Set this to disable the pass filter inside unencrypted HTTP for Apple only")
+	flag.StringVar(&socks5, "socks5", "", "Set this to the address of the upstream socks5 proxy you want to use")
 	flag.Parse()
 
 	if !disableSyslog {
@@ -55,6 +58,14 @@ func main() {
 			log.Fatalf("Failed to use syslog: %s\n", err.Error())
 		}
 		log.SetOutput(syslogger)
+	}
+
+	if socks5 != "" {
+		proxy, err := url.Parse("socks5://" + socks5)
+		if err != nil {
+			return
+		}
+		httpclient.Transport.(*http.Transport).Proxy = http.ProxyURL(proxy)
 	}
 
 	dbreader, _ = maxminddb.Open(countryPath)

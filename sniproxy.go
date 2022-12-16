@@ -9,6 +9,8 @@ import (
 	"net"
 	"sync"
 	"time"
+
+	"golang.org/x/net/proxy"
 )
 
 func EstablishFlow(clientConn net.Conn) {
@@ -24,10 +26,24 @@ func EstablishFlow(clientConn net.Conn) {
 	}
 	go analytics.IncTLS(clientHello.ServerName)
 
-	backendConn, err := net.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
-	if err != nil {
-		log.Printf("Error: %s", err.Error())
-		return
+	var backendConn net.Conn
+	if socks5 != "" {
+		dialer, err := proxy.SOCKS5("tcp", socks5, nil, proxy.Direct)
+		if err != nil {
+			log.Printf("Error: %s", err.Error())
+			return
+		}
+		backendConn, err = dialer.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
+		if err != nil {
+			log.Printf("Error: %s", err.Error())
+			return
+		}
+	} else {
+		backendConn, err = net.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
+		if err != nil {
+			log.Printf("Error: %s", err.Error())
+			return
+		}
 	}
 	defer backendConn.Close()
 
