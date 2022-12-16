@@ -19,6 +19,7 @@ var (
 	disableSyslog    bool   = false
 	disableAppleOnly bool   = false
 	interfaceIP      string = "172.16.33.0"
+	interfaceIPv6    string = ""
 	socks5           string = ""
 	httpclient              = &http.Client{
 		Transport: &http.Transport{
@@ -50,6 +51,7 @@ func main() {
 	flag.StringVar(&interfaceIP, "interfaceIP", "172.16.33.0", "Set here the IP of the interface to bind to")
 	flag.BoolVar(&disableAppleOnly, "disableAppleOnly", false, "Set this to disable the pass filter inside unencrypted HTTP for Apple only")
 	flag.StringVar(&socks5, "socks5", "", "Set this to the address of the upstream socks5 proxy you want to use")
+	flag.StringVar(&interfaceIPv6, "interfaceIPv6", "", "Set here the IPv6 of the interface to bind to")
 	flag.Parse()
 
 	if !disableSyslog {
@@ -74,15 +76,39 @@ func main() {
 		log.Printf("Error opening %s\n", countryPath)
 	}
 
+	handler := http.DefaultServeMux
+	handler.HandleFunc("/", handleHTTPForward)
+	handler.HandleFunc(interfaceIP+"/", handleAnalytics)
+
 	go func() {
-		handler := http.DefaultServeMux
-		handler.HandleFunc("/", handleHTTPForward)
-		handler.HandleFunc(interfaceIP+"/", handleAnalytics)
 		err := http.ListenAndServe(interfaceIP+":80", handler)
 		if err != nil {
 			log.Fatalf("Failed to start server: %s\n", err.Error())
 		}
 	}()
+
+	if interfaceIPv6 != "" {
+		go func() {
+			err := http.ListenAndServe(interfaceIPv6+":80", handler)
+			if err != nil {
+				log.Fatalf("Failed to start server: %s\n", err.Error())
+			}
+		}()
+
+		go func() {
+			listener, err := net.Listen("tcp6", interfaceIPv6+":443")
+			if err != nil {
+				log.Fatalf("Failed to start server: %s\n", err.Error())
+			}
+			for {
+				flow, err := listener.Accept()
+				if err != nil {
+					continue
+				}
+				go EstablishFlow(flow)
+			}
+		}()
+	}
 
 	listener, err := net.Listen("tcp", interfaceIP+":443")
 	if err != nil {
