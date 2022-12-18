@@ -28,7 +28,7 @@ func EstablishFlow(clientConn net.Conn) {
 
 	var backendConn net.Conn
 	if socks5 != "" {
-		dialer, err := proxy.SOCKS5("tcp", socks5, nil, proxy.Direct)
+		dialer, err := proxy.SOCKS5("tcp", socks5, nil, &net.Dialer{Timeout: time.Second})
 		if err != nil {
 			log.Printf("Error: %s", err.Error())
 			return
@@ -39,7 +39,7 @@ func EstablishFlow(clientConn net.Conn) {
 			return
 		}
 	} else {
-		backendConn, err = net.Dial("tcp", net.JoinHostPort(clientHello.ServerName, "443"))
+		backendConn, err = net.DialTimeout("tcp", net.JoinHostPort(clientHello.ServerName, "443"), time.Second)
 		if err != nil {
 			log.Printf("Error: %s", err.Error())
 			return
