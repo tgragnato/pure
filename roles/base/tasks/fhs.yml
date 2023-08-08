@@ -1,0 +1,29 @@
+---
+
+- name: Prepare for the symlink phase
+  file:
+    state: absent
+    path: "{{item}}"
+  with_items:
+    - /media/cdrom
+    - /var/spool/cron
+    - /var/spool/mail
+
+- name: Symlink to /dev/null
+  file:
+    force: yes
+    src: /dev/null
+    dest: "{{item}}"
+    state: link
+  with_items:
+    - /home
+    - /media
+    - /mnt
+    - /opt
+    - /srv
+    - /var/cache/private
+    - /var/lib/private
+    - /var/local
+    - /var/mail
+    - /var/opt
+    - /var/spool
