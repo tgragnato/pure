@@ -1,0 +1,9 @@
+---
+
+- name: Roles shared by every host
+  hosts: all
+  vars_files:
+    - vars.yaml
+  remote_user: "{{ ssh_user }}"
+  roles:
+    - base
