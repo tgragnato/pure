@@ -257,3 +257,9 @@
     name: net.ipv4.udp_wmem_min
     value: 131072
   tags: network
+
+- name: Setting net.ipv4.tcp_fastopen
+  sysctl:
+    name: net.ipv4.tcp_fastopen
+    value: 3
+  tags: network
