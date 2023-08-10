@@ -8,6 +8,7 @@
     - /media/cdrom
     - /var/spool/cron
     - /var/spool/mail
+  tags: fhs
 
 - name: Symlink to /dev/null
   file:
@@ -27,6 +28,7 @@
     - /var/mail
     - /var/opt
     - /var/spool
+  tags: fhs
 
 - name: Cleanup /etc
   file:
@@ -35,3 +37,4 @@
   with_items:
     - /etc/opt
     - /etc/ufw
+  tags: fhs
