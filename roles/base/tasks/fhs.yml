@@ -3,7 +3,7 @@
 - name: Prepare for the symlink phase
   file:
     state: absent
-    path: "{{item}}"
+    path: "{{ item }}"
   with_items:
     - /media/cdrom
     - /var/spool/cron
@@ -33,7 +33,7 @@
 - name: Cleanup /etc
   file:
     state: absent
-    path: "{{item}}"
+    path: "{{ item }}"
   with_items:
     - /etc/opt
     - /etc/ufw

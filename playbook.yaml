@@ -8,7 +8,7 @@
   roles:
     - base
 
-- name: Snowflake
+- name: Snowflake role
   hosts: baremetal
   vars_files:
     - vars.yaml
