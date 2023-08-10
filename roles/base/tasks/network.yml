@@ -13,7 +13,13 @@
 - name: Remove comments from /etc/sysctl.conf
   lineinfile:
     path: /etc/sysctl.conf
-    regexp: "^#" 
+    regexp: '^#' 
+    state: absent
+
+- name: Remove empty lines from /etc/sysctl.conf
+  lineinfile:
+    path: /etc/sysctl.conf
+    regexp: '^\s*$'
     state: absent
 
 - name: Setting kernel.printk

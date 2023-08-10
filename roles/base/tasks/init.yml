@@ -8,10 +8,13 @@
     group: root
     mode: 0644
 
-- name: Delete /etc/apt/sources.list.d
+- name: Delete old apt sources
   file:
     state: absent
-    path: /etc/apt/sources.list.d
+    path: "{{item}}"
+  with_items:
+    - /etc/apt/sources.list.d
+    - /etc/apt/sources.list~
 
 - name: Configure apt
   copy:
@@ -31,6 +34,7 @@
     state: present
   with_items:
     - aptitude
+    - hardening-runtime
     - htop
     - iproute2
     - locales-all
@@ -43,9 +47,14 @@
     state: absent
   with_items:
     - cron
+    - cron-daemon-common
+    - dmidecode
     - ifupdown
+    - laptop-detect
     - locales
     - logrotate
+    - tasksel
+    - tasksel-data
 
 - name: Disable futile services
   systemd:
@@ -65,3 +74,4 @@
     - systemd-initctl.socket
     - systemd-rfkill.service
     - systemd-rfkill.socket
+    - user@0.service
