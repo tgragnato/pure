@@ -3,3 +3,4 @@ base_directory: /root
 debian_repository: https://deb.debian.org/debian
 debian_security: https://deb.debian.org/debian-security
 ca_bundle: /etc/ssl/certs/ca-certificates.crt
+snowflake_path: /usr/local/bin/snowflake
