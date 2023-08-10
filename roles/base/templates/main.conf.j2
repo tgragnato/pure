@@ -1,0 +1,73 @@
+server:
+
+    interface: 127.0.0.1
+    interface: ::1
+
+    access-control: 0.0.0.0/0 refuse
+    access-control: 127.0.0.0/8 allow
+    access-control: ::0/0 refuse
+    access-control: ::1 allow
+
+    private-address: 0.0.0.0/8
+    private-address: 100.64.0.0/10
+    private-address: 127.0.0.0/8
+    private-address: 169.254.0.0/16
+    private-address: 192.0.0.0/24
+    private-address: 192.0.2.0/24
+    private-address: 192.88.99.0/24
+    private-address: 198.18.0.0/15
+    private-address: 198.51.100.0/24
+    private-address: 203.0.113.0/24
+    private-address: 224.0.0.0/4
+    private-address: 240.0.0.0/4
+    private-address: 255.255.255.255/32
+    private-address: 10.0.0.0/8
+    private-address: 172.16.0.0/12
+    private-address: 192.168.0.0/16
+    private-address: ::/128
+    private-address: ::1/128
+    private-address: ::ffff:0:0/96
+    private-address: ::ffff:0:0:0/96
+    private-address: 64:ff9b::/96
+    private-address: 64:ff9b:1::/48
+    private-address: 100::/64
+    private-address: 2001:0000::/32
+    private-address: 2001:20::/28
+    private-address: 2001:db8::/32
+    private-address: 2002::/16
+    private-address: fc00::/7
+    private-address: fe80::/10
+    private-address: ff00::/8
+
+    hide-identity: yes
+    hide-version: yes
+
+    root-hints: /usr/share/dns/root.hints
+    
+    # Custom
+    cache-max-ttl: 604800
+    cache-min-ttl: 3600
+    prefetch: yes
+    prefetch-key: yes
+    aggressive-nsec: yes
+    use-caps-for-id: yes
+    deny-any: yes
+
+    # Cores
+    num-threads: 4
+    msg-cache-slabs: 4
+    rrset-cache-slabs: 4
+    infra-cache-slabs: 4
+    key-cache-slabs: 4
+
+    # Memory Control
+    msg-cache-size: 1024m
+    rrset-cache-size: 2048m
+    key-cache-size: 1024m
+    neg-cache-size: 1024m
+    infra-cache-numhosts: 100000000000
+    harden-large-queries: "yes"
+    harden-short-bufsize: "yes"
+
+    # CAs bundle
+    tls-cert-bundle: {{ ca_bundle }}

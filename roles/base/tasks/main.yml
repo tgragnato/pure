@@ -8,3 +8,6 @@
 
 - name: Initialize the network
   import_tasks: network.yml
+
+- name: Setup dns
+  import_tasks: dns.yml

@@ -3,3 +3,11 @@
 - name: Reload .network and .netdev files
   shell: networkctl reload
   listen: networkctl reload
+
+- name: Setup or update root anchor
+  shell: unbound-anchor
+  listen: unbound-anchor
+
+- name: Reload unbound
+  shell: unbound-control
+  listen: reload unbound
