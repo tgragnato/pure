@@ -2,7 +2,7 @@
 
 - name: Install unbound
   apt:
-    name: "{{item}}"
+    name: "{{ item }}"
     state: present
   with_items:
     - unbound
