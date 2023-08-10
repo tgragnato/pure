@@ -72,6 +72,72 @@
     value: 1
   tags: network
 
+- name: Setting net.ipv4.tcp_rfc1337
+  sysctl:
+    name: net.ipv4.tcp_rfc1337
+    value: 1
+  tags: network
+
+- name: Setting net.ipv4.tcp_timestamps
+  sysctl:
+    name: net.ipv4.tcp_timestamps
+    value: 0
+  tags: network
+
+- name: Setting net.ipv4.icmp_echo_enable_probe
+  sysctl:
+    name: net.ipv4.icmp_echo_enable_probe
+    value: 0
+  tags: network
+
+- name: Setting net.ipv4.icmp_echo_ignore_all
+  sysctl:
+    name: net.ipv4.icmp_echo_ignore_all
+    value: 1
+  tags: network
+
+- name: Setting net.ipv4.icmp_echo_ignore_broadcasts
+  sysctl:
+    name: net.ipv4.icmp_echo_ignore_broadcasts
+    value: 1
+  tags: network
+
+- name: Setting net.ipv4.icmp_ignore_bogus_error_responses
+  sysctl:
+    name: net.ipv4.icmp_ignore_bogus_error_responses
+    value: 1
+  tags: network
+
+- name: Setting net.ipv4.icmp_msgs_burst
+  sysctl:
+    name: net.ipv4.icmp_msgs_burst
+    value: 1
+  tags: network
+
+- name: Setting net.ipv4.icmp_msgs_per_sec
+  sysctl:
+    name: net.ipv4.icmp_msgs_per_sec
+    value: 2
+  tags: network
+
+- name: Setting net.ipv4.icmp_ratelimit
+  sysctl:
+    name: net.ipv4.icmp_ratelimit
+    value: 10
+  tags: network
+
+- name: Setting net.ipv6.icmp.echo_ignore_all
+  sysctl:
+    name: net.ipv6.icmp.echo_ignore_all
+    value: 1
+  tags: network
+
+- name: Setting kernel.unprivileged_bpf_disabled
+  sysctl:
+    name: kernel.unprivileged_bpf_disabled
+    value: 1
+  tags: network
+
 - name: Setting net.ipv4.ip_forward
   sysctl:
     name: net.ipv4.ip_forward
@@ -130,4 +196,64 @@
   sysctl:
     name: net.ipv4.ip_local_port_range
     value: 1024 65535
+  tags: network
+
+- name: Setting net.core.default_qdisc
+  sysctl:
+    name: net.core.default_qdisc
+    value: fq
+  tags: network
+
+- name: Setting net.ipv4.tcp_congestion_control
+  sysctl:
+    name: net.ipv4.tcp_congestion_control
+    value: bbr
+  tags: network
+
+- name: Setting net.core.rmem_max
+  sysctl:
+    name: net.core.rmem_max
+    value: 16777216
+  tags: network
+
+- name: Setting net.core.wmem_max
+  sysctl:
+    name: net.core.wmem_max
+    value: 16777216
+  tags: network
+
+- name: Setting net.ipv4.tcp_mem
+  sysctl:
+    name: net.ipv4.tcp_mem
+    value: 8192 262144 16777216
+  tags: network
+
+- name: Setting net.ipv4.tcp_rmem
+  sysctl:
+    name: net.ipv4.tcp_rmem
+    value: 4096 131072 16777216
+  tags: network
+
+- name: Setting net.ipv4.tcp_wmem
+  sysctl:
+    name: net.ipv4.tcp_wmem
+    value: 4096 131072 16777216
+  tags: network
+
+- name: Setting net.ipv4.udp_mem
+  sysctl:
+    name: net.ipv4.udp_mem
+    value: 1048576 2097152 16777216
+  tags: network
+
+- name: Setting net.ipv4.udp_rmem_min
+  sysctl:
+    name: net.ipv4.udp_rmem_min
+    value: 131072
+  tags: network
+
+- name: Setting net.ipv4.udp_wmem_min
+  sysctl:
+    name: net.ipv4.udp_wmem_min
+    value: 131072
   tags: network

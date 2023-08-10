@@ -3,8 +3,6 @@
 - name: Set the hostname
   ansible.builtin.hostname:
     name: "{{ hostname }}"
-  tags:
-    - hostname
   tags: init
 
 - name: Set apt sources
