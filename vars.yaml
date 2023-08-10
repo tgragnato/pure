@@ -1,2 +1,4 @@
 ssh_user: 'root'
 base_directory: /root
+debian_repository: https://deb.debian.org/debian
+debian_security: https://deb.debian.org/debian-security

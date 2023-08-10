@@ -1,0 +1,5 @@
+---
+
+- name: Reload .network and .netdev files
+  shell: networkctl reload
+  listen: networkctl reload

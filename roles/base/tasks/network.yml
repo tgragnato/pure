@@ -1,93 +1,133 @@
 ---
 
+- name: Check systemd-networkd
+  systemd:
+    name: systemd-networkd
+    state: started
+    enabled: yes
+    masked: no
+  tags: network
+
+- name: Install network profiles
+  copy:
+    src: "{{ item }}"
+    dest: "/etc/systemd/network/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  with_items:
+    - enp.network
+    - wan.netdev
+    - wan.network
+  notify: networkctl reload
+  tags: network
+
 - name: Delete /etc/network
   file:
     state: absent
     path: /etc/network
+  tags: network
 
 - name: Delete /etc/sysctl.d
   file:
     state: absent
     path: /etc/sysctl.d
+  tags: network
 
 - name: Remove comments from /etc/sysctl.conf
   lineinfile:
     path: /etc/sysctl.conf
     regexp: '^#' 
     state: absent
+  tags: network
 
 - name: Remove empty lines from /etc/sysctl.conf
   lineinfile:
     path: /etc/sysctl.conf
     regexp: '^\s*$'
     state: absent
+  tags: network
 
 - name: Setting kernel.printk
   sysctl:
     name: kernel.printk
     value: 3 4 1 3
+  tags: network
 
 - name: Setting net.ipv4.conf.default.rp_filter
   sysctl:
     name: net.ipv4.conf.default.rp_filter
     value: 1
+  tags: network
 
 - name: Setting net.ipv4.conf.all.rp_filter
   sysctl:
     name: net.ipv4.conf.all.rp_filter
     value: 1
+  tags: network
 
 - name: Setting net.ipv4.tcp_syncookies
   sysctl:
     name: net.ipv4.tcp_syncookies
     value: 1
+  tags: network
 
 - name: Setting net.ipv4.ip_forward
   sysctl:
     name: net.ipv4.ip_forward
     value: 0
+  tags: network
 
 - name: Setting net.ipv6.conf.all.forwarding
   sysctl:
     name: net.ipv6.conf.all.forwarding
     value: 0
+  tags: network
 
 - name: Setting net.ipv4.conf.all.accept_redirects
   sysctl:
     name: net.ipv4.conf.all.accept_redirects
     value: 0
+  tags: network
 
 - name: Setting net.ipv6.conf.all.accept_redirects
   sysctl:
     name: net.ipv6.conf.all.accept_redirects
     value: 0
+  tags: network
 
 - name: Setting net.ipv4.conf.all.secure_redirects
   sysctl:
     name: net.ipv4.conf.all.secure_redirects
     value: 0
+  tags: network
 
 - name: Setting net.ipv4.conf.all.send_redirects
   sysctl:
     name: net.ipv4.conf.all.send_redirects
     value: 0
+  tags: network
 
 - name: Setting net.ipv4.conf.all.accept_source_route
   sysctl:
     name: net.ipv4.conf.all.accept_source_route
     value: 0
+  tags: network
 
 - name: Setting net.ipv6.conf.all.accept_source_route
   sysctl:
     name: net.ipv6.conf.all.accept_source_route
     value: 0
+  tags: network
 
 - name: Setting net.ipv4.conf.all.log_martians
   sysctl:
     name: net.ipv4.conf.all.log_martians
     value: 0
+  tags: network
 
 - name: Setting net.ipv4.ip_local_port_range
   sysctl:
     name: net.ipv4.ip_local_port_range
     value: 1024 65535
+  tags: network
