@@ -9,5 +9,5 @@
   listen: unbound-anchor
 
 - name: Reload unbound
-  shell: unbound-control
+  shell: unbound-control reload
   listen: reload unbound

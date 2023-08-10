@@ -1,0 +1,9 @@
+---
+
+- name: Restart snowflake
+  shell: systemctl restart snowflake
+  listen: restart snowflake
+
+- name: Daemon reload
+  shell: systemctl daemon-reload
+  listen: daemon-reload

@@ -1,0 +1,42 @@
+[Unit]
+Description=Snowflake Proxy Daemon
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+AmbientCapabilities=
+CapabilityBoundingSet=
+DevicePolicy=closed
+ExecStart={{ snowflake_path }} -unsafe-logging
+Group=proxy
+IPAddressDeny=link-local multicast
+LimitNOFILE=32768
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=true
+PrivateDevices=yes
+PrivateTmp=yes
+ProcSubset=pid
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=invisible
+ProtectSystem=strict
+RemoveIPC=yes
+Restart=on-failure
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@resources @privileged
+UMask=777
+User=proxy
+
+[Install]
+WantedBy=multi-user.target
