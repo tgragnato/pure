@@ -1,0 +1,65 @@
+---
+
+- name: Install unbound
+  apt:
+    name: "{{item}}"
+    state: present
+  with_items:
+    - unbound
+    - unbound-anchor
+    - dns-root-data
+  tags: dns
+
+- name: Setup unbound
+  template:
+    src: main.conf.j2
+    dest: /etc/unbound/unbound.conf.d/main.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload unbound
+  tags: dns
+
+- name: Setup local data
+  copy:
+    src: localdata.conf
+    dest: /etc/unbound/unbound.conf.d/localdata.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify: reload unbound
+  tags: dns
+
+- name: Link root hints
+  file:
+    force: yes
+    src: /usr/share/dns/root.key
+    dest: /var/lib/unbound/root.key
+    state: link
+  notify: unbound-anchor
+  tags: dns
+
+- name: Disable unbound-resolvconf
+  systemd:
+    name: unbound-resolvconf.service
+    state: stopped
+    enabled: no
+    masked: yes
+  tags: dns
+
+- name: Enable unbound
+  systemd:
+    name: unbound.service
+    state: started
+    enabled: yes
+    masked: no
+  tags: dns
+
+- name: Setup resolv.conf
+  copy:
+    src: resolv.conf
+    dest: /etc/resolv.conf
+    owner: root
+    group: root
+    mode: 0644
+  tags: dns
