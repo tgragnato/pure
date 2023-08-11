@@ -4,3 +4,12 @@ debian_repository: https://deb.debian.org/debian
 debian_security: https://deb.debian.org/debian-security
 ca_bundle: /etc/ssl/certs/ca-certificates.crt
 snowflake_path: /usr/local/bin/snowflake
+ipv6: yes
+ipv4: yes
+sinkhole_china: yes
+sinkhole_russia: yes
+sinkhole_iran: yes
+sinkhole_dprk: yes
+root_hints: /usr/share/dns/root.hints
+cache_max: 604800
+cache_min: 3600

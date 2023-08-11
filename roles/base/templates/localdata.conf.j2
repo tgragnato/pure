@@ -1,6 +1,6 @@
 server:
 
-    # China
+{% if sinkhole_china %}
     local-zone: "cn." always_null
     local-zone: "xn--fiqs8s." always_null
     local-zone: "xn--fiqz9s." always_null
@@ -9,17 +9,21 @@ server:
     local-zone: "mo." always_null
     local-zone: "xn--mix082f." always_null
     local-zone: "xn--mix891f." always_null
+{% endif %}
 
-    # Russia
+{% if sinkhole_russia %}
     local-zone: "ru." always_null
     local-zone: "su." always_null
     local-zone: "xn--p1ai." always_null
     local-zone: "by." always_null
     local-zone: "xn--90ais." always_null
+{% endif %}
 
-    # Iran
+{% if sinkhole_iran %}
     local-zone: "ir." always_null
     local-zone: "xn--mgba3a4f16a." always_null
+{% endif %}
 
-    # DPRK
+{% if sinkhole_dprk %}
     local-zone: "kp." always_null
+{% endif %}

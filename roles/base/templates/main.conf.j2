@@ -1,12 +1,20 @@
 server:
 
+{% if ipv4 %}
     interface: 127.0.0.1
+{% endif %}
+{% if ipv6 %}
     interface: ::1
+{% endif %}
 
     access-control: 0.0.0.0/0 refuse
+{% if ipv4 %}
     access-control: 127.0.0.0/8 allow
+{% endif %}
     access-control: ::0/0 refuse
+{% if ipv6 %}
     access-control: ::1 allow
+{% endif %}
 
     private-address: 0.0.0.0/8
     private-address: 100.64.0.0/10
@@ -42,32 +50,41 @@ server:
     hide-identity: yes
     hide-version: yes
 
-    root-hints: /usr/share/dns/root.hints
+    root-hints: {{ root_hints }}
     
     # Custom
-    cache-max-ttl: 604800
-    cache-min-ttl: 3600
+    cache-max-ttl: {{ cache_max }}
+    cache-min-ttl: {{ cache_min }}
     prefetch: yes
     prefetch-key: yes
     aggressive-nsec: yes
     use-caps-for-id: yes
     deny-any: yes
+    qname-minimisation: yes
+    qname-minimisation-strict: yes
 
     # Cores
-    num-threads: 4
-    msg-cache-slabs: 4
-    rrset-cache-slabs: 4
-    infra-cache-slabs: 4
-    key-cache-slabs: 4
+    num-threads: {{ cores }}
+    msg-cache-slabs: {{ cores }}
+    rrset-cache-slabs: {{ cores }}
+    infra-cache-slabs: {{ cores }}
+    key-cache-slabs: {{ cores }}
 
     # Memory Control
-    msg-cache-size: 1024m
-    rrset-cache-size: 2048m
-    key-cache-size: 1024m
-    neg-cache-size: 1024m
+    msg-cache-size: {{ cache_size }}
+    rrset-cache-size: {{ cache_rrsets }}
+    key-cache-size: {{ cache_size }}
+    neg-cache-size: {{ cache_size }}
     infra-cache-numhosts: 100000000000
+
+    # Harden
     harden-large-queries: "yes"
     harden-short-bufsize: "yes"
+    harden-glue: "yes"
+    harden-dnssec-stripped: "yes"
+    harden-below-nxdomain: "yes"
+    harden-referral-path: "yes"
+    harden-algo-downgrade: "yes"
 
     # CAs bundle
     tls-cert-bundle: {{ ca_bundle }}

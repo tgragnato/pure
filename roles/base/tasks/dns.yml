@@ -7,6 +7,7 @@
   with_items:
     - unbound
     - unbound-anchor
+    - unbound-host
     - dns-root-data
   tags: dns
 
@@ -21,8 +22,8 @@
   tags: dns
 
 - name: Setup local data
-  copy:
-    src: localdata.conf
+  template:
+    src: localdata.conf.j2
     dest: /etc/unbound/unbound.conf.d/localdata.conf
     owner: root
     group: root
@@ -56,8 +57,8 @@
   tags: dns
 
 - name: Setup resolv.conf
-  copy:
-    src: resolv.conf
+  template:
+    src: resolv.conf.j2
     dest: /etc/resolv.conf
     owner: root
     group: root
