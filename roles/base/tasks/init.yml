@@ -17,7 +17,7 @@
 - name: Delete old apt sources
   file:
     state: absent
-    path: "{{item}}"
+    path: "{{ item }}"
   with_items:
     - /etc/apt/sources.list.d
     - /etc/apt/sources.list~
@@ -39,7 +39,7 @@
 
 - name: Install essential packages
   apt:
-    name: "{{item}}"
+    name: "{{ item }}"
     state: present
   with_items:
     - aptitude
@@ -53,7 +53,7 @@
 
 - name: Remove default packages
   apt:
-    name: "{{item}}"
+    name: "{{ item }}"
     state: absent
   with_items:
     - cron
@@ -69,7 +69,7 @@
 
 - name: Disable futile services
   systemd:
-    name: "{{item}}"
+    name: "{{ item }}"
     state: stopped
     enabled: no
     masked: yes

@@ -14,7 +14,7 @@
   file:
     force: yes
     src: /dev/null
-    dest: "{{item}}"
+    dest: "{{ item }}"
     state: link
   with_items:
     - /home
