@@ -8,10 +8,10 @@
   roles:
     - base
 
-- name: Snowflake role
+- name: Firewall role
   hosts: baremetal
   vars_files:
     - vars.yaml
   remote_user: "{{ ssh_user }}"
   roles:
-    - snowflake
+    - firewall

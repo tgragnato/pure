@@ -1,0 +1,21 @@
+---
+
+- name: Restart snowflake
+  shell: systemctl restart snowflake
+  listen: restart snowflake
+
+- name: Daemon reload
+  shell: systemctl daemon-reload
+  listen: daemon-reload
+
+- name: Restart hostapd
+  shell: systemctl restart hostapd
+  listen: restart hostapd
+
+- name: Reload .network and .netdev files
+  shell: networkctl reload
+  listen: networkctl reload
+
+- name: Restart nftables
+  shell: systemctl restart nftables
+  listen: restart nftables

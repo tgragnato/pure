@@ -1,0 +1,37 @@
+[Unit]
+Description=Unbound DNS server
+Documentation=man:unbound(8)
+After=network.target
+After=network-online.target
+
+[Service]
+Type=notify
+Restart=on-failure
+EnvironmentFile=-/etc/default/unbound
+ExecStartPre=-/usr/libexec/unbound-helper chroot_setup
+ExecStart=/usr/sbin/unbound -d -p $DAEMON_OPTS
+ExecStopPost=-/usr/libexec/unbound-helper chroot_teardown
+ExecReload=+/bin/kill -HUP $MAINPID
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=yes
+PrivateDevices=yes
+PrivateTmp=yes
+ProcSubset=pid
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=invisible
+RestrictAddressFamilies=AF_INET AF_INET6 AF_PACKET AF_NETLINK AF_UNIX
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+
+[Install]
+WantedBy=multi-user.target

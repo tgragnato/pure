@@ -1,7 +1,7 @@
 ---
 
 - name: Set the hostname
-  ansible.builtin.hostname:
+  hostname:
     name: "{{ hostname }}"
   tags: init
 
@@ -24,8 +24,8 @@
   tags: init
 
 - name: Configure apt
-  copy:
-    src: 99custom
+  template:
+    src: 99custom.j2
     dest: /etc/apt/apt.conf.d/99custom
     owner: root
     group: root
@@ -49,6 +49,14 @@
     - locales-all
     - lsof
     - tmux
+  tags: init
+
+- name: Customize the hardening runtime
+  lineinfile:
+    path: /etc/default/grub.d/01_hardening.cfg
+    line: GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT pci=noaer intel_iommu=on"
+    state: present
+  notify: update grub
   tags: init
 
 - name: Remove default packages

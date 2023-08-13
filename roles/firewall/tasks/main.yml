@@ -1,0 +1,13 @@
+---
+
+- name: Initialize the wifi
+  import_tasks: wifi.yml
+
+#- name: Initialize wireguard
+#  import_tasks: wireguard.yml
+
+- name: Initialize the firewall
+  import_tasks: firewall.yml
+
+- name: Install snowflake
+  import_tasks: snowflake.yml

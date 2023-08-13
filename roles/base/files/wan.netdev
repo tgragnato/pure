@@ -1,7 +1,0 @@
-[NetDev]
-Name=wan
-Kind=bond
-
-[Bond]
-Mode=balance-alb
-MIIMonitorSec=1s

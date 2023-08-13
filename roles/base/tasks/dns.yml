@@ -14,7 +14,7 @@
 - name: Setup unbound
   template:
     src: main.conf.j2
-    dest: /etc/unbound/unbound.conf.d/main.conf
+    dest: "{{ undbound_confdir }}/main.conf"
     owner: root
     group: root
     mode: 0644
@@ -24,7 +24,7 @@
 - name: Setup local data
   template:
     src: localdata.conf.j2
-    dest: /etc/unbound/unbound.conf.d/localdata.conf
+    dest: "{{ undbound_confdir }}/localdata.conf"
     owner: root
     group: root
     mode: 0644
@@ -46,6 +46,22 @@
     state: stopped
     enabled: no
     masked: yes
+  tags: dns
+
+- name: Install the unbound service
+  template:
+    src: unbound.service.j2
+    dest: /etc/systemd/system/unbound.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - daemon-reload
+    - restart unbound
+  tags: dns
+
+- name: Check the unbound configuration
+  shell: unbound-checkconf
   tags: dns
 
 - name: Enable unbound
