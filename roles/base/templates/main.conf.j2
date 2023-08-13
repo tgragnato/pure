@@ -2,18 +2,30 @@ server:
 
 {% if ipv4 %}
     interface: 127.0.0.1
+{% if forwarding %}
+    interface: {{ wifi_ipv4 }}
+{% endif %}
 {% endif %}
 {% if ipv6 %}
     interface: ::1
+{% if forwarding %}
+    interface: {{ wifi_ipv6 }}
+{% endif %}
 {% endif %}
 
     access-control: 0.0.0.0/0 refuse
 {% if ipv4 %}
     access-control: 127.0.0.0/8 allow
+{% if forwarding %}
+    access-control: {{ wifi_ipv4 }}/{{ wifi_class4 }} allow
+{% endif %}
 {% endif %}
     access-control: ::0/0 refuse
 {% if ipv6 %}
     access-control: ::1 allow
+{% if forwarding %}
+    access-control: {{ wifi_ipv6 }}/{{ wifi_class6 }} allow
+{% endif %}
 {% endif %}
 
     private-address: 0.0.0.0/8
@@ -64,17 +76,17 @@ server:
     qname-minimisation-strict: yes
 
     # Cores
-    num-threads: {{ cores }}
-    msg-cache-slabs: {{ cores }}
-    rrset-cache-slabs: {{ cores }}
-    infra-cache-slabs: {{ cores }}
-    key-cache-slabs: {{ cores }}
+    num-threads: {{ cores | default(1) }}
+    msg-cache-slabs: {{ cores | default(1) }}
+    rrset-cache-slabs: {{ cores | default(1) }}
+    infra-cache-slabs: {{ cores | default(1)}}
+    key-cache-slabs: {{ cores | default(1) }}
 
     # Memory Control
-    msg-cache-size: {{ cache_size }}
-    rrset-cache-size: {{ cache_rrsets }}
-    key-cache-size: {{ cache_size }}
-    neg-cache-size: {{ cache_size }}
+    msg-cache-size: {{ cache_size | default("128m") }}
+    rrset-cache-size: {{ cache_rrsets | default("256m") }}
+    key-cache-size: {{ cache_size | default("128m") }}
+    neg-cache-size: {{ cache_size | default("128m") }}
     infra-cache-numhosts: 100000000000
 
     # Harden

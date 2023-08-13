@@ -1,9 +1,4 @@
 all:
-  vars:
-    nonfree_firmware: ''
-    cores: 1
-    cache_size: 128m
-    cache_rrsets: 256m
   children:
     baremetal:
       vars:
@@ -11,6 +6,7 @@ all:
         cores: 4
         cache_size: 1024m
         cache_rrsets: 2048m
+        forwarding: 1
       hosts:
-        192.168.1.85:
+        172.16.32.1:
           hostname: puremini

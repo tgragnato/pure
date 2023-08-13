@@ -1,5 +1,9 @@
 ---
 
+- name: Update grub
+  shell: update-grub
+  listen: update grub
+
 - name: Reload .network and .netdev files
   shell: networkctl reload
   listen: networkctl reload
@@ -7,6 +11,14 @@
 - name: Setup or update root anchor
   shell: unbound-anchor
   listen: unbound-anchor
+
+- name: Daemon reload
+  shell: systemctl daemon-reload
+  listen: daemon-reload
+
+- name: Restart unbound
+  shell: systemctl restart unbound
+  listen: restart unbound
 
 - name: Reload unbound
   shell: unbound-control reload

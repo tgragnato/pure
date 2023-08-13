@@ -1,0 +1,29 @@
+---
+
+- name: Check systemd-networkd
+  systemd:
+    name: systemd-networkd
+    state: started
+    enabled: yes
+    masked: no
+  tags: wireguard
+
+- name: Install the network device
+  template:
+    src: wg0.netdev.j2
+    dest: /etc/systemd/network/wg0.netdev
+    owner: root
+    group: systemd-network
+    mode: 0640
+  notify: networkctl reload
+  tags: wireguard
+
+- name: Install the network profile
+  template:
+    src: wg0.network.j2
+    dest: /etc/systemd/network/wg0.network
+    owner: root
+    group: root
+    mode: 0644
+  notify: networkctl reload
+  tags: wireguard

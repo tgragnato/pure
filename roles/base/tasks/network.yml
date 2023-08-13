@@ -9,14 +9,14 @@
   tags: network
 
 - name: Install network profiles
-  copy:
-    src: "{{ item }}"
+  template:
+    src: "{{ item }}.j2"
     dest: "/etc/systemd/network/{{ item }}"
     owner: root
     group: root
     mode: 0644
   with_items:
-    - enp.network
+    - en.network
     - wan.netdev
     - wan.network
   notify: networkctl reload
@@ -81,9 +81,9 @@
     - name: kernel.unprivileged_bpf_disabled
       value: 1
     - name: net.ipv4.ip_forward
-      value: 0
+      value: "{{ forwarding | default(0) }}"
     - name: net.ipv6.conf.all.forwarding
-      value: 0
+      value: "{{ forwarding | default(0) }}"
     - name: net.ipv4.conf.all.accept_redirects
       value: 0
     - name: net.ipv6.conf.all.accept_redirects
