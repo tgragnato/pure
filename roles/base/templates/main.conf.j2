@@ -3,13 +3,13 @@ server:
 {% if ipv4 %}
     interface: 127.0.0.1
 {% if forwarding %}
-    interface: {{ wifi_ipv4 }}
+    interface: {{ wg0_ipv4 }}
 {% endif %}
 {% endif %}
 {% if ipv6 %}
     interface: ::1
 {% if forwarding %}
-    interface: {{ wifi_ipv6 }}
+    interface: {{ wg0_ipv6 }}
 {% endif %}
 {% endif %}
 
@@ -17,14 +17,14 @@ server:
 {% if ipv4 %}
     access-control: 127.0.0.0/8 allow
 {% if forwarding %}
-    access-control: {{ wifi_ipv4 }}/{{ wifi_class4 }} allow
+    access-control: {{ wg0_ipv4 }}/{{ wg0_class4 }} allow
 {% endif %}
 {% endif %}
     access-control: ::0/0 refuse
 {% if ipv6 %}
     access-control: ::1 allow
 {% if forwarding %}
-    access-control: {{ wifi_ipv6 }}/{{ wifi_class6 }} allow
+    access-control: {{ wg0_ipv6 }}/{{ wg0_class6 }} allow
 {% endif %}
 {% endif %}
 
