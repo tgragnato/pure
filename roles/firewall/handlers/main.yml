@@ -8,10 +8,6 @@
   shell: systemctl daemon-reload
   listen: daemon-reload
 
-- name: Restart hostapd
-  shell: systemctl restart hostapd
-  listen: restart hostapd
-
 - name: Reload .network and .netdev files
   shell: networkctl reload
   listen: networkctl reload

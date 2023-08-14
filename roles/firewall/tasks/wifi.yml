@@ -1,43 +1,19 @@
 ---
 
-- name: Install hostapd
+- name: Remove hostapd
   apt:
     name: hostapd
-    state: present
+    state: absent
   tags: wifi
 
-- name: Setup hostapd.conf
-  template:
-    src: hostapd.conf.j2
-    dest: /etc/hostapd/hostapd.conf
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart hostapd
+- name: Remove hostapd.conf
+  file:
+    path: /etc/hostapd/hostapd.conf
+    state: absent
   tags: wifi
 
-- name: Enable hostapd
-  systemd:
-    name: hostapd.service
-    state: started
-    enabled: yes
-    masked: no
-  tags: wifi
-
-- name: Check systemd-networkd
-  systemd:
-    name: systemd-networkd
-    state: started
-    enabled: yes
-    masked: no
-  tags: wifi
-
-- name: Install network profile
-  template:
-    src: wifi.network.j2
-    dest: /etc/systemd/network/wifi.network
-    owner: root
-    group: root
-    mode: 0644
-  notify: networkctl reload
+- name: Remove the network profile
+  file:
+    path: /etc/systemd/network/wifi.network
+    state: absent
   tags: wifi

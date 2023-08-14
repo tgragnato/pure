@@ -1,6 +1,6 @@
 ---
 
-- name: Initialize the wifi
+- name: Remove the wifi
   import_tasks: wifi.yml
 
 #- name: Initialize wireguard
