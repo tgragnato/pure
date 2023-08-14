@@ -8,7 +8,7 @@ table inet filter {
         type filter hook input priority 0; policy drop;
         iif lo accept
         iifname wan jump input_wan
-        iifname { {{ wifi_interface }}, wg0 } accept
+        iifname wg0 accept
     }
     chain input_wan {
         ip protocol icmp accept
@@ -28,7 +28,7 @@ table inet filter {
         type filter hook output priority 0; policy drop;
         oif lo accept
         oifname wan jump output_wan
-        oifname { {{ wifi_interface }}, wg0 } accept
+        oifname wg0 accept
     }
     chain output_wan {
 {% if ipv4 %}
@@ -53,9 +53,9 @@ table inet filter {
     chain forward {
         type filter hook forward priority 0; policy drop;
         meta pkttype { broadcast, multicast } drop
-        iifname { {{ wifi_interface }}, wg0 } oifname wan jump forward_nat
-        iifname wan oifname { {{ wifi_interface }}, wg0 } jump forward_reverse
-        iifname { {{ wifi_interface }}, wg0 } oifname { {{ wifi_interface }}, wg0 } reject with icmpx type host-unreachable
+        iifname wg0 oifname wan jump forward_nat
+        iifname wan oifname wg0 jump forward_reverse
+        iifname wg0 oifname wg0 reject with icmpx type host-unreachable
     }
     chain forward_reverse {
         ct state invalid drop
@@ -73,14 +73,10 @@ table inet filter {
     chain prerouting {
         type nat hook prerouting priority 0;
 {% if ipv4 %}
-        iifname {{ wifi_interface }} ip daddr != {{ wifi_ipv4 }} tcp sport 53 redirect to 53
-        iifname {{ wifi_interface }} ip daddr != {{ wifi_ipv4 }} udp sport 53 redirect to 53
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp sport 53 redirect to 53
         iifname wg0 ip daddr != {{ wg0_ipv4 }} udp sport 53 redirect to 53
 {% endif %}
 {% if ipv6 %}
-        iifname {{ wifi_interface }} ip6 daddr != {{ wifi_ipv6 }} tcp sport 53 redirect to 53
-        iifname {{ wifi_interface }} ip6 daddr != {{ wifi_ipv6 }} udp sport 53 redirect to 53
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp sport 53 redirect to 53
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} udp sport 53 redirect to 53
 {% endif %}

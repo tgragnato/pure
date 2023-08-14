@@ -54,7 +54,7 @@
 - name: Customize the hardening runtime
   lineinfile:
     path: /etc/default/grub.d/01_hardening.cfg
-    line: GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT pci=noaer intel_iommu=on"
+    line: GRUB_CMDLINE_LINUX_DEFAULT="$GRUB_CMDLINE_LINUX_DEFAULT intel_iommu=on"
     state: present
   notify: update grub
   tags: init

@@ -1,0 +1,15 @@
+[NetDev]
+Name = wg0
+Kind = wireguard
+
+[WireGuard]
+PrivateKey = {{ wg0_privatekey }}
+ListenPort = {{ wg0_port }}
+
+{% for peer in wgpeers %}
+[WireGuardPeer]
+PublicKey = {{ peer.publickey }}
+PresharedKey = {{ peer.presharedkey }}
+AllowedIPs = {{ peer.allowedips }}
+
+{% endfor %}
