@@ -16,6 +16,10 @@
   shell: systemctl restart sntpd
   listen: restart sntpd
 
+- name: Restart shshd
+  shell: systemctl restart shshd
+  listen: restart shshd
+
 - name: Restart snowflake
   shell: systemctl restart snowflake
   listen: restart snowflake
