@@ -6,5 +6,8 @@
 - name: Initialize the firewall
   import_tasks: firewall.yml
 
+- name: Install sntpd
+  import_tasks: sntpd.yml
+
 - name: Install snowflake
   import_tasks: snowflake.yml

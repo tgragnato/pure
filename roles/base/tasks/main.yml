@@ -11,3 +11,6 @@
 
 - name: Setup dns
   import_tasks: dns.yml
+
+- name: Setup ntp
+  import_tasks: ntp.yml

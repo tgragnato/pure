@@ -1,0 +1,31 @@
+---
+
+- name: Install sntpd
+  copy:
+    src: sntpd
+    dest: "{{ sntpd_path }}"
+    owner: nobody
+    group: nogroup
+    mode: 0500
+  notify: restart sntpd
+  tags: sntpd
+
+- name: Install the sntpd service
+  template:
+    src: sntpd.service.j2
+    dest: /etc/systemd/system/sntpd.service
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - daemon-reload
+    - restart sntpd
+  tags: sntpd
+
+- name: Enable and start sntpd
+  systemd:
+    name: sntpd.service
+    state: started
+    enabled: yes
+    masked: no
+  tags: sntpd

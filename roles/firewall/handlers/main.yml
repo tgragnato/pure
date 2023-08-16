@@ -1,9 +1,5 @@
 ---
 
-- name: Restart snowflake
-  shell: systemctl restart snowflake
-  listen: restart snowflake
-
 - name: Daemon reload
   shell: systemctl daemon-reload
   listen: daemon-reload
@@ -15,3 +11,11 @@
 - name: Restart nftables
   shell: systemctl restart nftables
   listen: restart nftables
+
+- name: Restart sntpd
+  shell: systemctl restart sntpd
+  listen: restart sntpd
+
+- name: Restart snowflake
+  shell: systemctl restart snowflake
+  listen: restart snowflake

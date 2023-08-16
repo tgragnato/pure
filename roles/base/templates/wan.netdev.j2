@@ -3,5 +3,5 @@ Name=wan
 Kind=bond
 
 [Bond]
-Mode={{ balance_mode }}
+Mode={{ balance_mode | default('balance-alb') }}
 MIIMonitorSec=1s

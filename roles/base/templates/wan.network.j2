@@ -2,7 +2,15 @@
 Name=wan
 
 [Network]
+{% if ipv4 and ipv6 %}
 DHCP=yes
+{% elif ipv4 %}
+DHCP=ipv4
+{% elif ipv6 %}
+DHCP=ipv6
+{% else %}
+DHCP=no
+{% endif %}
 LLMNR=no
 MulticastDNS=no
 

@@ -23,3 +23,7 @@
 - name: Reload unbound
   shell: unbound-control reload
   listen: reload unbound
+
+- name: Restart timesyncd
+  shell: systemctl restart systemd-timesyncd
+  listen: restart ntp
