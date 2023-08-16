@@ -1,2 +1,4 @@
 roles/firewall/files/sntpd
 sntpd/sntpd
+roles/firewall/files/shshd
+shshd/shshd
