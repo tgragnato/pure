@@ -11,3 +11,6 @@ shshd: roles/firewall/files/shshd
 
 roles/firewall/files/shshd:
 	GOOS=linux GOARCH=amd64 go build -C shshd -o ../roles/firewall/files/shshd
+
+all: sntpd shshd
+	ansible-playbook -i inventory.yaml playbook.yaml
