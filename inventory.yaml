@@ -8,5 +8,5 @@ all:
         cache_rrsets: 2048m
         forwarding: 1
       hosts:
-        192.168.1.85:
+        172.16.33.1:
           hostname: puremini
