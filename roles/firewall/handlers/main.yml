@@ -24,6 +24,10 @@
   shell: systemctl restart snid
   listen: restart snid
 
+- name: Restart tor
+  shell: systemctl restart tor@default
+  listen: restart tor
+
 - name: Restart snowflake
   shell: systemctl restart snowflake
   listen: restart snowflake

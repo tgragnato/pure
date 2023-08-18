@@ -3,6 +3,9 @@
 - name: Initialize wireguard
   import_tasks: wireguard.yml
 
+- name: Install tor
+  import_tasks: tor.yml
+
 - name: Initialize the firewall
   import_tasks: firewall.yml
 
