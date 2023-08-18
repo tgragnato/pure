@@ -2,3 +2,5 @@ roles/firewall/files/sntpd
 sntpd/sntpd
 roles/firewall/files/shshd
 shshd/shshd
+roles/firewall/files/snid
+snid/snid

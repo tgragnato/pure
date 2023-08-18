@@ -20,6 +20,10 @@
   shell: systemctl restart shshd
   listen: restart shshd
 
+- name: Restart snid
+  shell: systemctl restart snid
+  listen: restart snid
+
 - name: Restart snowflake
   shell: systemctl restart snowflake
   listen: restart snowflake

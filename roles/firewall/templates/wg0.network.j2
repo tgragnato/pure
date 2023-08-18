@@ -2,5 +2,9 @@
 Name = wg0
 
 [Network]
+{% if ipv4 %}
 Address = {{ wg0_ipv4 }}/{{ wg0_class4 }}
+{% endif %}
+{% if ipv6 %}
 Address = {{ wg0_ipv6 }}/{{ wg0_class6 }}
+{% endif %}
