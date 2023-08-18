@@ -12,5 +12,8 @@
 - name: Install shshd
   import_tasks: shshd.yml
 
+- name: Install snid
+  import_tasks: snid.yml
+
 - name: Install snowflake
   import_tasks: snowflake.yml
