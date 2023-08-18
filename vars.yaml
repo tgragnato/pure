@@ -63,4 +63,5 @@ wan_ssh: yes
 sntpd_path: /usr/local/bin/sntpd
 shshd_path: /usr/local/bin/shshd
 snid_path: /usr/local/bin/snid
+client_path: /usr/bin/snowflake-client
 snowflake_path: /usr/local/bin/snowflake

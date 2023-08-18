@@ -7,7 +7,7 @@ Directory tree:
     [https://www.theiphonewiki.com/wiki/SHSH](https://www.theiphonewiki.com/wiki/SHSH)
 - `sntpd` is a sntp v4 server that relays the time of the system on which it is running
     [https://www.rfc-editor.org/rfc/rfc2030](https://www.rfc-editor.org/rfc/rfc2030)
-- `snid` is a TLS proxy traffic that does not terminate
+- `snid` is a proxy for TLS that does not terminate
     - it refuses non-TLS traffic and connections to bare IP addresses
     - checks the geographical location of the remote endpoints
     - logs the [Server Name Indication](https://www.rfc-editor.org/rfc/rfc3546.html)

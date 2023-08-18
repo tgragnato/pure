@@ -1,0 +1,38 @@
+---
+
+- name: Install tor
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - tor
+    - tor-geoipdb
+  tags: tor
+
+- name: Setup torrc
+  template:
+    src: torrc.j2
+    dest: /etc/tor/torrc
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart tor
+  tags: tor
+
+- name: Install the snowflake client
+  copy:
+    src: client
+    dest: "{{ client_path }}"
+    owner: debian-tor
+    group: debian-tor
+    mode: 0750
+  notify: restart tor
+  tags: tor
+
+- name: Enable and start tor
+  systemd:
+    name: tor@default.service
+    state: started
+    enabled: yes
+    masked: no
+  tags: tor

@@ -46,10 +46,10 @@ table inet filter {
         meta pkttype { broadcast, multicast } drop
         ct state invalid drop
         ct state established,related accept
-        tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy } accept
+        tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } accept
         tcp sport 1024-65535 tcp dport { 80, 8443 } skuid proxy accept
         tcp sport 1024-65535 tcp dport 53 skuid unbound accept
-        udp sport 1024-65535 udp sport 1024-65535 skuid proxy accept
+        udp sport 1024-65535 udp sport 1024-65535 skuid { proxy, debian-tor } accept
         udp sport 1024-65535 udp dport 53 skuid unbound accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
         reject with icmpx type port-unreachable

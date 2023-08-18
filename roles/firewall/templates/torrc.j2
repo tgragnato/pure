@@ -1,0 +1,27 @@
+
+{% if forwarding %}
+{% if ipv6 %}
+SocksPort [{{ wg0_ipv6 }}]:9050 IsolateDestPort IsolateDestAddr
+SocksPolicy accept {{ wg0_ipv6 }}/{{ wg0_class6 }}, reject *
+{% else %}
+SocksPort {{ wg0_ipv4 }}:9050
+SocksPolicy accept {{ wg0_ipv4 }}/{{ wg0_class4 }}, reject *
+{% endif %}
+{% endif %}
+
+AvoidDiskWrites 1
+ClientOnly 1
+ClientPreferIPv6ORPort 1
+ClientUseIPv6 1
+ConnectionPadding 1
+ControlSocket 0
+
+UseBridges 1
+ClientTransportPlugin snowflake exec {{ client_path }}
+Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=cdn.sstatic.net ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=cdn.sstatic.net ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge 93.56.117.22:443 2A5DF4A0FDD52868E25F2C33BC232AFFD19B8BF3
+
+NumDirectoryGuards 3
+NumEntryGuards 3
+NumPrimaryGuards 3
