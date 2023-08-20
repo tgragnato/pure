@@ -1,11 +1,13 @@
 
 {% if forwarding %}
 {% if ipv6 %}
-SocksPort [{{ wg0_ipv6 }}]:9050 IsolateDestPort IsolateDestAddr
-SocksPolicy accept {{ wg0_ipv6 }}/{{ wg0_class6 }}, reject *
+SocksPort [::1]:9050 IsolateDestPort IsolateDestAddr
++SocksPort [{{ wg0_ipv6 }}]:9050 IsolateDestPort IsolateDestAddr
+SocksPolicy accept ::1/128, accept {{ wg0_ipv6 }}/{{ wg0_class6 }}, reject *
 {% else %}
-SocksPort {{ wg0_ipv4 }}:9050
-SocksPolicy accept {{ wg0_ipv4 }}/{{ wg0_class4 }}, reject *
+SocksPort 127.0.0.1:9050 IsolateDestPort IsolateDestAddr
++SocksPort {{ wg0_ipv4 }}:9050
+SocksPolicy accept 127.0.0.1/32, accept {{ wg0_ipv4 }}/{{ wg0_class4 }}, reject *
 {% endif %}
 {% endif %}
 
@@ -25,3 +27,6 @@ Bridge 93.56.117.22:443 2A5DF4A0FDD52868E25F2C33BC232AFFD19B8BF3
 NumDirectoryGuards 3
 NumEntryGuards 3
 NumPrimaryGuards 3
+
+GeoIPFile /usr/share/tor/geoip
+GeoIPv6File /usr/share/tor/geoip6

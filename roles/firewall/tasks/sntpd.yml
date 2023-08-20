@@ -13,7 +13,7 @@
 - name: Install the sntpd service
   template:
     src: sntpd.service.j2
-    dest: /etc/systemd/system/sntpd.service
+    dest: "{{ systemd_system }}/sntpd.service"
     owner: root
     group: root
     mode: 0644
