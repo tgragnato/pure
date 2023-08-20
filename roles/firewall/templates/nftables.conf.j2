@@ -25,7 +25,7 @@ table inet filter {
 {% if wan_ssh %}
         tcp sport 1024-65535 tcp dport 22 accept
 {% endif %}
-        udp sport 1024-65535 udp dport { 123, {{ wg0_port }}} accept
+        udp sport 1024-65535 udp dport { 123, {{ wg0_port }} } accept
     }
 
     chain output {
@@ -46,12 +46,11 @@ table inet filter {
         meta pkttype { broadcast, multicast } drop
         ct state invalid drop
         ct state established,related accept
-        tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } accept
-        tcp sport 1024-65535 tcp dport { 80, 8443 } skuid proxy accept
         tcp sport 1024-65535 tcp dport 53 skuid unbound accept
-        udp sport 1024-65535 udp sport 1024-65535 skuid { proxy, debian-tor } accept
         udp sport 1024-65535 udp dport 53 skuid unbound accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
+        tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } accept
+        udp sport 1024-65535 udp sport 1024-65535 skuid { proxy, debian-tor } accept
         reject with icmpx type port-unreachable
     }
 
@@ -70,8 +69,12 @@ table inet filter {
     chain forward_nat {
         ct state invalid drop
         ct state established,related accept
-        tcp sport 49152-65535 tcp dport { 453, 465, 587, 993, 5223 } accept
         udp sport 49152-65535 udp dport 1024-65535 accept
+{% if ipv4 %}
+        ip daddr { 52.20.0.0/14, 34.192.0.0/12, 3.208.0.0/12, 54.160.0.0/14, 35.168.0.0/13, 52.200.0.0/13 } tcp sport 49152-65535 tcp dport 453 accept
+        ip daddr 17.0.0.0/8 tcp sport 49152-65535 tcp dport { 587, 993, 5223 } accept
+        ip daddr 17.0.0.0/8 udp sport 16384-16403 udp dport 1024-65535 accept
+{% endif %}
         reject with icmpx type port-unreachable
     }
 

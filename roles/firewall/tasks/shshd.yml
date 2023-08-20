@@ -4,8 +4,8 @@
   copy:
     src: shshd
     dest: "{{ shshd_path }}"
-    owner: proxy
-    group: proxy
+    owner: nobody
+    group: nogroup
     mode: 0500
   notify: restart shshd
   tags: shshd
@@ -13,7 +13,7 @@
 - name: Install the shshd service
   template:
     src: shshd.service.j2
-    dest: /etc/systemd/system/shshd.service
+    dest: "{{ systemd_system }}/shshd.service"
     owner: root
     group: root
     mode: 0644

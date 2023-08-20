@@ -13,7 +13,7 @@
 - name: Install the snowflake service
   template:
     src: snowflake.service.j2
-    dest: /etc/systemd/system/snowflake.service
+    dest: "{{ systemd_system }}/snowflake.service"
     owner: root
     group: root
     mode: 0644

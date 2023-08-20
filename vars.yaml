@@ -2,6 +2,9 @@ ssh_user: root
 debian_repository: https://deb.debian.org/debian
 debian_security: https://deb.debian.org/debian-security
 undbound_confdir: /etc/unbound/unbound.conf.d
+systemd_prefix: /etc/systemd
+systemd_system: "{{ systemd_prefix }}/system"
+systemd_network: "{{ systemd_prefix }}/network"
 ca_bundle: /etc/ssl/certs/ca-certificates.crt
 ipv6: yes
 ipv4: yes
@@ -59,7 +62,7 @@ wgpeers:
           63633839356332613232376533646332386264366137643534336366306164623330396566353663
           3630343964363339613639626162353161616162633538383030
     allowedips: 172.16.33.3/32, fd5d:2ddd:f4a5::3/128
-wan_ssh: yes
+wan_ssh: no
 sntpd_path: /usr/local/bin/sntpd
 shshd_path: /usr/local/bin/shshd
 snid_path: /usr/local/bin/snid

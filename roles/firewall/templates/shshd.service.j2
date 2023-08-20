@@ -8,7 +8,7 @@ AmbientCapabilities=CAP_NET_BIND_SERVICE
 CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 DevicePolicy=closed
 ExecStart={{ shshd_path }} -interfaceIPv4 {{ wg0_ipv4 }} -interfaceIPv6 [{{ wg0_ipv6 }}]
-Group=proxy
+Group=nogroup
 LimitNOFILE=32768
 LockPersonality=yes
 MemoryDenyWriteExecute=yes
@@ -35,7 +35,7 @@ SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@resources @privileged
 UMask=777
-User=proxy
+User=nobody
 
 [Install]
 WantedBy=multi-user.target

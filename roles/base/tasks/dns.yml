@@ -51,7 +51,7 @@
 - name: Install the unbound service
   template:
     src: unbound.service.j2
-    dest: /etc/systemd/system/unbound.service
+    dest: "{{ systemd_system }}/unbound.service"
     owner: root
     group: root
     mode: 0644

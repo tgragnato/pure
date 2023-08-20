@@ -1,14 +1,5 @@
 ---
 
-- name: Install tor
-  apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - tor
-    - tor-geoipdb
-  tags: tor
-
 - name: Setup torrc
   template:
     src: torrc.j2
@@ -27,6 +18,19 @@
     group: debian-tor
     mode: 0750
   notify: restart tor
+  tags: tor
+
+- name: Install tor
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - tor
+    - tor-geoipdb
+  tags: tor
+
+- name: Check the tor configuration
+  shell: tor --verify-config -f /etc/tor/torrc
   tags: tor
 
 - name: Enable and start tor
