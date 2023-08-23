@@ -72,8 +72,12 @@ table inet filter {
         udp sport 49152-65535 udp dport 1024-65535 accept
 {% if ipv4 %}
         ip daddr { 52.20.0.0/14, 34.192.0.0/12, 3.208.0.0/12, 54.160.0.0/14, 35.168.0.0/13, 52.200.0.0/13 } tcp sport 49152-65535 tcp dport 453 accept
+        ip daddr g.whatsapp.net tcp sport 49152-65535 tcp dport 5222 accept
         ip daddr 17.0.0.0/8 tcp sport 49152-65535 tcp dport { 587, 993, 5223 } accept
         ip daddr 17.0.0.0/8 udp sport 16384-16403 udp dport 1024-65535 accept
+{% endif %}
+{% if ipv6 %}
+        ip6 daddr g.whatsapp.net tcp sport 49152-65535 tcp dport 5222 accept
 {% endif %}
         reject with icmpx type port-unreachable
     }
