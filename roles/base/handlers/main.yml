@@ -8,21 +8,13 @@
   shell: networkctl reload
   listen: networkctl reload
 
-- name: Setup or update root anchor
-  shell: unbound-anchor
-  listen: unbound-anchor
-
 - name: Daemon reload
   shell: systemctl daemon-reload
   listen: daemon-reload
 
-- name: Restart unbound
-  shell: systemctl restart unbound
-  listen: restart unbound
-
-- name: Reload unbound
-  shell: unbound-control reload
-  listen: reload unbound
+- name: Restart resolved
+  shell: systemctl restart systemd-resolved
+  listen: restart resolved
 
 - name: Restart timesyncd
   shell: systemctl restart systemd-timesyncd

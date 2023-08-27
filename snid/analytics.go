@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"net"
 	"sort"
 	"strings"
 	"sync"
@@ -10,14 +9,12 @@ import (
 )
 
 var analytics = &Analytics{
-	data:  map[string]uint{},
-	exact: map[string]uint{},
+	data: map[string]uint{},
 }
 
 type Analytics struct {
 	sync.Mutex
-	data  map[string]uint
-	exact map[string]uint
+	data map[string]uint
 }
 
 type Domain struct {
@@ -43,19 +40,13 @@ func (a *Analytics) Inc(dName string) {
 	} else {
 		a.data[truncated] = 1
 	}
-	_, exist = a.exact[dName]
-	if exist {
-		a.exact[dName]++
-	} else {
-		a.exact[dName] = 1
-	}
 	a.Unlock()
 }
 
 func (a *Analytics) Report() {
 	for {
 		select {
-		case <-time.NewTicker(time.Hour / 2).C:
+		case <-time.NewTicker(time.Hour).C:
 			a.Lock()
 			dl := make(DomainList, len(a.data))
 			i := 0
@@ -70,23 +61,6 @@ func (a *Analytics) Report() {
 			for _, orderedLogItem := range dl {
 				log.Printf("%s, %d\n", orderedLogItem.domain, orderedLogItem.counter)
 			}
-		case <-time.NewTicker(6 * time.Hour).C:
-			a.Lock()
-			log.Printf("%v\n", a.exact)
-			a.Unlock()
-		}
-	}
-}
-
-func (a *Analytics) PreloadDNS() {
-	for {
-		select {
-		case <-time.NewTicker(15 * time.Minute).C:
-			a.Lock()
-			for domain := range a.exact {
-				go net.LookupIP(domain)
-			}
-			a.Unlock()
 		}
 	}
 }

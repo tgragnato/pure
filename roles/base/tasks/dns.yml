@@ -1,82 +1,32 @@
 ---
 
-- name: Install unbound
+- name: Install systemd-resolved
   apt:
-    name: "{{ item }}"
+    name: systemd-resolved
     state: present
-  with_items:
-    - unbound
-    - unbound-anchor
-    - unbound-host
-    - dns-root-data
   tags: dns
 
-- name: Setup unbound
+- name: Setup systemd-resolved
   template:
-    src: main.conf.j2
-    dest: "{{ undbound_confdir }}/main.conf"
+    src: resolved.conf.j2
+    dest: "{{ systemd_prefix }}/resolved.conf"
     owner: root
     group: root
     mode: 0644
-  notify: reload unbound
+  notify: restart resolved
   tags: dns
 
-- name: Setup local data
-  template:
-    src: localdata.conf.j2
-    dest: "{{ undbound_confdir }}/localdata.conf"
-    owner: root
-    group: root
-    mode: 0644
-  notify: reload unbound
-  tags: dns
-
-- name: Link root hints
-  file:
-    force: yes
-    src: /usr/share/dns/root.key
-    dest: /var/lib/unbound/root.key
-    state: link
-  notify: unbound-anchor
-  tags: dns
-
-- name: Disable unbound-resolvconf
+- name: Enable systemd-resolved
   systemd:
-    name: unbound-resolvconf.service
-    state: stopped
-    enabled: no
-    masked: yes
-  tags: dns
-
-- name: Install the unbound service
-  template:
-    src: unbound.service.j2
-    dest: "{{ systemd_system }}/unbound.service"
-    owner: root
-    group: root
-    mode: 0644
-  notify:
-    - daemon-reload
-    - restart unbound
-  tags: dns
-
-- name: Check the unbound configuration
-  shell: unbound-checkconf
-  tags: dns
-
-- name: Enable unbound
-  systemd:
-    name: unbound.service
+    name: systemd-resolved.service
     state: started
     enabled: yes
     masked: no
   tags: dns
 
 - name: Setup resolv.conf
-  template:
-    src: resolv.conf.j2
+  file:
+    src: /var/run/systemd/resolve/stub-resolv.conf
     dest: /etc/resolv.conf
-    owner: root
-    group: root
-    mode: 0644
+    state: link
   tags: dns
