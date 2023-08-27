@@ -51,7 +51,7 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 		r.Header.Del("X-Apple-Request-UUID")
 	case "static.ess.apple.com", "certs.apple.com":
 		r.URL.Scheme = "https"
-	case "ocsp.pki.goog", "proxy-safebrowsing.googleapis.com", "ocsp.r2m01.amazontrust.com", "ocsp.rootca1.amazontrust.com":
+	case "ocsp.pki.goog", "ocsp.r2m01.amazontrust.com", "ocsp.rootca1.amazontrust.com":
 		r.URL.Scheme = "https"
 		r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/116.0")
 		r.Header.Del("X-Apple-Request-UUID")

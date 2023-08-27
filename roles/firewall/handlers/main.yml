@@ -31,3 +31,7 @@
 - name: Restart snowflake
   shell: systemctl restart snowflake
   listen: restart snowflake
+
+- name: Restart dnsd
+  shell: systemctl restart dnsd
+  listen: restart dnsd

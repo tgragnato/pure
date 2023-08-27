@@ -4,3 +4,5 @@ roles/firewall/files/shshd
 shshd/shshd
 roles/firewall/files/snid
 snid/snid
+roles/firewall/files/dnsd
+dnsd/dnsd

@@ -19,7 +19,6 @@ func main() {
 	}
 
 	go analytics.Report()
-	go analytics.PreloadDNS()
 
 	if iface6 != "" {
 		go func() {

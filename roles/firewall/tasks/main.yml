@@ -20,3 +20,6 @@
 
 - name: Install snowflake
   import_tasks: snowflake.yml
+
+- name: Install dnsd
+  import_tasks: dnsd.yml

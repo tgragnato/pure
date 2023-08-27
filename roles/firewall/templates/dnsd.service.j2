@@ -1,0 +1,41 @@
+[Unit]
+Description=DNS Proxy Daemon
+Wants=network-online.target
+After=network.target network-online.target
+
+[Service]
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+DevicePolicy=closed
+ExecStart={{ dnsd_path }}
+Group=nogroup
+LimitNOFILE=32768
+LockPersonality=yes
+MemoryDenyWriteExecute=yes
+NoNewPrivileges=true
+PrivateDevices=yes
+PrivateTmp=yes
+ProcSubset=pid
+ProtectClock=yes
+ProtectControlGroups=yes
+ProtectHome=yes
+ProtectHostname=yes
+ProtectKernelLogs=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectProc=invisible
+ProtectSystem=strict
+RemoveIPC=yes
+Restart=on-failure
+RestrictAddressFamilies=AF_INET AF_INET6
+RestrictNamespaces=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallFilter=~@resources @privileged
+UMask=777
+User=nobody
+
+[Install]
+WantedBy=multi-user.target

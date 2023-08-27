@@ -3,9 +3,6 @@ all:
     baremetal:
       vars:
         nonfree_firmware: non-free-firmware
-        cores: 4
-        cache_size: 1024m
-        cache_rrsets: 2048m
         forwarding: 1
       hosts:
         172.16.33.1:
