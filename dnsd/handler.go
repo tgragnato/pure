@@ -1,43 +1,12 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"net"
 	"strings"
 
 	"github.com/miekg/dns"
 )
-
-func retNull(m *dns.Msg, qName string) {
-	m.Answer = nil
-	newRR, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, "0.0.0.0"))
-	if err == nil {
-		m.Answer = append(m.Answer, newRR)
-	}
-	newRR, err = dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, "0000:0000:0000:0000:0000:0000:0000:0000"))
-	if err == nil {
-		m.Answer = append(m.Answer, newRR)
-	}
-}
-
-func addIP(m *dns.Msg, qName string, ip []net.IP) {
-	for i := range ip {
-		rr, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, ip[i].String()))
-		if err == nil {
-			m.Answer = append(m.Answer, rr)
-		}
-	}
-}
-
-func addIPv6(m *dns.Msg, qName string, ip []net.IP) {
-	for i := range ip {
-		rr, err := dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, ip[i].String()))
-		if err == nil {
-			m.Answer = append(m.Answer, rr)
-		}
-	}
-}
 
 func parseQuery(m *dns.Msg) {
 	for _, q := range m.Question {
@@ -64,7 +33,10 @@ func parseQuery(m *dns.Msg) {
 			ips, cnames, ttl, err := DoH(q.Name, q.Qtype == dns.TypeAAAA)
 			if err != nil {
 				log.Println(q.Name + ": " + err.Error())
+				m.SetRcode(m, dns.RcodeNXRrset)
 				return
+			} else {
+				log.Println(q.Name + ": First resolution")
 			}
 
 			for _, cname := range cnames {
@@ -90,6 +62,12 @@ func parseQuery(m *dns.Msg) {
 				go cache4.Set(q.Name, ips, ttl)
 				addIP(m, q.Name, ips)
 			}
+
+		case dns.TypeHTTPS:
+			addHTTPS(m, q.Name)
+
+		default:
+			m.SetRcode(m, dns.RcodeNotImplemented)
 		}
 	}
 }
