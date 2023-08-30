@@ -8,8 +8,8 @@ import (
 )
 
 var (
-	cache4 = NewCache(3600*time.Second, false)
-	cache6 = NewCache(3600*time.Second, true)
+	cache4 = newCache(3600*time.Second, false)
+	cache6 = newCache(3600*time.Second, true)
 )
 
 type Item struct {
@@ -21,8 +21,8 @@ func (item *Item) expired() bool {
 	if item.data == nil || item.expires == nil || len(item.data) == 0 {
 		return true
 	}
-	if net.ParseIP("0.0.0.0").Equal(item.data[0]) ||
-		net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000").Equal(item.data[0]) {
+	if net.ParseIP(nullIPv4).Equal(item.data[0]) ||
+		net.ParseIP(nullIPv6).Equal(item.data[0]) {
 		return false
 	}
 	return item.expires.Before(time.Now().Add(900 * time.Second))
@@ -119,7 +119,7 @@ func (cache *Cache) CleanupTimer() {
 	}
 }
 
-func NewCache(duration time.Duration, v6 bool) *Cache {
+func newCache(duration time.Duration, v6 bool) *Cache {
 	cache := &Cache{
 		ttl:   duration,
 		items: map[string]*Item{},

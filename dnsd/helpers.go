@@ -12,13 +12,18 @@ var (
 	hintIPv6 net.IP
 )
 
+const (
+	nullIPv4 = "0.0.0.0"
+	nullIPv6 = "0000:0000:0000:0000:0000:0000:0000:0000"
+)
+
 func retNull(m *dns.Msg, qName string) {
 	m.Answer = nil
-	newRR, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, "0.0.0.0"))
+	newRR, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, nullIPv4))
 	if err == nil {
 		m.Answer = append(m.Answer, newRR)
 	}
-	newRR, err = dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, "0000:0000:0000:0000:0000:0000:0000:0000"))
+	newRR, err = dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, nullIPv6))
 	if err == nil {
 		m.Answer = append(m.Answer, newRR)
 	}

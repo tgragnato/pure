@@ -18,14 +18,22 @@ func parseQuery(m *dns.Msg) {
 					addIPv6(m, q.Name, data)
 					return
 				}
+				if found := errCache6.Exist(q.Name); found {
+					m.SetRcode(m, dns.RcodeNameError)
+					return
+				}
 			} else {
 				if data, found := cache4.Get(q.Name); found {
 					addIP(m, q.Name, data)
 					return
 				}
+				if found := errCache4.Exist(q.Name); found {
+					m.SetRcode(m, dns.RcodeNameError)
+					return
+				}
 			}
 
-			if !CheckDomain(q.Name) {
+			if !checkDomain(q.Name) {
 				retNull(m, q.Name)
 				return
 			}
@@ -33,25 +41,30 @@ func parseQuery(m *dns.Msg) {
 			ips, cnames, ttl, err := DoH(q.Name, q.Qtype == dns.TypeAAAA)
 			if err != nil {
 				log.Println(q.Name + ": " + err.Error())
-				m.SetRcode(m, dns.RcodeNXRrset)
+				if q.Qtype == dns.TypeAAAA {
+					go errCache6.Add(q.Name)
+				} else {
+					go errCache4.Add(q.Name)
+				}
+				m.SetRcode(m, dns.RcodeNameError)
 				return
 			} else {
 				log.Println(q.Name + ": First resolution")
 			}
 
 			for _, cname := range cnames {
-				if !CheckDomain(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
+				if !checkDomain(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
 					retNull(m, q.Name)
-					go cache4.Set(q.Name, []net.IP{net.ParseIP("0.0.0.0")}, 0)
-					go cache6.Set(q.Name, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
+					go cache4.Set(q.Name, []net.IP{net.ParseIP(nullIPv4)}, 0)
+					go cache6.Set(q.Name, []net.IP{net.ParseIP(nullIPv6)}, 0)
 					return
 				}
 			}
 
 			if !checkIPs(ips) {
 				retNull(m, q.Name)
-				go cache4.Set(q.Name, []net.IP{net.ParseIP("0.0.0.0")}, 0)
-				go cache6.Set(q.Name, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
+				go cache4.Set(q.Name, []net.IP{net.ParseIP(nullIPv4)}, 0)
+				go cache6.Set(q.Name, []net.IP{net.ParseIP(nullIPv6)}, 0)
 				return
 			}
 
