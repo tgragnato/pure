@@ -49,6 +49,7 @@ table inet filter {
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
         tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } accept
         udp sport 1024-65535 udp sport 1024-65535 skuid { proxy, debian-tor } accept
+        tcp sport 1024-65535 tcp dport { 453, 587, 993, 5222 } skuid haproxy accept
         reject with icmpx type port-unreachable
     }
 
@@ -69,13 +70,8 @@ table inet filter {
         ct state established,related accept
         udp sport 49152-65535 udp dport 1024-65535 accept
 {% if ipv4 %}
-        ip daddr { 52.20.0.0/14, 34.192.0.0/12, 3.208.0.0/12, 54.160.0.0/14, 35.168.0.0/13, 52.200.0.0/13 } tcp sport 49152-65535 tcp dport 453 accept
-        ip daddr g.whatsapp.net tcp sport 49152-65535 tcp dport 5222 accept
         ip daddr 17.0.0.0/8 tcp sport 49152-65535 tcp dport { 587, 993, 5223 } accept
         ip daddr 17.0.0.0/8 udp sport 16384-16403 udp dport 1024-65535 accept
-{% endif %}
-{% if ipv6 %}
-        ip6 daddr g.whatsapp.net tcp sport 49152-65535 tcp dport 5222 accept
 {% endif %}
         reject with icmpx type port-unreachable
     }
@@ -88,6 +84,11 @@ table inet filter {
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 80 redirect to 80
         iifname wg0 ip daddr != {{ wg0_ipv4 }} udp dport 123 redirect to 123
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 443 redirect to 443
+        iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 453 redirect to 453
+        iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 585 redirect to 993
+        iifname wg0 ip daddr != {{ wg0_ipv4 }} ip daddr != 17.0.0.0/8 tcp dport 587 redirect to 587
+        iifname wg0 ip daddr != {{ wg0_ipv4 }} ip daddr != 17.0.0.0/8 tcp dport 993 redirect to 993
+        iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 5222 redirect to 5222
 {% endif %}
 {% if ipv6 %}
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 53 redirect to 53
@@ -95,6 +96,11 @@ table inet filter {
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 80 redirect to 80
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} udp dport 123 redirect to 123
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 443 redirect to 443
+        iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 453 redirect to 453
+        iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 585 redirect to 993
+        iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 587 redirect to 587
+        iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 993 redirect to 993
+        iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 5222 redirect to 5222
 {% endif %}
     }
 
