@@ -1,5 +1,17 @@
 ---
 
+- name: Install the haproxy service
+  template:
+    src: haproxy.service.j2
+    dest: "{{ systemd_system }}/haproxy.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - daemon-reload
+    - restart haproxy
+  tags: haproxy
+
 - name: Install haproxy
   apt:
     name: haproxy
