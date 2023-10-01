@@ -1,6 +1,6 @@
 ---
 
-- name: Install openntpd
+- name: Install timesyncd
   apt:
     name: systemd-timesyncd
     state: present
