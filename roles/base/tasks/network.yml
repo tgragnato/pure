@@ -122,4 +122,10 @@
       value: 131072
     - name: net.ipv4.tcp_fastopen
       value: 3
+    - name: net.core.somaxconn
+      value: 2147483647
+    - name: net.netfilter.nf_conntrack_max
+      value: 2147483647
+    - name: net.nf_conntrack_max
+      value: 2147483647
   tags: network
