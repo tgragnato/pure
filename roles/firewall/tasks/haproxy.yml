@@ -1,0 +1,29 @@
+---
+
+- name: Install haproxy
+  apt:
+    name: haproxy
+    state: present
+  tags: haproxy
+
+- name: Setup haproxy.cfg
+  template:
+    src: haproxy.cfg.j2
+    dest: /etc/haproxy/haproxy.cfg
+    owner: root
+    group: root
+    mode: 0644
+  notify: restart haproxy
+  tags: haproxy
+
+- name: Check haproxy.cfg
+  shell: haproxy -c -n -V -f /etc/haproxy/haproxy.cfg
+  tags: haproxy
+
+- name: Enable haproxy
+  systemd:
+    name: haproxy.service
+    state: started
+    enabled: yes
+    masked: no
+  tags: haproxy

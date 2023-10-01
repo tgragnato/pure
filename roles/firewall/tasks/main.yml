@@ -6,6 +6,9 @@
 - name: Install tor
   import_tasks: tor.yml
 
+- name: Install haproxy
+  import_tasks: haproxy.yml
+
 - name: Initialize the firewall
   import_tasks: firewall.yml
 

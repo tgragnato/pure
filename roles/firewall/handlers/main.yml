@@ -35,3 +35,7 @@
 - name: Restart dnsd
   shell: systemctl restart dnsd
   listen: restart dnsd
+
+- name: Restart haproxy
+  shell: systemctl restart haproxy
+  listen: restart haproxy
