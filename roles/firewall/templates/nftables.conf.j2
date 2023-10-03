@@ -49,7 +49,7 @@ table inet filter {
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
         tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } accept
         udp sport 1024-65535 udp sport 1024-65535 skuid { proxy, debian-tor } accept
-        tcp sport 1024-65535 tcp dport { 453, 587, 993, 5222 } skuid haproxy accept
+        tcp sport 1024-65535 tcp dport { 587, 993, 5222 } skuid haproxy accept
         reject with icmpx type port-unreachable
     }
 
