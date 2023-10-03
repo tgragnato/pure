@@ -97,7 +97,11 @@ backend be_chat
     stick on payload_lv(43,1) if { req_ssl_hello_type 1 }
     stick store-response payload_lv(43,1) if serverhello
 
-    server-template chat 7 {{ haproxy_chat }}:453 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1
+{% if ipv6 %}
+    server-template chat 7 {{ haproxy_chat }}:453 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1 socks4 {{ wg0_ipv4 }}:9050 check check-via-socks4 inter 1m fall 5 rise 5
+{% else %}
+    server-template chat 7 {{ haproxy_chat }}:453 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1 socks4 127.0.0.1:9050 check check-via-socks4 inter 1m fall 5 rise 5
+{% endif %}
 
 backend be_imaps
     mode tcp
@@ -116,9 +120,9 @@ backend be_imaps
     stick store-response payload_lv(43,1) if serverhello
 
 {% if ipv6 %}
-    server-template imaps 3 {{ haproxy_imaps }}:993 resolvers resolved resolve-prefer ipv6 init-addr none maxconn 1
+    server-template imaps 3 {{ haproxy_imaps }}:993 resolvers resolved resolve-prefer ipv6 init-addr none maxconn 1 check inter 1m fall 5 rise 5
 {% else %}
-    server-template imaps 3 {{ haproxy_imaps }}:993 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1
+    server-template imaps 3 {{ haproxy_imaps }}:993 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1 check inter 1m fall 5 rise 5
 {% endif %}
 
 backend be_snid
@@ -149,9 +153,9 @@ listen submission_egress
     balance roundrobin
     
 {% if ipv6 %}
-    server-template submission 2 {{ haproxy_submission }}:587 resolvers resolved resolve-prefer ipv6 init-addr none maxconn 1
+    server-template submission 2 {{ haproxy_submission }}:587 resolvers resolved resolve-prefer ipv6 init-addr none maxconn 1 check inter 1m fall 5 rise 5
 {% else %}
-    server-template submission 2 {{ haproxy_submission }}:587 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1
+    server-template submission 2 {{ haproxy_submission }}:587 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1 check inter 1m fall 5 rise 5
 {% endif %}
 
 listen whatsapp_egress
@@ -164,9 +168,9 @@ listen whatsapp_egress
     balance roundrobin
 
 {% if ipv6 %}
-    server-template whatsapp 2 g.whatsapp.net:5222 resolvers resolved resolve-prefer ipv6 init-addr none maxconn 1
+    server-template whatsapp 2 g.whatsapp.net:5222 resolvers resolved resolve-prefer ipv6 init-addr none maxconn 1 check inter 1m fall 5 rise 5
 {% else %}
-    server-template whatsapp 2 g.whatsapp.net:5222 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1
+    server-template whatsapp 2 g.whatsapp.net:5222 resolvers resolved resolve-prefer ipv4 init-addr none maxconn 1 check inter 1m fall 5 rise 5
 {% endif %}
 
 listen socks_ingress
