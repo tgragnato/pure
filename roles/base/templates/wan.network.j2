@@ -13,6 +13,11 @@ DHCP=no
 {% endif %}
 LLMNR=no
 MulticastDNS=no
+{% if ipv4 %}
+Domains=~push.apple.com                         
+DNS=192.168.1.254
+DNSSEC=allow-downgrade
+{% endif %}
 
 [DHCPv4]
 SendHostname=no

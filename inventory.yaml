@@ -5,5 +5,5 @@ all:
         nonfree_firmware: non-free-firmware
         forwarding: 1
       hosts:
-        172.16.33.1:
+        fd5d:2ddd:f4a5::1:
           hostname: puremini
