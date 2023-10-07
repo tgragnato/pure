@@ -19,8 +19,8 @@
 DNS=127.0.0.1
 FallbackDNS=127.0.0.1
 {% else %}
-DNS=fd5d:2ddd:f4a5::1
-FallbackDNS=172.16.33.1
+DNS={{ wg0_ipv6 }}
+FallbackDNS={{ wg0_ipv4 }}
 {% endif %}
 Domains=~.
 DNSSEC=no
@@ -31,8 +31,8 @@ Cache=yes
 CacheFromLocalhost=yes
 DNSStubListener=yes
 {% if forwarding %}
-DNSStubListenerExtra=fd5d:2ddd:f4a5::1
-DNSStubListenerExtra=172.16.33.1
+DNSStubListenerExtra={{ wg0_ipv6 }}
+DNSStubListenerExtra={{ wg0_ipv4 }}
 {% endif %}
 ReadEtcHosts=no
 ResolveUnicastSingleLabel=no
