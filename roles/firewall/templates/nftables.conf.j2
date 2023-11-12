@@ -25,7 +25,7 @@ table inet filter {
 {% if wan_ssh %}
         tcp sport 1024-65535 tcp dport 22 accept
 {% endif %}
-        udp sport 1024-65535 udp dport { 123, {{ wg0_port }} } accept
+        udp sport 1024-65535 udp dport { 123, {{ wg0_port }}, 1024-65535 } accept
     }
 
     chain output {
@@ -68,8 +68,8 @@ table inet filter {
     chain forward_nat {
         ct state invalid drop
         ct state established,related accept
-        tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } accept
-        udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 accept
+        tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 accept
+        udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 meta mark set 0x000000b4 accept
         reject with icmpx type port-unreachable
     }
 
@@ -94,6 +94,6 @@ table inet filter {
     chain postrouting {
         type nat hook postrouting priority 0;
         oifname wan tcp flags syn tcp option maxseg size set rt mtu
-        oifname wan masquerade fully-random
+        oifname wan meta mark 0x000000b4 masquerade fully-random
     }
 }
