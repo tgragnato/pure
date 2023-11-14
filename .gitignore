@@ -6,3 +6,5 @@ roles/firewall/files/snid
 snid/snid
 roles/firewall/files/dnsd
 dnsd/dnsd
+roles/firewall/files/nfguard
+nfguard/nfguard

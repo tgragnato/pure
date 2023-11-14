@@ -35,3 +35,7 @@
 - name: Restart dnsd
   shell: systemctl restart dnsd
   listen: restart dnsd
+
+- name: Restart nfguard
+  shell: systemctl restart nfguard
+  listen: restart nfguard
