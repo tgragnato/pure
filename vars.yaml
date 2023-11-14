@@ -81,3 +81,4 @@ snid_path: /usr/local/bin/snid
 client_path: /usr/bin/snowflake-client
 snowflake_path: /usr/local/bin/snowflake
 dnsd_path: /usr/local/bin/dnsd
+nfguard_path: /usr/local/bin/nfguard

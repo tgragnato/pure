@@ -48,7 +48,8 @@ table inet filter {
         ct state established,related accept
         ip daddr 192.168.1.254 udp sport 1024-65535 udp dport 53 skuid systemd-resolve accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
-        tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } accept
+        ip protocol tcp tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } queue num 0-3 fanout,bypass
+        ip6 nexthdr tcp tcp sport 1024-65535 tcp dport 443 skuid { _apt, proxy, debian-tor } queue num 4-7 fanout,bypass
         udp sport 1024-65535 udp sport 1024-65535 skuid { proxy, debian-tor } accept
         reject with icmpx type port-unreachable
     }
@@ -68,7 +69,8 @@ table inet filter {
     chain forward_nat {
         ct state invalid drop
         ct state established,related accept
-        tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 accept
+        ip protocol tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 0-3 fanout,bypass
+        ip6 nexthdr tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 4-7 fanout,bypass
         udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 meta mark set 0x000000b4 accept
         reject with icmpx type port-unreachable
     }

@@ -264,6 +264,7 @@ var blacklist = []string{
 	// North Korea
 	"kp.",
 	// Blocks
+	"12ezo5v60.com.",
 	"1drv.com.",
 	"1ecosolution.it.",
 	"1phads.com.",
@@ -454,6 +455,7 @@ var blacklist = []string{
 	"friendshipmale.com.",
 	"ftjcfx.com.",
 	"fundingchoicesmessages.google.com.",
+	"fvcwqkkqmuv.com.",
 	"gameloft.com.",
 	"gatekeeperconsent.com.",
 	"getpocket.com.",
@@ -682,6 +684,7 @@ var blacklist = []string{
 	"trendemon.com.",
 	"tru.am.",
 	"trustarc.com.",
+	"tsyndicate.com.",
 	"tvpixel.com.",
 	"typekit.net.",
 	"unity3d.com.",
