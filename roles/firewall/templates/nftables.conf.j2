@@ -21,6 +21,12 @@ table inet filter {
 {% endif %}
         meta pkttype { broadcast, multicast } drop
         ct state invalid drop
+{% if ipv4 %}
+        ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
+{% endif %}
+{% if ipv6 %}
+        ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
+{% endif %}
         ct state established,related accept
 {% if wan_ssh %}
         tcp sport 1024-65535 tcp dport 22 accept
@@ -45,6 +51,12 @@ table inet filter {
 {% endif %}
         meta pkttype { broadcast, multicast } drop
         ct state invalid drop
+{% if ipv4 %}
+        ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
+{% endif %}
+{% if ipv6 %}
+        ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
+{% endif %}
         ct state established,related accept
         ip daddr 192.168.1.254 udp sport 1024-65535 udp dport 53 skuid systemd-resolve accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
@@ -63,14 +75,30 @@ table inet filter {
     }
     chain forward_reverse {
         ct state invalid drop
+{% if ipv4 %}
+        ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
+{% endif %}
+{% if ipv6 %}
+        ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
+{% endif %}
         ct state established,related accept
         drop
     }
     chain forward_nat {
         ct state invalid drop
+{% if ipv4 %}
+        ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
+{% endif %}
+{% if ipv6 %}
+        ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
+{% endif %}
         ct state established,related accept
+{% if ipv4 %}
         ip protocol tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 0-3 fanout,bypass
+{% endif %}
+{% if ipv6 %}
         ip6 nexthdr tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 4-7 fanout,bypass
+{% endif %}
         udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 meta mark set 0x000000b4 accept
         reject with icmpx type port-unreachable
     }
