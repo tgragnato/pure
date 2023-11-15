@@ -12,7 +12,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
-func queueWorker(queueNum uint16, ipv6 bool, wg *sync.WaitGroup) {
+func queueWorker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool, wg *sync.WaitGroup) {
 	defer wg.Done()
 
 	nf, err := nfqueue.Open(&nfqueue.Config{
@@ -39,21 +39,21 @@ func queueWorker(queueNum uint16, ipv6 bool, wg *sync.WaitGroup) {
 
 		tcpLayer := packet.Layer(layers.LayerTypeTCP)
 		if tcpLayer == nil {
-			log.Println("Non TCP packet" + packet.String())
 			err := nf.SetVerdict(id, nfqueue.NfAccept)
 			if err != nil {
 				log.Println(err.Error())
 			}
+			go analytics.IncUnmodified()
 			return 0
 		}
 
 		tcp, _ := tcpLayer.(*layers.TCP)
 		if !tcp.SYN && !tcp.ACK {
-			log.Println("Non ( SYN | ACK ) packet" + packet.String())
 			err := nf.SetVerdict(id, nfqueue.NfAccept)
 			if err != nil {
 				log.Println(err.Error())
 			}
+			go analytics.IncUnmodified()
 			return 0
 		}
 
@@ -76,6 +76,7 @@ func queueWorker(queueNum uint16, ipv6 bool, wg *sync.WaitGroup) {
 		if err != nil {
 			log.Println(err.Error())
 		}
+		go analytics.IncModified()
 		return 0
 	}
 
