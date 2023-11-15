@@ -11,6 +11,12 @@ Directory tree:
     - The cache is in-memory and it never performs record eviction, the purpose is to
         - minimize the latency introduced by DoHoT
         - reduce the amount of information deducible from the logs via pattern of life analysis
+- `nfguard` is a network interference tool that uses NFQUEUE
+    - It modifies the window size of TCP packets with the SYN or the ACK flag set
+    - Middleboxes that do not support stream reassembly will be unable to collect the metadata of the TLS streams
+    - References:
+        - [brdgrd (Bridge Guard)](https://github.com/NullHypothesis/brdgrd)
+        - [About Geneva - How it Works](https://geneva.cs.umd.edu/about/)
 - `snid` is a proxy for TLS that does not terminate
     - it refuses non-TLS traffic and connections to bare IP addresses
     - checks the geographical location of the remote endpoints
