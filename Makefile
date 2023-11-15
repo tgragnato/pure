@@ -1,4 +1,4 @@
-all: sntpd shshd snid dnsd
+all: sntpd shshd snid dnsd nfguard
 	ansible-playbook --ask-vault-password -i inventory.yaml playbook.yaml
 
 clean:
