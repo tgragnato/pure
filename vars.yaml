@@ -4,9 +4,6 @@ debian_security: https://deb.debian.org/debian-security
 systemd_prefix: /etc/systemd
 systemd_system: "{{ systemd_prefix }}/system"
 systemd_network: "{{ systemd_prefix }}/network"
-ca_bundle: /etc/ssl/certs/ca-certificates.crt
-ipv6: yes
-ipv4: yes
 ntp_servers: ntp1.inrim.it ntp2.inrim.it time.euro.apple.com time.asia.apple.com time.apple.com
 ntp_fallback: time.cloudflare.com ntp1.fortiguard.com ntp2.fortiguard.com ntp.checkpoint.com ntp2.checkpoint.com
 wg0_privatekey: !vault |

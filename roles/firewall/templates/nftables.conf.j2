@@ -11,22 +11,14 @@ table inet filter {
         iifname wg0 accept
     }
     chain input_wan {
-{% if ipv4 %}
         ip protocol icmp accept
         ip protocol udp udp sport 67 udp dport 68 accept
-{% endif %}
-{% if ipv6 %}
         ip6 nexthdr icmpv6 accept
         ip6 nexthdr udp udp sport 547 udp dport 546 accept
-{% endif %}
         meta pkttype { broadcast, multicast } drop
         ct state invalid drop
-{% if ipv4 %}
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
-{% endif %}
-{% if ipv6 %}
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
-{% endif %}
         ct state established,related accept
 {% if wan_ssh %}
         tcp sport 1024-65535 tcp dport 22 accept
@@ -41,22 +33,14 @@ table inet filter {
         oifname wg0 accept
     }
     chain output_wan {
-{% if ipv4 %}
         ip protocol icmp accept
         ip protocol udp udp sport 68 udp dport 67 accept
-{% endif %}
-{% if ipv6 %}
         ip6 nexthdr icmpv6 accept
         ip6 nexthdr udp udp sport 546 udp dport 547 accept
-{% endif %}
         meta pkttype { broadcast, multicast } drop
         ct state invalid drop
-{% if ipv4 %}
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
-{% endif %}
-{% if ipv6 %}
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
-{% endif %}
         ct state established,related accept
         ip daddr 192.168.1.254 udp sport 1024-65535 udp dport 53 skuid systemd-resolve accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
@@ -75,50 +59,34 @@ table inet filter {
     }
     chain forward_reverse {
         ct state invalid drop
-{% if ipv4 %}
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
-{% endif %}
-{% if ipv6 %}
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
-{% endif %}
         ct state established,related accept
         drop
     }
     chain forward_nat {
         ct state invalid drop
-{% if ipv4 %}
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
-{% endif %}
-{% if ipv6 %}
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
-{% endif %}
         ct state established,related accept
-{% if ipv4 %}
         ip protocol tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 0-3 fanout,bypass
-{% endif %}
-{% if ipv6 %}
         ip6 nexthdr tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 4-7 fanout,bypass
-{% endif %}
         udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 meta mark set 0x000000b4 accept
         reject with icmpx type port-unreachable
     }
 
     chain prerouting {
         type nat hook prerouting priority 0;
-{% if ipv4 %}
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 53 redirect to 53
         iifname wg0 ip daddr != {{ wg0_ipv4 }} udp dport 53 redirect to 53
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 80 redirect to 80
         iifname wg0 ip daddr != {{ wg0_ipv4 }} udp dport 123 redirect to 123
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 443 redirect to 443
-{% endif %}
-{% if ipv6 %}
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 53 redirect to 53
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} udp dport 53 redirect to 53
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 80 redirect to 80
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} udp dport 123 redirect to 123
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 443 redirect to 443
-{% endif %}
     }
 
     chain postrouting {
