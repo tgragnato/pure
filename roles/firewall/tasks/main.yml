@@ -9,20 +9,11 @@
 - name: Initialize the firewall
   import_tasks: firewall.yml
 
-- name: Install sntpd
-  import_tasks: sntpd.yml
-
-- name: Install shshd
-  import_tasks: shshd.yml
-
-- name: Install snid
-  import_tasks: snid.yml
-
-- name: Install snowflake
-  import_tasks: snowflake.yml
-
 - name: Install dnsd
   import_tasks: dnsd.yml
 
 - name: Install nfguard
   import_tasks: nfguard.yml
+
+- name: Install snowflake
+  import_tasks: snowflake.yml

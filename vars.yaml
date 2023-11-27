@@ -72,9 +72,6 @@ wgpeers:
           6366633337373065323835613839336665323339373561366263
     allowedips: 192.168.33.4/32, fd5d:2ddd:f4a5::4/128
 wan_ssh: no
-sntpd_path: /usr/local/bin/sntpd
-shshd_path: /usr/local/bin/shshd
-snid_path: /usr/local/bin/snid
 client_path: /usr/bin/snowflake-client
 snowflake_path: /usr/local/bin/snowflake
 dnsd_path: /usr/local/bin/dnsd

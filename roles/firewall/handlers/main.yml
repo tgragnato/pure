@@ -12,18 +12,6 @@
   shell: systemctl restart nftables
   listen: restart nftables
 
-- name: Restart sntpd
-  shell: systemctl restart sntpd
-  listen: restart sntpd
-
-- name: Restart shshd
-  shell: systemctl restart shshd
-  listen: restart shshd
-
-- name: Restart snid
-  shell: systemctl restart snid
-  listen: restart snid
-
 - name: Restart tor
   shell: systemctl restart tor@default
   listen: restart tor
