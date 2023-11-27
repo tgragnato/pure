@@ -1,10 +1,10 @@
-package main
+package checks
 
 import (
 	"strings"
 )
 
-func checkDomain(domain string) bool {
+func CheckDomain(domain string) bool {
 	for _, suffix := range blacklist {
 		if strings.HasSuffix(domain, suffix) {
 			return false

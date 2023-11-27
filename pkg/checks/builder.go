@@ -1,4 +1,4 @@
-package main
+package checks
 
 import (
 	"net"
@@ -6,38 +6,14 @@ import (
 	"gitlab.torproject.org/tpo/anti-censorship/geoip"
 )
 
-var (
-	geo, errGeo  = geoip.New("/usr/share/tor/geoip", "/usr/share/tor/geoip6")
-	unrouteables [28]*net.IPNet
-)
-
-func checkIPs(ips []net.IP) bool {
-	for x := range ips {
-		if !ips[x].IsGlobalUnicast() {
-			return false
-		}
-		for y := range unrouteables {
-			if unrouteables[y].Contains(ips[x]) {
-				return false
-			}
-		}
-
-		if geo != nil {
-			country, ok := geo.GetCountryByAddr(ips[x])
-			if !ok {
-				return false
-			}
-			switch country {
-			case "CN", "HK", "MO", "RU", "BY":
-				return false
-			}
-		}
-	}
-
-	return true
+func NewGeoChecks() *GeoChecks {
+	geoChecks := &GeoChecks{}
+	geoChecks.initCidr()
+	geoChecks.initGeo()
+	return geoChecks
 }
 
-func initCheck() {
+func (g *GeoChecks) initCidr() {
 	cidrStrings := []string{
 		"0.0.0.0/8",
 		"100.64.0.0/10",
@@ -72,6 +48,13 @@ func initCheck() {
 	}
 
 	for i := range cidrStrings {
-		_, unrouteables[i], _ = net.ParseCIDR(cidrStrings[i])
+		_, g.unrouteables[i], _ = net.ParseCIDR(cidrStrings[i])
+	}
+}
+
+func (g *GeoChecks) initGeo() {
+	geo, errGeo := geoip.New("/usr/share/tor/geoip", "/usr/share/tor/geoip6")
+	if errGeo == nil {
+		g.geo = geo
 	}
 }

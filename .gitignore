@@ -1,4 +1,4 @@
 roles/firewall/files/dnsd
-dnsd/dnsd
+cmd/dnsd/dnsd
 roles/firewall/files/nfguard
 cmd/nfguard/nfguard

@@ -3,7 +3,7 @@
 `pure` is a collection of software and tools that I use to manage my network and my storage.
 
 Directory tree:
-- `dnsd` is meant to be an intercepting DNS caching proxy
+- `cmd/dnsd` is meant to be an intercepting DNS caching proxy
     - I'm willingly not implementing support for most record types
     - The forwarder for A and AAAA records is loosely inspired by
         - [Introducing DNS Resolver for Tor](https://blog.cloudflare.com/welcome-hidden-resolver/)

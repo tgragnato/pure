@@ -1,4 +1,4 @@
-package main
+package dnshandlers
 
 import (
 	"log"
@@ -6,9 +6,22 @@ import (
 	"strings"
 
 	"github.com/miekg/dns"
+	"github.com/tgragnato/pure/pkg/checks"
+	"github.com/tgragnato/pure/pkg/dohot"
+	"github.com/tgragnato/pure/pkg/errcache"
+	"github.com/tgragnato/pure/pkg/ipcache"
 )
 
-func parseQuery(m *dns.Msg) {
+func ParseQuery(
+	m *dns.Msg,
+	cache4 *ipcache.Cache,
+	cache6 *ipcache.Cache,
+	errCache4 *errcache.ErrCache,
+	errCache6 *errcache.ErrCache,
+	geoChecks *checks.GeoChecks,
+	hintIPv4 net.IP,
+	hintIPv6 net.IP,
+) {
 	for _, q := range m.Question {
 		switch q.Qtype {
 		case dns.TypeA, dns.TypeAAAA:
@@ -33,12 +46,12 @@ func parseQuery(m *dns.Msg) {
 				}
 			}
 
-			if !checkDomain(q.Name) {
+			if !checks.CheckDomain(q.Name) {
 				retNull(m, q.Name)
 				return
 			}
 
-			ips, cnames, ttl, err := DoH(q.Name, q.Qtype == dns.TypeAAAA)
+			ips, cnames, ttl, err := dohot.DoH(q.Name, q.Qtype == dns.TypeAAAA)
 			if err != nil {
 				log.Println(q.Name + ": " + err.Error())
 				if q.Qtype == dns.TypeAAAA {
@@ -53,18 +66,18 @@ func parseQuery(m *dns.Msg) {
 			}
 
 			for _, cname := range cnames {
-				if !checkDomain(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
+				if !checks.CheckDomain(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
 					retNull(m, q.Name)
-					go cache4.Set(q.Name, []net.IP{net.ParseIP(nullIPv4)}, 0)
-					go cache6.Set(q.Name, []net.IP{net.ParseIP(nullIPv6)}, 0)
+					go cache4.Set(q.Name, []net.IP{net.ParseIP("0.0.0.0")}, 0)
+					go cache6.Set(q.Name, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
 					return
 				}
 			}
 
-			if !checkIPs(ips) {
+			if !geoChecks.CheckIPs(ips) {
 				retNull(m, q.Name)
-				go cache4.Set(q.Name, []net.IP{net.ParseIP(nullIPv4)}, 0)
-				go cache6.Set(q.Name, []net.IP{net.ParseIP(nullIPv6)}, 0)
+				go cache4.Set(q.Name, []net.IP{net.ParseIP("0.0.0.0")}, 0)
+				go cache6.Set(q.Name, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
 				return
 			}
 
@@ -77,23 +90,10 @@ func parseQuery(m *dns.Msg) {
 			}
 
 		case dns.TypeHTTPS:
-			addHTTPS(m, q.Name)
+			addHTTPS(m, q.Name, hintIPv4, hintIPv6)
 
 		default:
 			m.SetRcode(m, dns.RcodeNotImplemented)
 		}
 	}
-}
-
-func handleDnsRequest(w dns.ResponseWriter, r *dns.Msg) {
-	m := new(dns.Msg)
-	m.SetReply(r)
-	m.Compress = false
-
-	switch r.Opcode {
-	case dns.OpcodeQuery:
-		parseQuery(m)
-	}
-
-	w.WriteMsg(m)
 }
