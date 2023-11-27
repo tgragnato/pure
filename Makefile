@@ -8,7 +8,7 @@ clean:
 dnsd: roles/firewall/files/dnsd
 
 roles/firewall/files/dnsd:
-	GOOS=linux GOARCH=amd64 go build -C dnsd -o ../roles/firewall/files/dnsd
+	GOOS=linux GOARCH=amd64 go build -C cmd/dnsd -o ../../roles/firewall/files/dnsd
 
 nfguard: roles/firewall/files/nfguard
 

@@ -1,4 +1,4 @@
-package main
+package dnshandlers
 
 import (
 	"fmt"
@@ -7,23 +7,13 @@ import (
 	"github.com/miekg/dns"
 )
 
-var (
-	hintIPv4 net.IP
-	hintIPv6 net.IP
-)
-
-const (
-	nullIPv4 = "0.0.0.0"
-	nullIPv6 = "0000:0000:0000:0000:0000:0000:0000:0000"
-)
-
 func retNull(m *dns.Msg, qName string) {
 	m.Answer = nil
-	newRR, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, nullIPv4))
+	newRR, err := dns.NewRR(fmt.Sprintf("%s A %s", qName, "0.0.0.0"))
 	if err == nil {
 		m.Answer = append(m.Answer, newRR)
 	}
-	newRR, err = dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, nullIPv6))
+	newRR, err = dns.NewRR(fmt.Sprintf("%s AAAA %s", qName, "0000:0000:0000:0000:0000:0000:0000:0000"))
 	if err == nil {
 		m.Answer = append(m.Answer, newRR)
 	}
@@ -47,7 +37,12 @@ func addIPv6(m *dns.Msg, qName string, ip []net.IP) {
 	}
 }
 
-func addHTTPS(m *dns.Msg, qName string) {
+func addHTTPS(
+	m *dns.Msg,
+	qName string,
+	hintIPv4 net.IP,
+	hintIPv6 net.IP,
+) {
 	https := &dns.SVCB{
 		Hdr: dns.RR_Header{
 			Name:   qName,
