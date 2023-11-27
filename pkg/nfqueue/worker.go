@@ -44,7 +44,7 @@ func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) 
 		}
 
 		tcp, _ := tcpLayer.(*layers.TCP)
-		if !tcp.SYN && !tcp.ACK {
+		if !tcp.SYN {
 			err := nf.SetVerdict(id, nfqueue.NfAccept)
 			if err != nil {
 				log.Println(err.Error())
