@@ -1,10 +1,9 @@
-package main
+package nfqueue
 
 import (
 	"context"
 	"log"
 	"math/rand"
-	"sync"
 	"time"
 
 	"github.com/florianl/go-nfqueue"
@@ -12,9 +11,7 @@ import (
 	"github.com/google/gopacket/layers"
 )
 
-func queueWorker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool, wg *sync.WaitGroup) {
-	defer wg.Done()
-
+func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) {
 	nf, err := nfqueue.Open(&nfqueue.Config{
 		NfQueue:      queueNum,
 		MaxPacketLen: 0xFFFF,
@@ -23,7 +20,7 @@ func queueWorker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 b
 		WriteTimeout: time.Second,
 	})
 	if err != nil {
-		log.Println(err.Error())
+		log.Fatalln(err.Error())
 		return
 	}
 	defer nf.Close()
@@ -43,7 +40,6 @@ func queueWorker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 b
 			if err != nil {
 				log.Println(err.Error())
 			}
-			go analytics.IncUnmodified()
 			return 0
 		}
 
@@ -53,7 +49,6 @@ func queueWorker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 b
 			if err != nil {
 				log.Println(err.Error())
 			}
-			go analytics.IncUnmodified()
 			return 0
 		}
 
@@ -76,7 +71,6 @@ func queueWorker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 b
 		if err != nil {
 			log.Println(err.Error())
 		}
-		go analytics.IncModified()
 		return 0
 	}
 

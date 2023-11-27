@@ -4,8 +4,8 @@
   copy:
     src: nfguard
     dest: "{{ nfguard_path }}"
-    owner: nobody
-    group: nogroup
+    owner: proxy
+    group: proxy
     mode: 0500
   notify: restart nfguard
   tags: nfguard

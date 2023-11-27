@@ -1,37 +1,11 @@
-package main
+package shsh
 
 import (
 	"fmt"
 	"io"
-	"log"
-	"net"
 	"net/http"
-	"net/url"
 	"strings"
 	"time"
-)
-
-var (
-	proxy, _   = url.Parse("socks5://[::1]:9050")
-	httpclient = &http.Client{
-		Transport: &http.Transport{
-			DialContext: (&net.Dialer{
-				Timeout:   5 * time.Minute,
-				KeepAlive: time.Millisecond,
-				DualStack: true,
-			}).DialContext,
-			ForceAttemptHTTP2:     false,
-			MaxIdleConnsPerHost:   10,
-			MaxConnsPerHost:       20,
-			IdleConnTimeout:       5 * time.Minute,
-			ResponseHeaderTimeout: 2 * time.Second,
-			Proxy:                 http.ProxyURL(proxy),
-		},
-		Timeout: 5 * time.Minute,
-		CheckRedirect: func(*http.Request, []*http.Request) error {
-			return http.ErrUseLastResponse
-		},
-	}
 )
 
 func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
@@ -65,8 +39,6 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 
 	resp, err := httpclient.Do(r)
 	if err != nil {
-		log.Printf("Error doing HTTP request http://%s%s", host, r.URL.RequestURI())
-		log.Printf("   Printing error: %s", err.Error())
 		http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), http.StatusFound)
 		return
 	}
@@ -83,7 +55,7 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 	go func() {
 		for {
 			select {
-			case <-time.Tick(time.Second / 3):
+			case <-time.NewTicker(time.Second / 3).C:
 				f, ok := w.(http.Flusher)
 				if ok {
 					f.Flush()
