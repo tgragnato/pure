@@ -69,8 +69,10 @@ table inet filter {
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
         ct state established,related accept
-        ip protocol tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 0-3 fanout,bypass
-        ip6 nexthdr tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222, 5223 } meta mark set 0x000000b4 queue num 4-7 fanout,bypass
+        ip protocol tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222 } meta mark set 0x000000b4 queue num 0-3 fanout,bypass
+        ip daddr { 17.249.0.0/16, 17.252.0.0/16, 17.57.144.0/22, 17.188.128.0/18, 17.188.20.0/23 } tcp sport 49152-65535 tcp dport 5223 meta mark set 0x000000b4 queue num 0-3 fanout,bypass
+        ip6 nexthdr tcp tcp sport 49152-65535 tcp dport { 22, 453, 587, 993, 5222 } meta mark set 0x000000b4 queue num 4-7 fanout,bypass
+        ip6 daddr { 2620:149:a44::/48, 2403:300:a42::/48, 2403:300:a51::/48, 2a01:b740:a42::/48 } tcp sport 49152-65535 tcp dport 5223 meta mark set 0x000000b4 queue num 4-7 fanout,bypass
         udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 meta mark set 0x000000b4 accept
         reject with icmpx type port-unreachable
     }
