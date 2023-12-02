@@ -5,7 +5,7 @@ After=network.target network-online.target
 
 [Service]
 DevicePolicy=closed
-ExecStart={{ snowflake_path }} -unsafe-logging
+ExecStart={{ snowflake_path }} -unsafe-logging -nat-type-force-unrestricted -ephemeral-ports-range 1024:65535
 Group=proxy
 LimitNOFILE=32768
 LockPersonality=yes
