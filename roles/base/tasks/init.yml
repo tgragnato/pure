@@ -43,11 +43,19 @@
     state: present
   with_items:
     - aptitude
+    - btrfs-progs
+    - gdisk 
     - hardening-runtime
     - htop
     - iproute2
+    - lm-sensors
     - locales-all
     - lsof
+    - man-db
+    - manpages
+    - manpages-it
+    - smartmontools
+    - tcpdump
     - tmux
   tags: init
 
