@@ -56,14 +56,16 @@ func addHTTPS(
 			&dns.SVCBAlpn{
 				Alpn: []string{"h2", "http/1.1"},
 			},
-			&dns.SVCBPort{
-				Port: 443,
-			},
 			&dns.SVCBIPv4Hint{
 				Hint: []net.IP{hintIPv4},
 			},
 			&dns.SVCBIPv6Hint{
 				Hint: []net.IP{hintIPv6},
+			},
+			&dns.SVCBMandatory{
+				Code: []dns.SVCBKey{
+					dns.SVCB_ALPN,
+				},
 			},
 		},
 	}
