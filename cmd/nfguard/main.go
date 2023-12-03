@@ -49,7 +49,7 @@ func main() {
 		log.Fatalf("Failed to start server: %s\n", err.Error())
 	}
 
-	nfqueue.Start(8, 60, 90)
+	nfqueue.Start(queueNum, windowSizeMin, windowSizeMax)
 
 	<-signalCh
 }
