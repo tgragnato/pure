@@ -105,9 +105,9 @@
     - name: net.ipv4.tcp_congestion_control
       value: bbr
     - name: net.core.rmem_max
-      value: 16777216
+      value: 536870912
     - name: net.core.wmem_max
-      value: 16777216
+      value: 536870912
     - name: net.ipv4.tcp_mem
       value: 8192 262144 536870912
     - name: net.ipv4.tcp_rmem
@@ -117,9 +117,9 @@
     - name: net.ipv4.udp_mem
       value: 1048576 2097152 536870912
     - name: net.ipv4.udp_rmem_min
-      value: 131072
+      value: 1048576
     - name: net.ipv4.udp_wmem_min
-      value: 131072
+      value: 1048576
     - name: net.ipv4.tcp_fastopen
       value: 3
     - name: net.core.somaxconn
