@@ -69,13 +69,13 @@ table inet filter {
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
         ct state established,related accept
-        ip protocol tcp tcp sport 49152-65535 tcp dport { 587, 993 } meta mark set 0x000000b4 queue num 0-3 fanout,bypass
         ip daddr { 140.82.112.0/20, 143.55.64.0/20, 192.30.252.0/22, 116.202.120.180/32 } tcp sport 49152-65535 tcp dport 22 meta mark set 0x000000b4 queue num 0-3 fanout,bypass
-        ip daddr { 3.208.0.0/12, 34.192.0.0/12, 35.168.0.0/13, 52.20.0.0/14, 52.200.0.0/13, 54.160.0.0/14 } tcp sport 49152-65535 tcp dport 453 meta mark set 0x000000b4 queue num 0-3 fanout,bypass 
-        ip daddr 157.240.0.0/17 tcp sport 49152-65535 tcp dport 5222 meta mark set 0x000000b4 queue num 0-3 fanout,bypass 
+        ip daddr { 3.208.0.0/12, 34.192.0.0/12, 35.168.0.0/13, 52.20.0.0/14, 52.200.0.0/13, 54.160.0.0/14 } tcp sport 49152-65535 tcp dport 453 meta mark set 0x000000b4 queue num 0-3 fanout,bypass
+        ip daddr { 173.194.0.0/16, 17.0.0.0/8 } tcp sport 49152-65535 tcp dport { 587, 993 } meta mark set 0x000000b4 queue num 0-3 fanout,bypass
+        ip daddr 157.240.0.0/17 tcp sport 49152-65535 tcp dport 5222 meta mark set 0x000000b4 queue num 0-3 fanout,bypass
         ip daddr { 17.249.0.0/16, 17.252.0.0/16, 17.57.144.0/22, 17.188.128.0/18, 17.188.20.0/23 } tcp sport 49152-65535 tcp dport 5223 meta mark set 0x000000b4 queue num 0-3 fanout,bypass
-        ip6 nexthdr tcp tcp sport 49152-65535 tcp dport { 587, 993 } meta mark set 0x000000b4 queue num 4-7 fanout,bypass
         ip6 daddr { 2620:112:3000::/44, 2a0a:a440::/29, 2a01:4f8:fff0:4f:266:37ff:feb8:3489/128 } tcp sport 49152-65535 tcp dport 22 meta mark set 0x000000b4 queue num 4-7 fanout,bypass
+        ip6 daddr { 2607:f8b0::/32, 2403:300::/32, 2620:149::/32, 2a01:b740::/32, 2a01:b747::/32 } tcp sport 49152-65535 tcp dport { 587, 993 } meta mark set 0x000000b4 queue num 4-7 fanout,bypass
         ip6 daddr 2a03:2880::/32 tcp sport 49152-65535 tcp dport 5222 meta mark set 0x000000b4 queue num 4-7 fanout,bypass
         ip6 daddr { 2620:149:a44::/48, 2403:300:a42::/48, 2403:300:a51::/48, 2a01:b740:a42::/48 } tcp sport 49152-65535 tcp dport 5223 meta mark set 0x000000b4 queue num 4-7 fanout,bypass
         udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 meta mark set 0x000000b4 accept
