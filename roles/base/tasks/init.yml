@@ -18,7 +18,7 @@
   file:
     state: absent
     path: "{{ item }}"
-  with_items:
+  loop:
     - /etc/apt/sources.list.d
     - /etc/apt/sources.list~
   tags: init
@@ -41,7 +41,7 @@
   apt:
     name: "{{ item }}"
     state: present
-  with_items:
+  loop:
     - aptitude
     - btrfs-progs
     - gdisk 
@@ -71,7 +71,7 @@
   apt:
     name: "{{ item }}"
     state: absent
-  with_items:
+  loop:
     - cron
     - cron-daemon-common
     - dmidecode
@@ -89,7 +89,7 @@
     state: stopped
     enabled: no
     masked: yes
-  with_items:
+  loop:
     - emergency.service
     - rc-local.service
     - rescue.service
