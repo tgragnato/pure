@@ -4,7 +4,7 @@
   file:
     state: absent
     path: "{{ item }}"
-  with_items:
+  loop:
     - /media/cdrom
     - /var/spool/cron
     - /var/spool/mail
@@ -16,7 +16,7 @@
     src: /dev/null
     dest: "{{ item }}"
     state: link
-  with_items:
+  loop:
     - /home
     - /media
     - /mnt
@@ -34,7 +34,7 @@
   file:
     state: absent
     path: "{{ item }}"
-  with_items:
+  loop:
     - /etc/opt
     - /etc/ufw
   tags: fhs

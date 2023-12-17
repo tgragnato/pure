@@ -15,7 +15,7 @@
     owner: root
     group: root
     mode: 0644
-  with_items:
+  loop:
     - en.network
     - wan.netdev
     - wan.network
@@ -26,7 +26,7 @@
   file:
     state: absent
     path: "{{ item }}"
-  with_items:
+  loop:
     - /etc/network
     - /etc/sysctl.d
   tags: network
@@ -49,7 +49,7 @@
   sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
-  with_items:
+  loop:
     - name: kernel.printk
       value: 3 4 1 3
     - name: net.ipv4.conf.default.rp_filter
