@@ -492,6 +492,7 @@ var blacklist = []string{
 	"insurads.com.",
 	"intake-analytics.wikimedia.org.",
 	"intellipopup.com.",
+	"intelliscapesolutions.com.",
 	"intercom.io.",
 	"intercomcdn.com.",
 	"ioladv.it.",
