@@ -15,3 +15,11 @@
   remote_user: "{{ ssh_user }}"
   roles:
     - firewall
+
+- name: Services role
+  hosts: baremetal
+  vars_files:
+    - vars.yaml
+  remote_user: "{{ ssh_user }}"
+  roles:
+    - services
