@@ -1,0 +1,81 @@
+---
+
+- name: Install the dependencies
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - liblttng-ust1
+    - libkrb5-3
+    - zlib1g
+    - libssl3
+    - libicu72
+    - gcc
+    - g++
+  tags: runners
+
+- name: Create the runner group
+  group:
+    name: runner
+    system: true
+  tags: runners
+
+- name: Create the runner user
+  user:
+    name: runner
+    group: runner
+    shell: /bin/bash
+    home: "{{ runner_workdir }}"
+    system: true
+  tags: runners
+
+- name: Check if the runner is installed
+  stat:
+    path: "{{ runner_workdir }}/runsvc.sh"
+  register: runner_status
+  tags: runners
+
+- name: Install the runner
+  block:
+
+    - name: Download the tar archive
+      get_url:
+        url: "https://github.com/actions/runner/releases/download/v{{ runner_version }}/actions-runner-linux-{{ runner_arch }}-{{ runner_version }}.tar.gz"
+        dest: "/dev/shm/runner.tar.gz"
+      tags: runners
+
+    - name: Extract the tar archive
+      unarchive:
+        src: "/dev/shm/runner.tar.gz"
+        dest: "{{ runner_workdir }}"
+      tags: runners
+
+  when: not runner_status.stat.exists
+  tags: runners
+
+- name: Create the configuration directory
+  file:
+    path: "{{ runner_confdir }}"
+    state: directory
+  tags: runners
+
+- name: Install the runners service
+  template:
+    src: runner@.service.j2
+    dest: "{{ systemd_system }}/runner@.service"
+    owner: root
+    group: root
+    mode: 0644
+  notify: daemon-reload
+  tags: runners
+
+- name: Enable and start the runners
+  systemd:
+    name: "runner@{{ item }}.service"
+    state: started
+    enabled: yes
+    masked: no
+  loop:
+    - magnetico
+    - snowflake
+  tags: runners

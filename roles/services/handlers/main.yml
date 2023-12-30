@@ -1,0 +1,5 @@
+---
+
+- name: Daemon reload
+  shell: systemctl daemon-reload
+  listen: daemon-reload

@@ -76,3 +76,7 @@ client_path: /usr/bin/snowflake-client
 snowflake_path: /usr/local/bin/snowflake
 dnsd_path: /usr/local/bin/dnsd
 nfguard_path: /usr/local/bin/nfguard
+runner_arch: x64
+runner_version: "2.311.0"
+runner_workdir: /var/lib/runner
+runner_confdir: /etc/runners
