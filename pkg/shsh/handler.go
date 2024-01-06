@@ -21,11 +21,11 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 		r.URL.Scheme = "http"
 	case "ocsp.digicert.com", "r3.o.lencr.org", "ocsp2.globalsign.com", "ocsp.sectigo.com", "ocsp.usertrust.com", "ocsp.godaddy.com", "ocsp.comodoca.com":
 		r.URL.Scheme = "http"
-		r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101 Firefox/102.0")
+		r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:121.0) Gecko/20100101 Firefox/121.0")
 		r.Header.Del("X-Apple-Request-UUID")
 	case "ocsp.pki.goog", "ocsp.r2m01.amazontrust.com", "ocsp.rootca1.amazontrust.com":
 		r.URL.Scheme = "https"
-		r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:109.0) Gecko/20100101 Firefox/118.0")
+		r.Header.Set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; rv:121.0) Gecko/20100101 Firefox/121.0")
 		r.Header.Del("X-Apple-Request-UUID")
 	default:
 		http.Redirect(w, r, "https://"+host+r.URL.RequestURI(), http.StatusMovedPermanently)
