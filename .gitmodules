@@ -1,0 +1,3 @@
+[submodule "snowflake"]
+	path = snowflake
+	url = https://github.com/tgragnato/snowflake
