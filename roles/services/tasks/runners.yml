@@ -78,5 +78,4 @@
   loop:
     - magnetico
     - snowflake
-    - inca
   tags: runners
