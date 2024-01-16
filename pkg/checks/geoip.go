@@ -32,7 +32,7 @@ func (g *GeoChecks) CheckIPs(ips []net.IP) bool {
 				return false
 			}
 			switch country {
-			case "CN", "HK", "MO", "RU", "BY":
+			case "CN", "HK", "MO", "RU", "BY", "IR", "KP":
 				return false
 			}
 		}
