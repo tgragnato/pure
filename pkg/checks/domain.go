@@ -3,6 +3,7 @@ package checks
 import "strings"
 
 var whitelist = []string{
+	"apple-finance.query.yahoo.com.",
 	"d3w4wp6rol9nvz.cloudfront.net.",
 	"gcs-eu-00002.content-storage-download.googleapis.com.",
 	"gcs-eu-00002.content-storage-upload.googleapis.com.",
