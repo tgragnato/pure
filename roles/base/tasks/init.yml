@@ -53,7 +53,9 @@
     - lsof
     - man-db
     - manpages
+    - manpages-dev
     - manpages-it
+    - nano
     - smartmontools
     - tcpdump
     - tmux
