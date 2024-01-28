@@ -18,7 +18,7 @@ func establishFlow(clientConn net.Conn) {
 		return
 	}
 
-	backendConn, err := net.DialTimeout("tcp", net.JoinHostPort(clientHello.ServerName, "443"), time.Second)
+	backendConn, err := net.DialTimeout("tcp", getHostPort(clientHello.ServerName), time.Second)
 	if err != nil {
 		log.Printf("Error: %s", err.Error())
 		return
