@@ -108,6 +108,14 @@
       value: 536870912
     - name: net.core.wmem_max
       value: 536870912
+    - name: net.core.optmem_max
+      value: 536870912
+    - name: net.core.rmem_default
+      value: 1048576
+    - name: net.core.wmem_default
+      value: 1048576
+    - name: net.core.netdev_max_backlog
+      value: 500000
     - name: net.ipv4.tcp_mem
       value: 8192 262144 536870912
     - name: net.ipv4.tcp_rmem
