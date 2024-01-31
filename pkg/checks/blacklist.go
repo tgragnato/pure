@@ -459,6 +459,7 @@ var blacklist = []string{
 	"bidmatic.io.",
 	"bidr.io.",
 	"bidswitch.net.",
+	"binaryborrowedorganized.com.",
 	"bing.com.",
 	"bing.net.",
 	"bizible.com.",
