@@ -51,6 +51,7 @@
   sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
+  ignore_errors: true
   loop:
     - name: kernel.printk
       value: 3 4 1 3
