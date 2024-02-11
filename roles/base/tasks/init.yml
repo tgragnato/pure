@@ -81,6 +81,7 @@
     - laptop-detect
     - locales
     - logrotate
+    - smartmontools
     - tasksel
     - tasksel-data
   tags: init
