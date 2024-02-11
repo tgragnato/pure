@@ -6,6 +6,7 @@
     path: "{{ item }}"
   loop:
     - /media/cdrom
+    - /media/cdrom0
     - /var/spool/cron
     - /var/spool/mail
   tags: fhs
