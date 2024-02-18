@@ -17,8 +17,6 @@
     mode: 0644
   loop:
     - en.network
-    - bond.netdev
-    - bond.network
     - wan.netdev
     - wan.network
   notify: networkctl reload
