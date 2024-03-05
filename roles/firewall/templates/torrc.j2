@@ -14,16 +14,20 @@ ControlSocket 0
 
 UseBridges 1
 ClientTransportPlugin snowflake exec {{ client_path }}
-Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=foursquare.com fronts=foursquare.com,github.githubassets.com ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
-Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=foursquare.com fronts=foursquare.com,github.githubassets.com ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=github.githubassets.com fronts=github.githubassets.com,www.shazam.com,www.cosmopolitan.com,www.esquire.com ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://snowflake-broker.torproject.net.global.prod.fastly.net/ front=github.githubassets.com fronts=github.githubassets.com,www.shazam.com,www.cosmopolitan.com,www.esquire.com ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://snowflake-broker.azureedge.net/ fronts=ajax.aspnetcdn.com ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://snowflake-broker.azureedge.net/ fronts=ajax.aspnetcdn.com ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.4:80 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://1098762253.rsc.cdn77.org/ fronts=docs.plesk.com,www.phpmyadmin.net ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
+Bridge snowflake 192.0.2.3:80 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://1098762253.rsc.cdn77.org/ fronts=docs.plesk.com,www.phpmyadmin.net ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn
 Bridge 93.56.117.22:443 2A5DF4A0FDD52868E25F2C33BC232AFFD19B8BF3
 Bridge 93.55.235.232:443 CDD296D8C38EAA6A94242FCF03293E0D6EC4A0D0
 Bridge 109.168.11.31:443 6E6670C904B6C5E6550BEB4B59F3B1FBB4AF6CA8
 Bridge 149.154.157.80:443 A7F80AB7E04C0004E8DE0A0037F8ED54292458BF
 
-NumDirectoryGuards 6
-NumEntryGuards 6
-NumPrimaryGuards 6
+NumDirectoryGuards 10
+NumEntryGuards 10
+NumPrimaryGuards 10
 
 GeoIPFile /usr/share/tor/geoip
 GeoIPv6File /usr/share/tor/geoip6
