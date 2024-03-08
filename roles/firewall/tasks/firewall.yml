@@ -13,11 +13,8 @@
     owner: root
     group: root
     mode: 0644
+    validate: nft -c -f %s
   notify: restart nftables
-  tags: firewall
-
-- name: Check nftables.conf
-  shell: nft -c -f /etc/nftables.conf
   tags: firewall
 
 - name: Enable nftables
