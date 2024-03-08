@@ -1,13 +1,12 @@
 ---
 
-- name: Setup torrc
-  template:
-    src: torrc.j2
-    dest: /etc/tor/torrc
-    owner: root
-    group: root
-    mode: 0644
-  notify: restart tor
+- name: Install tor
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - tor
+    - tor-geoipdb
   tags: tor
 
 - name: Install the snowflake client
@@ -20,17 +19,15 @@
   notify: restart tor
   tags: tor
 
-- name: Install tor
-  apt:
-    name: "{{ item }}"
-    state: present
-  loop:
-    - tor
-    - tor-geoipdb
-  tags: tor
-
-- name: Check the tor configuration
-  shell: tor --verify-config -f /etc/tor/torrc
+- name: Setup torrc
+  template:
+    src: torrc.j2
+    dest: /etc/tor/torrc
+    owner: root
+    group: root
+    mode: 0644
+    validate: tor --verify-config -f %s
+  notify: restart tor
   tags: tor
 
 - name: Enable and start tor
