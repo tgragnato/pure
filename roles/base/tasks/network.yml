@@ -141,4 +141,6 @@
       value: 1
     - name: net.ipv6.conf.wan.use_tempaddr
       value: 2
+    - name: kernel.unprivileged_userns_clone
+      value: 0
   tags: network
