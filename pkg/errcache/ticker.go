@@ -23,7 +23,9 @@ func (errCache *ErrCache) cleanup(keys []string) {
 		ips, cnames, ttl, err := dohot.DoH(keys[i], errCache.ipv6)
 		if err == nil {
 			for _, cname := range cnames {
-				if !checks.CheckDomain(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
+				if !checks.CheckDomain(cname) &&
+					!strings.HasSuffix(cname, "cloudfront.net.") &&
+					!strings.HasSuffix(cname, "s3.amazonaws.com.") {
 					go errCache.cache4.Set(keys[i], []net.IP{net.ParseIP("0.0.0.0")}, 0)
 					go errCache.cache6.Set(keys[i], []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
 					go errCache.Del(keys[i])

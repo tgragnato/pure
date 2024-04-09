@@ -66,7 +66,9 @@ func ParseQuery(
 			}
 
 			for _, cname := range cnames {
-				if !checks.CheckDomain(cname) && !strings.HasSuffix(cname, "cloudfront.net.") {
+				if !checks.CheckDomain(cname) &&
+					!strings.HasSuffix(cname, "cloudfront.net.") &&
+					!strings.HasSuffix(cname, "s3.amazonaws.com.") {
 					retNull(m, q.Name)
 					go cache4.Set(q.Name, []net.IP{net.ParseIP("0.0.0.0")}, 0)
 					go cache6.Set(q.Name, []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
