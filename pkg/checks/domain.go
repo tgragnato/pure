@@ -4,10 +4,11 @@ import "strings"
 
 var whitelist = []string{
 	"apple-finance.query.yahoo.com.",
-	"dnfed9a4ru7oh.cloudfront.net.",
 	"d1612au5bhln8.cloudfront.net.",
+	"dnfed9a4ru7oh.cloudfront.net.",
 	"gcs-eu-00002.content-storage-download.googleapis.com.",
 	"gcs-eu-00002.content-storage-upload.googleapis.com.",
+	"semrush.com.",
 }
 
 func CheckDomain(domain string) bool {
