@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/florianl/go-nfqueue v1.3.1
 	github.com/google/gopacket v1.1.19
-	github.com/miekg/dns v1.1.58
+	github.com/miekg/dns v1.1.59
 	gitlab.torproject.org/tpo/anti-censorship/geoip v0.0.0-20210928150955-7ce4b3d98d01
 )
 
