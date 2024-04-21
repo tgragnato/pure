@@ -1,26 +1,26 @@
 ---
 
 - name: Install nftables
-  apt:
+  ansible.builtin.apt:
     name: nftables
     state: present
   tags: firewall
 
 - name: Setup nftables.conf
-  template:
+  ansible.builtin.template:
     src: nftables.conf.j2
     dest: /etc/nftables.conf
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
     validate: nft -c -f %s
   notify: restart nftables
   tags: firewall
 
 - name: Enable nftables
-  systemd:
+  ansible.builtin.systemd:
     name: nftables.service
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: firewall

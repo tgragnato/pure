@@ -1,29 +1,29 @@
 ---
 
 - name: Check systemd-networkd
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-networkd
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: wireguard
 
 - name: Install the network device
-  template:
+  ansible.builtin.template:
     src: wg0.netdev.j2
     dest: "{{ systemd_network }}/wg0.netdev"
     owner: root
     group: systemd-network
-    mode: 0640
+    mode: '0640'
   notify: networkctl reload
   tags: wireguard
 
 - name: Install the network profile
-  template:
+  ansible.builtin.template:
     src: wg0.network.j2
     dest: "{{ systemd_network }}/wg0.network"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify: networkctl reload
   tags: wireguard

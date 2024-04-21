@@ -1,4 +1,4 @@
 ---
 
 - name: Install runners
-  import_tasks: runners.yml
+  ansible.builtin.import_tasks: runners.yml

@@ -1,31 +1,30 @@
 ---
 
 - name: Install snowflake
-  copy:
+  ansible.builtin.copy:
     src: snowflake
     dest: "{{ snowflake_path }}"
     owner: root
     group: proxy
-    mode: 0750
+    mode: '0750'
   notify: restart snowflake
   tags: snowflake
 
 - name: Install the snowflake service
-  template:
+  ansible.builtin.template:
     src: snowflake.service.j2
     dest: "{{ systemd_system }}/snowflake.service"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify:
-    - daemon-reload
     - restart snowflake
   tags: snowflake
 
 - name: Enable and start snowflake
-  systemd:
+  ansible.builtin.systemd:
     name: snowflake.service
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: snowflake

@@ -1,25 +1,25 @@
 ---
 
 - name: Install timesyncd
-  apt:
+  ansible.builtin.apt:
     name: systemd-timesyncd
     state: present
   tags: ntp
 
 - name: Setup timesyncd.conf
-  template:
+  ansible.builtin.template:
     src: timesyncd.conf.j2
     dest: "{{ systemd_prefix }}/timesyncd.conf"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify: restart ntp
   tags: ntp
 
 - name: Enable timesyncd
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-timesyncd.service
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: ntp

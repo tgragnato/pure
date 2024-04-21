@@ -1,31 +1,30 @@
 ---
 
 - name: Install nfguard
-  copy:
+  ansible.builtin.copy:
     src: nfguard
     dest: "{{ nfguard_path }}"
     owner: proxy
     group: proxy
-    mode: 0500
+    mode: '0500'
   notify: restart nfguard
   tags: nfguard
 
 - name: Install the nfguard service
-  template:
+  ansible.builtin.template:
     src: nfguard.service.j2
     dest: "{{ systemd_system }}/nfguard.service"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify:
-    - daemon-reload
     - restart nfguard
   tags: nfguard
 
 - name: Enable and start nfguard
-  systemd:
+  ansible.builtin.systemd:
     name: nfguard.service
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: nfguard

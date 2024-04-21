@@ -1,20 +1,20 @@
 ---
 
 - name: Check systemd-networkd
-  systemd:
+  ansible.builtin.systemd:
     name: systemd-networkd
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: network
 
 - name: Install network profiles
-  template:
+  ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ systemd_network }}/{{ item }}"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   loop:
     - en.network
     - wan.netdev
@@ -23,7 +23,7 @@
   tags: network
 
 - name: Delete unused directories
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ item }}"
   loop:
@@ -32,24 +32,24 @@
   tags: network
 
 - name: Remove comments from /etc/sysctl.conf
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/sysctl.conf
-    regexp: '^#' 
+    regexp: '^#'
     state: absent
   tags: network
 
 - name: Remove empty lines from /etc/sysctl.conf
-  lineinfile:
+  ansible.builtin.lineinfile:
     path: /etc/sysctl.conf
     regexp: '^\s*$'
     state: absent
   tags: network
 
 - name: Setting sysctl.conf
-  sysctl:
+  ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
-  ignore_errors: true
+  failed_when: false
   loop:
     - name: kernel.printk
       value: 3 4 1 3

@@ -1,19 +1,19 @@
 ---
 
 - name: Initialize wireguard
-  import_tasks: wireguard.yml
+  ansible.builtin.import_tasks: wireguard.yml
 
 - name: Install tor
-  import_tasks: tor.yml
+  ansible.builtin.import_tasks: tor.yml
 
 - name: Initialize the firewall
-  import_tasks: firewall.yml
+  ansible.builtin.import_tasks: firewall.yml
 
 - name: Install dnsd
-  import_tasks: dnsd.yml
+  ansible.builtin.import_tasks: dnsd.yml
 
 - name: Install nfguard
-  import_tasks: nfguard.yml
+  ansible.builtin.import_tasks: nfguard.yml
 
 - name: Install snowflake
-  import_tasks: snowflake.yml
+  ansible.builtin.import_tasks: snowflake.yml

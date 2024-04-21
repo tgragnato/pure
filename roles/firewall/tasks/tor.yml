@@ -1,7 +1,7 @@
 ---
 
 - name: Install tor
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
@@ -10,30 +10,30 @@
   tags: tor
 
 - name: Install the snowflake client
-  copy:
+  ansible.builtin.copy:
     src: client
     dest: "{{ client_path }}"
     owner: debian-tor
     group: debian-tor
-    mode: 0750
+    mode: '0750'
   notify: restart tor
   tags: tor
 
 - name: Setup torrc
-  template:
+  ansible.builtin.template:
     src: torrc.j2
     dest: /etc/tor/torrc
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
     validate: tor --verify-config -f %s
   notify: restart tor
   tags: tor
 
 - name: Enable and start tor
-  systemd:
+  ansible.builtin.systemd:
     name: tor@default.service
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: tor

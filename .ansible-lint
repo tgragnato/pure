@@ -1,0 +1,9 @@
+---
+# .ansible-lint
+
+exclude_paths:
+  - .github/
+  - snowflake/
+
+use_default_rules: true
+offline: false

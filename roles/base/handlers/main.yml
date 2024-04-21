@@ -1,21 +1,25 @@
 ---
 
 - name: Update grub
-  shell: update-grub
+  ansible.builtin.command:
+    cmd: /usr/sbin/update-grub
   listen: update grub
+  changed_when: false
 
 - name: Reload .network and .netdev files
-  shell: networkctl reload
+  ansible.builtin.command:
+    cmd: /usr/bin/networkctl reload
   listen: networkctl reload
-
-- name: Daemon reload
-  shell: systemctl daemon-reload
-  listen: daemon-reload
+  changed_when: false
 
 - name: Restart resolved
-  shell: systemctl restart systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved.service
+    state: restarted
   listen: restart resolved
 
 - name: Restart timesyncd
-  shell: systemctl restart systemd-timesyncd
+  ansible.builtin.systemd:
+    name: systemd-timesyncd.service
+    state: restarted
   listen: restart ntp

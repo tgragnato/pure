@@ -20,9 +20,6 @@ table inet filter {
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
         ct state established,related accept
-{% if wan_ssh %}
-        tcp sport 1024-65535 tcp dport 22 accept
-{% endif %}
         udp sport 1024-65535 udp dport { 123, {{ wg0_port }}, 1024-65535 } accept
     }
 

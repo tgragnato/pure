@@ -1,7 +1,7 @@
 ---
 
 - name: Prepare for the symlink phase
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ item }}"
   loop:
@@ -12,8 +12,8 @@
   tags: fhs
 
 - name: Symlink to /dev/null
-  file:
-    force: yes
+  ansible.builtin.file:
+    force: true
     src: /dev/null
     dest: "{{ item }}"
     state: link
@@ -32,7 +32,7 @@
   tags: fhs
 
 - name: Cleanup /etc
-  file:
+  ansible.builtin.file:
     state: absent
     path: "{{ item }}"
   loop:

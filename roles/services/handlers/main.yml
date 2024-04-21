@@ -1,5 +1,6 @@
 ---
 
 - name: Daemon reload
-  shell: systemctl daemon-reload
+  ansible.builtin.systemd:
+    daemon_reload: true
   listen: daemon-reload

@@ -1,7 +1,7 @@
 ---
 
 - name: Install the dependencies
-  apt:
+  ansible.builtin.apt:
     name: "{{ item }}"
     state: present
   loop:
@@ -15,13 +15,13 @@
   tags: runners
 
 - name: Create the runner group
-  group:
+  ansible.builtin.group:
     name: runner
     system: true
   tags: runners
 
 - name: Create the runner user
-  user:
+  ansible.builtin.user:
     name: runner
     group: runner
     shell: /bin/bash
@@ -30,51 +30,53 @@
   tags: runners
 
 - name: Check if the runner is installed
-  stat:
+  ansible.builtin.stat:
     path: "{{ runner_workdir }}/runsvc.sh"
   register: runner_status
   tags: runners
 
 - name: Install the runner
+  when: not runner_status.stat.exists
+  tags: runners
   block:
 
     - name: Download the tar archive
-      get_url:
+      ansible.builtin.get_url:
         url: "https://github.com/actions/runner/releases/download/v{{ runner_version }}/actions-runner-linux-{{ runner_arch }}-{{ runner_version }}.tar.gz"
         dest: "/dev/shm/runner.tar.gz"
+        mode: '0640'
       tags: runners
 
     - name: Extract the tar archive
-      unarchive:
+      ansible.builtin.unarchive:
         src: "/dev/shm/runner.tar.gz"
         dest: "{{ runner_workdir }}"
+        mode: '0640'
       tags: runners
 
-  when: not runner_status.stat.exists
-  tags: runners
-
 - name: Create the configuration directory
-  file:
+  ansible.builtin.file:
     path: "{{ runner_confdir }}"
     state: directory
+    mode: '0750'
   tags: runners
 
 - name: Install the runners service
-  template:
+  ansible.builtin.template:
     src: runner@.service.j2
     dest: "{{ systemd_system }}/runner@.service"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify: daemon-reload
   tags: runners
 
 - name: Enable and start the runners
-  systemd:
+  ansible.builtin.systemd:
     name: "runner@{{ item }}.service"
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   loop:
     - magnetico
     - snowflake

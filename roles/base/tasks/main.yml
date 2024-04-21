@@ -1,16 +1,16 @@
 ---
 
 - name: Initialize the system
-  import_tasks: init.yml
+  ansible.builtin.import_tasks: init.yml
 
 - name: Customize the FHS
-  import_tasks: fhs.yml
+  ansible.builtin.import_tasks: fhs.yml
 
 - name: Initialize the network
-  import_tasks: network.yml
+  ansible.builtin.import_tasks: network.yml
 
 - name: Setup dns
-  import_tasks: dns.yml
+  ansible.builtin.import_tasks: dns.yml
 
 - name: Setup ntp
-  import_tasks: ntp.yml
+  ansible.builtin.import_tasks: ntp.yml

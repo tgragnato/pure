@@ -1,31 +1,30 @@
 ---
 
 - name: Install dnsd
-  copy:
+  ansible.builtin.copy:
     src: dnsd
     dest: "{{ dnsd_path }}"
     owner: nobody
     group: nogroup
-    mode: 0500
+    mode: '0500'
   notify: restart dnsd
   tags: dnsd
 
 - name: Install the dnsd service
-  template:
+  ansible.builtin.template:
     src: dnsd.service.j2
     dest: "{{ systemd_system }}/dnsd.service"
     owner: root
     group: root
-    mode: 0644
+    mode: '0644'
   notify:
-    - daemon-reload
     - restart dnsd
   tags: dnsd
 
 - name: Enable and start dnsd
-  systemd:
+  ansible.builtin.systemd:
     name: dnsd.service
     state: started
-    enabled: yes
-    masked: no
+    enabled: true
+    masked: false
   tags: dnsd

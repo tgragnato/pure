@@ -1,29 +1,42 @@
 ---
 
-- name: Daemon reload
-  shell: systemctl daemon-reload
-  listen: daemon-reload
-
 - name: Reload .network and .netdev files
-  shell: networkctl reload
+  ansible.builtin.command:
+    cmd: /usr/bin/networkctl reload
   listen: networkctl reload
+  changed_when: false
 
 - name: Restart nftables
-  shell: systemctl restart nftables
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: nftables.service
+    state: restarted
   listen: restart nftables
 
 - name: Restart tor
-  shell: systemctl restart tor@default
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: tor@default.service
+    state: restarted
   listen: restart tor
 
 - name: Restart snowflake
-  shell: systemctl restart snowflake
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: snowflake.service
+    state: restarted
   listen: restart snowflake
 
 - name: Restart dnsd
-  shell: systemctl restart dnsd
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: nfguard.service
+    state: restarted
   listen: restart dnsd
 
 - name: Restart nfguard
-  shell: systemctl restart nfguard
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: nfguard.service
+    state: restarted
   listen: restart nfguard
