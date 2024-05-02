@@ -4,3 +4,17 @@
   ansible.builtin.systemd:
     daemon_reload: true
   listen: daemon-reload
+
+- name: Restart magneticod
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: magneticod.service
+    state: restarted
+  listen: restart magneticod
+
+- name: Restart magneticow
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: magneticow.service
+    state: restarted
+  listen: restart magneticow

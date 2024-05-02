@@ -1,0 +1,57 @@
+---
+
+- name: Install magneticod
+  ansible.builtin.copy:
+    src: magneticod
+    dest: /usr/local/bin/magneticod
+    owner: daemon
+    group: daemon
+    mode: '0500'
+  tags: magnetico
+
+- name: Install the magneticod service
+  ansible.builtin.template:
+    src: magneticod.service.j2
+    dest: "{{ systemd_system }}/magneticod.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart magneticod
+  tags: magnetico
+
+- name: Enable and start magneticod
+  ansible.builtin.systemd:
+    name: magneticod.service
+    state: started
+    enabled: true
+    masked: false
+  tags: magnetico
+
+- name: Install magneticow
+  ansible.builtin.copy:
+    src: magneticow
+    dest: /usr/local/bin/magneticow
+    owner: nobody
+    group: nogroup
+    mode: '0500'
+  tags: magnetico
+
+- name: Install the magneticow service
+  ansible.builtin.template:
+    src: magneticow.service.j2
+    dest: "{{ systemd_system }}/magneticow.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart magneticow
+  tags: magnetico
+
+- name: Enable and start magneticow
+  ansible.builtin.systemd:
+    name: magneticow.service
+    state: started
+    enabled: true
+    masked: false
+  tags: magnetico

@@ -1,0 +1,60 @@
+---
+
+- name: Install postgresql
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - postgresql
+    - postgresql-contrib
+    - python3-psycopg2
+  tags: postgresql
+
+- name: Enable and start postgresql
+  ansible.builtin.systemd:
+    name: "postgresql@{{ postgresql_version }}-main.service"
+    enabled: yes
+    state: started
+  tags: postgresql
+
+- name: Ensure PostgreSQL users are present
+  postgresql_user:
+    name: "{{ item.username }}"
+    password: "{{ item.password | default(omit) }}"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+  become: true
+  become_method: su
+  become_user: "{{ postgresql_socketuser }}"
+  loop:
+    - { username: "magnetico", password: "magnetico" }
+  tags: postgresql
+
+- name: Ensure specified PostgreSQL databases are present
+  ansible.builtin.postgresql_db:
+    name: "{{ item.name }}"
+    owner: "{{ item.owner }}"
+    lc_collate: "C.UTF-8"
+    lc_ctype: "C.UTF-8"
+    encoding: "UTF-8"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+  become: true
+  become_method: su
+  become_user: "{{ postgresql_socketuser }}"
+  loop:
+    - { name: "magnetico", owner: "magnetico" }
+  tags: postgresql
+
+- name: Ensure specified PostgreSQL extensions are loaded
+  ansible.builtin.postgresql_ext:
+    name: "{{ item.name }}"
+    db: "{{ item.db }}"
+    cascade: true
+    version: latest
+    schema: public
+    login_unix_socket: "{{ postgresql_socketdir }}"
+  become: true
+  become_method: su
+  become_user: "{{ postgresql_socketuser }}"
+  loop:
+    - { name: "pg_trgm", db: "magnetico" }
+  tags: postgresql

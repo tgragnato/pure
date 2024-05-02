@@ -2,3 +2,9 @@
 
 - name: Install runners
   ansible.builtin.import_tasks: runners.yml
+
+- name: Install postgresql
+  ansible.builtin.import_tasks: postgresql.yml
+
+- name: Install magnetico
+  ansible.builtin.import_tasks: magnetico.yml

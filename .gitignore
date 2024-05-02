@@ -6,3 +6,5 @@ roles/firewall/files/nfguard
 cmd/nfguard/nfguard
 roles/firewall/files/client
 roles/firewall/files/snowflake
+roles/services/files/magneticod
+roles/services/files/magneticow
