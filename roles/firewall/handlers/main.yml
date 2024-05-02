@@ -30,7 +30,7 @@
 - name: Restart dnsd
   ansible.builtin.systemd:
     daemon_reload: true
-    name: nfguard.service
+    name: dnsd.service
     state: restarted
   listen: restart dnsd
 
