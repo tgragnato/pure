@@ -18,3 +18,10 @@
     name: magneticow.service
     state: restarted
   listen: restart magneticow
+
+- name: Restart grafana
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: grafana.service
+    state: restarted
+  listen: restart grafana

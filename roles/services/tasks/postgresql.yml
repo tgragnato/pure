@@ -27,6 +27,7 @@
   become_user: "{{ postgresql_socketuser }}"
   loop:
     - { username: "magnetico", password: "magnetico" }
+    - { username: "grafana", password: "grafana" }
   tags: postgresql
 
 - name: Ensure specified PostgreSQL databases are present
@@ -42,6 +43,7 @@
   become_user: "{{ postgresql_socketuser }}"
   loop:
     - { name: "magnetico", owner: "magnetico" }
+    - { name: "grafana", owner: "grafana" }
   tags: postgresql
 
 - name: Ensure specified PostgreSQL extensions are loaded

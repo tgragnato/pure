@@ -3,7 +3,7 @@
 - name: Install magneticod
   ansible.builtin.copy:
     src: magneticod
-    dest: /usr/local/bin/magneticod
+    dest: "{{ magneticod_path }}"
     owner: daemon
     group: daemon
     mode: '0500'
@@ -31,7 +31,7 @@
 - name: Install magneticow
   ansible.builtin.copy:
     src: magneticow
-    dest: /usr/local/bin/magneticow
+    dest: "{{ magneticow_path }}"
     owner: nobody
     group: nogroup
     mode: '0500'

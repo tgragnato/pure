@@ -4,6 +4,7 @@ debian_security: https://deb.debian.org/debian-security
 systemd_prefix: /etc/systemd
 systemd_system: "{{ systemd_prefix }}/system"
 systemd_network: "{{ systemd_prefix }}/network"
+local_folder: /usr/local
 ntp_servers: ntp1.inrim.it ntp2.inrim.it time.euro.apple.com time.asia.apple.com time.apple.com
 ntp_fallback: time.cloudflare.com ntp1.fortiguard.com ntp2.fortiguard.com ntp.checkpoint.com ntp2.checkpoint.com
 wg0_privatekey: !vault |
@@ -72,9 +73,9 @@ wgpeers:
           6366633337373065323835613839336665323339373561366263
     allowedips: 192.168.33.4/32, fd5d:2ddd:f4a5::4/128
 client_path: /usr/bin/snowflake-client
-snowflake_path: /usr/local/bin/snowflake
-dnsd_path: /usr/local/bin/dnsd
-nfguard_path: /usr/local/bin/nfguard
+snowflake_path: "{{ local_folder }}/bin/snowflake"
+dnsd_path: "{{ local_folder }}/bin/dnsd"
+nfguard_path: "{{ local_folder }}/bin/nfguard"
 runner_arch: x64
 runner_version: "2.311.0"
 runner_workdir: /var/lib/runner
@@ -82,5 +83,7 @@ runner_confdir: /etc/runners
 postgresql_socketdir: /var/run/postgresql/
 postgresql_version: 15
 postgresql_socketuser: postgres
-magneticod_path: /usr/local/bin/magneticod
-magneticow_path: /usr/local/bin/magneticow
+magneticod_path: "{{ local_folder }}/bin/magneticod"
+magneticow_path: "{{ local_folder }}/bin/magneticow"
+grafana_version: 10.4.2
+grafana_folder: "{{ local_folder }}/grafana-v{{ grafana_version }}"

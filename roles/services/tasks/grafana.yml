@@ -1,0 +1,45 @@
+---
+
+- name: Check if folder exist for grafana
+  ansible.builtin.stat:
+    path: "{{ grafana_folder }}"
+  register: grafana_installed
+  tags: grafana
+
+- name: Extract the standalone archive
+  ansible.builtin.unarchive:
+    src: "grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+    dest: "{{ local_folder }}"
+    remote_src: false
+  when: not grafana_installed.stat.exists
+  tags: grafana
+
+- name: Setup grafana
+  ansible.builtin.template:
+    src: grafana.ini.j2
+    dest: "{{ grafana_folder }}/conf/grafana.ini"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart grafana
+  tags: grafana
+
+- name: Setup the grafana systemd service
+  ansible.builtin.template:
+    src: grafana.service.j2
+    dest: "{{ systemd_system }}/grafana.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - restart grafana
+  tags: grafana
+
+- name: Enable and start grafana
+  ansible.builtin.systemd:
+    name: grafana.service
+    state: started
+    enabled: true
+    masked: false
+  tags: grafana

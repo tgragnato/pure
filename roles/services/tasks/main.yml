@@ -8,3 +8,6 @@
 
 - name: Install magnetico
   ansible.builtin.import_tasks: magnetico.yml
+
+- name: Install grafana
+  ansible.builtin.import_tasks: grafana.yml
