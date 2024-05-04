@@ -7,7 +7,7 @@ After=network.target network-online.target
 AmbientCapabilities=
 CapabilityBoundingSet=
 DevicePolicy=closed
-ExecStart={{ magneticod_path }} --max-rps=10000
+ExecStart={{ magneticod_path }} --max-rps=5000
 Group=daemon
 LimitNOFILE=32768
 LockPersonality=yes
