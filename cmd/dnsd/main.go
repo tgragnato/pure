@@ -19,20 +19,25 @@ import (
 func main() {
 
 	var (
-		cache4    = ipcache.NewCache(3600*time.Second, false)
-		cache6    = ipcache.NewCache(3600*time.Second, true)
-		geoChecks = checks.NewGeoChecks()
-		errCache4 = errcache.NewErrCache(time.Minute, false, cache4, cache6, geoChecks)
-		errCache6 = errcache.NewErrCache(time.Minute, true, cache4, cache6, geoChecks)
-		hint4     string
-		hint6     string
-		bindAddr  string
+		hint4    string
+		hint6    string
+		bindAddr string
+		dsn      string
 	)
 
 	flag.StringVar(&hint4, "hintIPv4", "", "Set here the IPv4 of the HTTPS hint")
 	flag.StringVar(&hint6, "hintIPv6", "", "Set here the IPv6 of the HTTPS hint")
 	flag.StringVar(&bindAddr, "bindAddr", "127.0.0.1:53", "Set here the address to bind to")
+	flag.StringVar(&dsn, "dsn", "postgres://dnsd:dnsd@localhost:5432/dnsd?sslmode=disable", "Set here the DSN for the PostgreSQL database")
 	flag.Parse()
+
+	var (
+		cache4    = ipcache.NewCache(3600*time.Second, false, dsn)
+		cache6    = ipcache.NewCache(3600*time.Second, true, dsn)
+		geoChecks = checks.NewGeoChecks()
+		errCache4 = errcache.NewErrCache(time.Minute, false, cache4, cache6, geoChecks)
+		errCache6 = errcache.NewErrCache(time.Minute, true, cache4, cache6, geoChecks)
+	)
 
 	hintIPv4 := net.ParseIP(hint4).To4()
 	if hintIPv4 == nil {

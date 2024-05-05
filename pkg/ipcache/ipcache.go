@@ -1,6 +1,7 @@
 package ipcache
 
 import (
+	"database/sql"
 	"net"
 	"sync"
 	"time"
@@ -12,6 +13,7 @@ type Cache struct {
 	items map[string]*Item
 	ipv6  bool
 	cln   bool
+	db    *sql.DB
 }
 
 func (cache *Cache) Set(key string, data []net.IP, ttl uint32) {
@@ -26,6 +28,7 @@ func (cache *Cache) Set(key string, data []net.IP, ttl uint32) {
 		expires: &expiration,
 	}
 	cache.Unlock()
+	cache.SetPersistent(key, data)
 }
 
 func (cache *Cache) Get(key string) (data []net.IP, found bool) {
@@ -35,8 +38,10 @@ func (cache *Cache) Get(key string) (data []net.IP, found bool) {
 		data = item.data
 		found = true
 	} else {
-		data = []net.IP{}
-		found = false
+		data, found = cache.GetPersistent(key)
+		if found {
+			go cache.Set(key, data, 0)
+		}
 	}
 	cache.RUnlock()
 	return

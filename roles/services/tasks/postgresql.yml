@@ -25,7 +25,7 @@
 - name: Tune the postgresql.conf parameters
   ansible.builtin.lineinfile:
     path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
-    regexp: "^{{ item.key }}"
+    regexp: '^{{ item.key }}\s'
     line: "{{ item.key }} = {{ item.value }}"
     state: present
   loop:
@@ -80,6 +80,8 @@
   loop:
     - { username: "magnetico", password: "magnetico" }
     - { username: "grafana", password: "grafana" }
+    - { username: "dnsd", password: "dnsd" }
+    - { username: "reader", password: "reader" }
   tags: postgresql
 
 - name: Ensure specified PostgreSQL databases are present
@@ -96,6 +98,39 @@
   loop:
     - { name: "magnetico", owner: "magnetico" }
     - { name: "grafana", owner: "grafana" }
+    - { name: "dnsd", owner: "dnsd" }
+  tags: postgresql
+
+- name: Ensure grafana can use the specified schemas
+  community.postgresql.postgresql_privs:
+    db: "{{ item.db }}"
+    privs: "USAGE"
+    type: "schema"
+    objs: "{{ item.schema }}"
+    roles: "reader"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+  become: true
+  become_method: ansible.builtin.su
+  become_user: "{{ postgresql_socketuser }}"
+  loop:
+    - { db: "magnetico", schema: "public" }
+    - { db: "dnsd", schema: "public" }
+  tags: postgresql
+
+- name: Ensure grafana can read from the tables
+  community.postgresql.postgresql_privs:
+    db: "{{ item }}"
+    privs: "SELECT"
+    type: "table"
+    objs: "ALL_IN_SCHEMA"
+    roles: "reader"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+  become: true
+  become_method: ansible.builtin.su
+  become_user: "{{ postgresql_socketuser }}"
+  loop:
+    - "magnetico"
+    - "dnsd"
   tags: postgresql
 
 - name: Ensure specified PostgreSQL extensions are loaded
@@ -111,4 +146,38 @@
   become_user: "{{ postgresql_socketuser }}"
   loop:
     - { name: "pg_trgm", db: "magnetico" }
+  tags: postgresql
+
+- name: Ensure table a exists
+  community.postgresql.postgresql_query:
+    db: "dnsd"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+    query: |
+      CREATE TABLE IF NOT EXISTS a (
+        key VARCHAR(255) PRIMARY KEY,
+        value TEXT,
+        discovered_on TIMESTAMP,
+        last_used TIMESTAMP
+      );
+      ALTER TABLE a OWNER TO dnsd;
+  become: true
+  become_method: ansible.builtin.su
+  become_user: "{{ postgresql_socketuser }}"
+  tags: postgresql
+
+- name: Ensure table aaaa exists
+  community.postgresql.postgresql_query:
+    db: "dnsd"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+    query: |
+      CREATE TABLE IF NOT EXISTS aaaa (
+        key VARCHAR(255) PRIMARY KEY,
+        value TEXT,
+        discovered_on TIMESTAMP,
+        last_used TIMESTAMP
+      );
+      ALTER TABLE aaaa OWNER TO dnsd;
+  become: true
+  become_method: ansible.builtin.su
+  become_user: "{{ postgresql_socketuser }}"
   tags: postgresql
