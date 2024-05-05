@@ -3,6 +3,7 @@
 
 exclude_paths:
   - .github/
+  - magnetico/
   - snowflake/
 
 use_default_rules: true
