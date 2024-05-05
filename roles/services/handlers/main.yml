@@ -5,6 +5,13 @@
     daemon_reload: true
   listen: daemon-reload
 
+- name: Restart postgresql
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: "postgresql@{{ postgresql_version }}-main.service"
+    state: restarted
+  listen: restart postgresql
+
 - name: Restart magneticod
   ansible.builtin.systemd:
     daemon_reload: true
