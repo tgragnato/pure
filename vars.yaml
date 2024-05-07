@@ -76,10 +76,6 @@ client_path: /usr/bin/snowflake-client
 snowflake_path: "{{ local_folder }}/bin/snowflake"
 dnsd_path: "{{ local_folder }}/bin/dnsd"
 nfguard_path: "{{ local_folder }}/bin/nfguard"
-runner_arch: x64
-runner_version: "2.311.0"
-runner_workdir: /var/lib/runner
-runner_confdir: /etc/runners
 postgresql_socketdir: /var/run/postgresql/
 postgresql_version: 15
 postgresql_socketuser: postgres
