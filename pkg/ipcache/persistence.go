@@ -79,3 +79,25 @@ func (cache *Cache) GetPersistent(key string) (data []net.IP, found bool) {
 
 	return ips, true
 }
+
+func (cache *Cache) DeletePersistent(key string) {
+	if cache.db == nil {
+		return
+	}
+
+	query := `
+		DELETE FROM a
+		WHERE key = $1
+	`
+	if cache.ipv6 {
+		query = `
+		DELETE FROM aaaa
+		WHERE key = $1
+	`
+	}
+
+	_, err := cache.db.Exec(query, key)
+	if err != nil {
+		log.Println(err.Error())
+	}
+}

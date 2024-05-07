@@ -28,7 +28,9 @@ func (cache *Cache) Set(key string, data []net.IP, ttl uint32) {
 		expires: &expiration,
 	}
 	cache.Unlock()
-	cache.SetPersistent(key, data)
+	if ttl != 0 {
+		cache.SetPersistent(key, data)
+	}
 }
 
 func (cache *Cache) Get(key string) (data []net.IP, found bool) {

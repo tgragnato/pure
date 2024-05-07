@@ -15,7 +15,6 @@ func NewCache(duration time.Duration, v6 bool, dsn string) *Cache {
 		log.Println(err.Error())
 		db = nil
 	}
-
 	if db != nil && db.Ping() != nil {
 		db = nil
 	}
@@ -28,6 +27,7 @@ func NewCache(duration time.Duration, v6 bool, dsn string) *Cache {
 		db:    db,
 	}
 
+	cache.Prefetch()
 	go cache.cleanupTimer()
 
 	return cache
