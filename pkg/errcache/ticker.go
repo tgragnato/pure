@@ -12,11 +12,11 @@ import (
 func (errCache *ErrCache) cleanup(keys []string) {
 	for i := range keys {
 		if _, exist := errCache.cache6.Get(keys[i]); errCache.ipv6 && exist {
-			go errCache.Del(keys[i])
+			go delete(errCache.items, keys[i])
 			continue
 		}
 		if _, exist := errCache.cache4.Get(keys[i]); !errCache.ipv6 && exist {
-			go errCache.Del(keys[i])
+			go delete(errCache.items, keys[i])
 			continue
 		}
 
@@ -28,7 +28,7 @@ func (errCache *ErrCache) cleanup(keys []string) {
 					!strings.HasSuffix(cname, "s3.amazonaws.com.") {
 					go errCache.cache4.Set(keys[i], []net.IP{net.ParseIP("0.0.0.0")}, 0)
 					go errCache.cache6.Set(keys[i], []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
-					go errCache.Del(keys[i])
+					go delete(errCache.items, keys[i])
 					continue
 				}
 			}
@@ -36,7 +36,7 @@ func (errCache *ErrCache) cleanup(keys []string) {
 			if !errCache.geoChecks.CheckIPs(ips) {
 				go errCache.cache4.Set(keys[i], []net.IP{net.ParseIP("0.0.0.0")}, 0)
 				go errCache.cache6.Set(keys[i], []net.IP{net.ParseIP("0000:0000:0000:0000:0000:0000:0000:0000")}, 0)
-				go errCache.Del(keys[i])
+				go delete(errCache.items, keys[i])
 				continue
 			}
 
@@ -45,7 +45,7 @@ func (errCache *ErrCache) cleanup(keys []string) {
 			} else {
 				go errCache.cache4.Set(keys[i], ips, ttl)
 			}
-			go errCache.Del(keys[i])
+			go delete(errCache.items, keys[i])
 		} else {
 			go func() {
 				errCache.Lock()
@@ -59,24 +59,21 @@ func (errCache *ErrCache) cleanup(keys []string) {
 }
 
 func (errCache *ErrCache) cleanupTimer() {
-	for {
-		select {
-		case <-time.NewTicker(errCache.duration).C:
-			if errCache.cln {
+	for range time.NewTicker(errCache.duration).C {
+		if errCache.cln {
+			continue
+		}
+		errCache.cln = true
+		cleanupkeys := []string{}
+		errCache.RLock()
+		for key := range errCache.items {
+			if !errCache.items[key].expired() {
 				continue
 			}
-			errCache.cln = true
-			cleanupkeys := []string{}
-			errCache.RLock()
-			for key := range errCache.items {
-				if !errCache.items[key].expired() {
-					continue
-				}
-				cleanupkeys = append(cleanupkeys, key)
-			}
-			errCache.RUnlock()
-			errCache.cleanup(cleanupkeys)
-			errCache.cln = false
+			cleanupkeys = append(cleanupkeys, key)
 		}
+		errCache.RUnlock()
+		errCache.cleanup(cleanupkeys)
+		errCache.cln = false
 	}
 }

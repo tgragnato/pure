@@ -1,0 +1,34 @@
+run:
+  concurrency: 4
+  timeout: 5m
+  tests: true
+  allow-parallel-runners: true
+  go: '1.22'
+
+linters:
+  enable:
+    - gosec
+    - gci
+
+issues:
+  exclude-rules:
+
+    - path: pkg/shsh/listen.go
+      linters:
+        - gosec
+      text: "G114:"
+
+    - path: pkg/sni/readonly.go
+      linters:
+        - gosec
+      text: "G402:"
+
+    - path: pkg/nfqueue/worker.go
+      linters:
+        - gosec
+      text: "G404:"
+
+    - path: pkg/sni/copy.go
+      linters:
+        - errcheck
+      text: ".CloseWrite` is not checked"

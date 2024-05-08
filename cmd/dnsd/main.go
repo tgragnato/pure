@@ -71,7 +71,10 @@ func main() {
 			)
 		}
 
-		w.WriteMsg(m)
+		err := w.WriteMsg(m)
+		if err != nil {
+			log.Printf("Failed to write message: %s\n", err.Error())
+		}
 	})
 
 	go func() {
@@ -83,7 +86,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to start server: %s\n", err.Error())
 		} else {
-			defer udp.Shutdown()
+			defer func() {
+				err := udp.Shutdown()
+				if err != nil {
+					log.Fatalf("Failed to shutdown server: %s\n", err.Error())
+				}
+			}()
 		}
 	}()
 
@@ -96,7 +104,12 @@ func main() {
 		if err != nil {
 			log.Fatalf("Failed to start server: %s\n", err.Error())
 		} else {
-			defer tcp.Shutdown()
+			defer func() {
+				err := tcp.Shutdown()
+				if err != nil {
+					log.Fatalf("Failed to shutdown server: %s\n", err.Error())
+				}
+			}()
 		}
 	}()
 

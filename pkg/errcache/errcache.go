@@ -29,14 +29,6 @@ func (errCache *ErrCache) Add(key string) {
 	errCache.Unlock()
 }
 
-func (errCache *ErrCache) Del(key string) {
-	errCache.Lock()
-	if _, exist := errCache.items[key]; exist {
-		delete(errCache.items, key)
-	}
-	errCache.Unlock()
-}
-
 func (errCache *ErrCache) Exist(key string) bool {
 	errCache.RLock()
 	_, exist := errCache.items[key]
