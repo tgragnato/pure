@@ -7,6 +7,7 @@
     owner: daemon
     group: daemon
     mode: '0500'
+  notify: restart magneticod
   tags: magnetico
 
 - name: Install the magneticod service
@@ -16,8 +17,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-    - restart magneticod
+  notify: restart magneticod
   tags: magnetico
 
 - name: Enable and start magneticod
@@ -35,6 +35,7 @@
     owner: nobody
     group: nogroup
     mode: '0500'
+  notify: restart magneticow
   tags: magnetico
 
 - name: Install the magneticow service
@@ -44,8 +45,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-    - restart magneticow
+  notify: restart magneticow
   tags: magnetico
 
 - name: Enable and start magneticow

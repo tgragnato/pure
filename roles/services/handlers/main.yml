@@ -32,3 +32,10 @@
     name: grafana.service
     state: restarted
   listen: restart grafana
+
+- name: Restart prometheus
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: prometheus.service
+    state: restarted
+  listen: restart prometheus

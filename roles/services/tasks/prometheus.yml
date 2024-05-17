@@ -1,0 +1,37 @@
+---
+
+- name: Install prometheus
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - prometheus
+    - prometheus-node-exporter
+    - prometheus-postgres-exporter
+    - prometheus-blackbox-exporter
+  tags: prometheus
+
+- name: Copy prometheus configuration
+  ansible.builtin.template:
+    src: prometheus.yml.j2
+    dest: /etc/prometheus/prometheus.yml
+    mode: 0644
+  notify: restart prometheus
+  tags: prometheus
+
+- name: Install the prometheus service
+  ansible.builtin.template:
+    src: prometheus.service.j2
+    dest: "{{ systemd_system }}/prometheus.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: restart prometheus
+  tags: prometheus
+
+- name: Enable and start prometheus
+  ansible.builtin.systemd:
+    name: prometheus
+    enabled: yes
+    state: started
+  tags: prometheus

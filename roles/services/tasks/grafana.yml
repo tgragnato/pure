@@ -21,8 +21,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-    - restart grafana
+  notify: restart grafana
   tags: grafana
 
 - name: Setup the grafana systemd service
@@ -32,8 +31,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-    - restart grafana
+  notify: restart grafana
   tags: grafana
 
 - name: Enable and start grafana

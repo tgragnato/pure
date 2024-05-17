@@ -8,3 +8,6 @@
 
 - name: Install grafana
   ansible.builtin.import_tasks: grafana.yml
+
+- name: Install prometheus
+  ansible.builtin.import_tasks: prometheus.yml
