@@ -19,7 +19,7 @@
     - '^#'
     - '^\s*$'
     - '^\s*#'
-  notify: restart postgresql
+  notify: Restart postgresql
   tags: postgresql
 
 - name: Tune the postgresql.conf parameters
@@ -59,7 +59,7 @@
       value: 4
     - key: max_parallel_maintenance_workers
       value: 2
-  notify: restart postgresql
+  notify: Restart postgresql
   tags: postgresql
 
 - name: Enable and start postgresql

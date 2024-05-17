@@ -15,7 +15,7 @@
     owner: root
     group: systemd-network
     mode: '0640'
-  notify: networkctl reload
+  notify: Networkctl reload
   tags: wireguard
 
 - name: Install the network profile
@@ -25,5 +25,5 @@
     owner: root
     group: root
     mode: '0644'
-  notify: networkctl reload
+  notify: Networkctl reload
   tags: wireguard

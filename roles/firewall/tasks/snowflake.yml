@@ -7,7 +7,7 @@
     owner: root
     group: proxy
     mode: '0750'
-  notify: restart snowflake
+  notify: Restart snowflake
   tags: snowflake
 
 - name: Install the snowflake service
@@ -17,8 +17,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-    - restart snowflake
+  notify: Restart snowflake
   tags: snowflake
 
 - name: Enable and start snowflake

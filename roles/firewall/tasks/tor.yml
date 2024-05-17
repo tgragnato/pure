@@ -16,7 +16,7 @@
     owner: debian-tor
     group: debian-tor
     mode: '0750'
-  notify: restart tor
+  notify: Restart tor
   tags: tor
 
 - name: Setup torrc
@@ -27,7 +27,7 @@
     group: root
     mode: '0644'
     validate: tor --verify-config -f %s
-  notify: restart tor
+  notify: Restart tor
   tags: tor
 
 - name: Enable and start tor

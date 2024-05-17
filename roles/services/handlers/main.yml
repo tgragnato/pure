@@ -1,41 +1,36 @@
 ---
 
-- name: Daemon reload
-  ansible.builtin.systemd:
-    daemon_reload: true
-  listen: daemon-reload
-
 - name: Restart postgresql
   ansible.builtin.systemd:
     daemon_reload: true
     name: "postgresql@{{ postgresql_version }}-main.service"
     state: restarted
-  listen: restart postgresql
+  listen: Restart postgresql
 
 - name: Restart magneticod
   ansible.builtin.systemd:
     daemon_reload: true
     name: magneticod.service
     state: restarted
-  listen: restart magneticod
+  listen: Restart magneticod
 
 - name: Restart magneticow
   ansible.builtin.systemd:
     daemon_reload: true
     name: magneticow.service
     state: restarted
-  listen: restart magneticow
+  listen: Restart magneticow
 
 - name: Restart grafana
   ansible.builtin.systemd:
     daemon_reload: true
     name: grafana.service
     state: restarted
-  listen: restart grafana
+  listen: Restart grafana
 
 - name: Restart prometheus
   ansible.builtin.systemd:
     daemon_reload: true
     name: prometheus.service
     state: restarted
-  listen: restart prometheus
+  listen: Restart prometheus

@@ -19,7 +19,7 @@
     - en.network
     - wan.netdev
     - wan.network
-  notify: networkctl reload
+  notify: Networkctl reload
   tags: network
 
 - name: Delete unused directories

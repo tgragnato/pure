@@ -13,7 +13,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify: restart resolved
+  notify: Restart resolved
   tags: dns
 
 - name: Enable systemd-resolved

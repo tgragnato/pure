@@ -7,7 +7,7 @@
     owner: proxy
     group: proxy
     mode: '0500'
-  notify: restart nfguard
+  notify: Restart nfguard
   tags: nfguard
 
 - name: Install the nfguard service
@@ -17,8 +17,7 @@
     owner: root
     group: root
     mode: '0644'
-  notify:
-    - restart nfguard
+  notify: Restart nfguard
   tags: nfguard
 
 - name: Enable and start nfguard
