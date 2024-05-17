@@ -3,7 +3,7 @@ module github.com/tgragnato/pure
 go 1.22
 
 require (
-	github.com/florianl/go-nfqueue v1.3.1
+	github.com/florianl/go-nfqueue v1.3.2
 	github.com/google/gopacket v1.1.19
 	github.com/jackc/pgx/v5 v5.5.5
 	github.com/miekg/dns v1.1.59
@@ -18,7 +18,6 @@ require (
 	github.com/josharian/native v1.1.0 // indirect
 	github.com/mdlayher/netlink v1.7.2 // indirect
 	github.com/mdlayher/socket v0.5.1 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
 	golang.org/x/crypto v0.23.0 // indirect
 	golang.org/x/mod v0.17.0 // indirect
 	golang.org/x/net v0.25.0 // indirect
