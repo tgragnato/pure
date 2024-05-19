@@ -82,6 +82,7 @@
     - { username: "grafana", password: "grafana" }
     - { username: "dnsd", password: "dnsd" }
     - { username: "reader", password: "reader" }
+    - { username: "{{ prometheus_postgres_exporter }}", password: "{{ prometheus_postgres_exporter }}" }
   tags: postgresql
 
 - name: Ensure specified PostgreSQL databases are present
@@ -177,6 +178,18 @@
         last_used TIMESTAMP
       );
       ALTER TABLE aaaa OWNER TO dnsd;
+  become: true
+  become_method: ansible.builtin.su
+  become_user: "{{ postgresql_socketuser }}"
+  tags: postgresql
+
+- name: Ensure the postgres exporter can read the statistics
+  community.postgresql.postgresql_query:
+    db: "postgres"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+    query: |
+      ALTER USER {{ prometheus_postgres_exporter }} SET SEARCH_PATH TO postgres_exporter,pg_catalog;
+      GRANT CONNECT ON DATABASE postgres TO {{ prometheus_postgres_exporter }};
   become: true
   become_method: ansible.builtin.su
   become_user: "{{ postgresql_socketuser }}"

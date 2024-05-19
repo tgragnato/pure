@@ -34,3 +34,10 @@
     name: prometheus.service
     state: restarted
   listen: Restart prometheus
+
+- name: Restart postgres-exporter
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: prometheus-postgres-exporter.service
+    state: restarted
+  listen: Restart postgres-exporter
