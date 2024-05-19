@@ -8,7 +8,6 @@
     - prometheus
     - prometheus-node-exporter
     - prometheus-postgres-exporter
-    - prometheus-blackbox-exporter
   tags: prometheus
 
 - name: Copy prometheus configuration
