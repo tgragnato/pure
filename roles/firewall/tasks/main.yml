@@ -17,3 +17,6 @@
 
 - name: Install snowflake
   ansible.builtin.import_tasks: snowflake.yml
+
+- name: Install spamd
+  ansible.builtin.import_tasks: spamd.yml

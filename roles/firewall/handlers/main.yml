@@ -40,3 +40,10 @@
     name: nfguard.service
     state: restarted
   listen: Restart nfguard
+
+- name: Restart spamd
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: spamd.service
+    state: restarted
+  listen: Restart spamd

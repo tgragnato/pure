@@ -76,6 +76,7 @@ client_path: /usr/bin/snowflake-client
 snowflake_path: "{{ local_folder }}/bin/snowflake"
 dnsd_path: "{{ local_folder }}/bin/dnsd"
 nfguard_path: "{{ local_folder }}/bin/nfguard"
+spamd_path: "{{ local_folder }}/bin/spamd"
 postgresql_socketdir: /var/run/postgresql/
 postgresql_version: 15
 postgresql_socketuser: postgres

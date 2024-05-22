@@ -6,6 +6,7 @@ clean:
 	rm -f roles/firewall/files/nfguard
 	rm -f roles/firewall/files/snowflake
 	rm -f roles/firewall/files/client
+	rm -f roles/firewall/files/spamd
 	rm -f roles/services/files/magneticod
 	rm -f roles/services/files/magneticow
 
@@ -28,6 +29,11 @@ client: roles/firewall/files/client
 
 roles/firewall/files/client:
 	GOOS=linux GOARCH=amd64 go build -C snowflake/client -o ../../roles/firewall/files/client
+
+spamd: roles/firewall/files/spamd
+
+roles/firewall/files/spamd:
+	GOOS=linux GOARCH=amd64 go build -C cmd/spamd -o ../../roles/firewall/files/spamd
 
 magnetico: magneticod magneticow
 

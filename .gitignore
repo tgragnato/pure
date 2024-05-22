@@ -10,3 +10,4 @@ roles/services/files/magneticod
 roles/services/files/magneticow
 roles/services/files/grafana*
 coverage.out
+roles/firewall/files/spamd
