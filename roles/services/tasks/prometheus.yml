@@ -28,6 +28,16 @@
   notify: Restart prometheus
   tags: prometheus
 
+- name: Copy the node exporter configuration
+  ansible.builtin.template:
+    src: prometheus-node-exporter.j2
+    dest: /etc/default/prometheus-node-exporter
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart node-exporter
+  tags: prometheus
+
 - name: Copy the postgres exporter configuration
   ansible.builtin.template:
     src: prometheus-postgres-exporter.j2
