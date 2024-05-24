@@ -3,12 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
+	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
-	"sync"
 	"syscall"
 	"time"
 )
@@ -86,37 +86,32 @@ func main() {
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
 
-	var wg sync.WaitGroup
-	wg.Add(numberOfWorkers)
-	ctx, cancel := context.WithCancel(context.Background())
-	for i := 0; i < numberOfWorkers; i++ {
-		go func(wg *sync.WaitGroup, ctx context.Context, cancel context.CancelFunc, i int) {
-			defer wg.Done()
-			for {
-				select {
-				case <-ctx.Done():
-					return
-				case <-signalCh:
-					cancel()
-					return
-				default:
-					for _, url := range urls {
-						req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
-						if err != nil {
-							fmt.Println(err.Error())
-							continue
-						}
-						req.Header.Set("User-Agent", userAgents[i%len(userAgents)])
-						resp, err := httpClient.Do(req)
-						if err != nil {
-							fmt.Println(err.Error())
-							continue
-						}
-						resp.Body.Close()
-					}
-				}
+	for range time.NewTicker(time.Minute).C {
+		for i := 0; i < numberOfWorkers; i++ {
+			items := make([]string, len(urls))
+			copy(items, urls)
+			rand.Shuffle(len(urls), func(i, j int) {
+				items[i], items[j] = items[j], items[i]
+			})
+			for _, url := range items {
+				go call(url, i)
 			}
-		}(&wg, ctx, cancel, i)
+		}
 	}
-	wg.Wait()
+
+	<-signalCh
+}
+
+func call(url string, i int) {
+	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
+	req.Header.Set("User-Agent", userAgents[i%len(userAgents)])
+	resp, err := httpClient.Do(req)
+	if err != nil {
+		return
+	}
+	resp.Body.Close()
 }
