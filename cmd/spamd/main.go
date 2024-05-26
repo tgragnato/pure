@@ -69,6 +69,14 @@ var (
 		"http://linioki.com/5laNXF80790UzLG767fwqmqfwwsz8171JFPBMGWFWHOFAWE13839/18625r22#fbtzrkfnduqlqqiegsvcg",
 		"https://tinyurl.com/HIMALA12/6DUEvB80790jvRD767claopcblok8171BPLORCVMSAKIGBA13839/18625i22",
 		"http://linioki.com/6DUEvB80790jvRD767claopcblok8171BPLORCVMSAKIGBA13839/18625i22",
+		"https://tinyurl.com/Loura41r/4uIEqG80984Plej1363mrquqxbpan10521NFBEGXOICSJWGLT2040632/18649e11#uhrmkzosemksdrbqpzucd",
+		"http://madishwm.com/4uIEqG80984Plej1363mrquqxbpan10521NFBEGXOICSJWGLT2040632/18649e11#uhrmkzosemksdrbqpzucd",
+		"https://tinyurl.com/Loura41r/5NvKDQ80984riYX1363umvrmnphby10521FORIIULLATURFLG2040632/18649Z11#pfxglimjeauhwqekshuix",
+		"http://madishwm.com/5NvKDQ80984riYX1363umvrmnphby10521FORIIULLATURFLG2040632/18649Z11#pfxglimjeauhwqekshuix",
+		"https://tinyurl.com/Loura41r/6UPeBZ80984EQhU1363qhpdnzbsew10521NBJBRWGNILCFBEZ2040632/18649i11",
+		"http://madishwm.com/6UPeBZ80984EQhU1363qhpdnzbsew10521NBJBRWGNILCFBEZ2040632/18649i11",
+		"https://tinyurl.com/Loura41r/4Iotjw81001AlPk1363ebsqyzwhvs10521SZXAOEISQDZMGFQ2040632/18649v11#qfhofadsqooaihokwkokk",
+		"http://madishwm.com/4Iotjw81001AlPk1363ebsqyzwhvs10521SZXAOEISQDZMGFQ2040632/18649v11#qfhofadsqooaihokwkokk",
 	}
 	userAgents = []string{
 		"Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15",
