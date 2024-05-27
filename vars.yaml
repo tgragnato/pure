@@ -82,7 +82,7 @@ postgresql_version: 15
 postgresql_socketuser: postgres
 magneticod_path: "{{ local_folder }}/bin/magneticod"
 magneticow_path: "{{ local_folder }}/bin/magneticow"
-grafana_version: 10.4.2
+grafana_version: 11.0.0
 grafana_folder: "{{ local_folder }}/grafana-v{{ grafana_version }}"
 prometheus_tsdb_retention: 10y
 prometheus_postgres_exporter: postgres_exporter

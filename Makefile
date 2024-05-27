@@ -47,7 +47,7 @@ magneticow: roles/services/files/magneticow
 roles/services/files/magneticow:
 	GOOS=linux GOARCH=amd64 go build -C magnetico/cmd/magneticow --tags fts5 -o ../../../roles/services/files/magneticow
 
-grafana: roles/services/files/grafana-10.4.2.linux-amd64.tar.gz
+grafana: roles/services/files/grafana-11.0.0.linux-amd64.tar.gz
 
-roles/services/files/grafana-10.4.2.linux-amd64.tar.gz:
-	curl https://dl.grafana.com/oss/release/grafana-10.4.2.linux-amd64.tar.gz -o roles/services/files/grafana-10.4.2.linux-amd64.tar.gz
+roles/services/files/grafana-11.0.0.linux-amd64.tar.gz:
+	curl https://dl.grafana.com/oss/release/grafana-11.0.0.linux-amd64.tar.gz -o roles/services/files/grafana-11.0.0.linux-amd64.tar.gz
