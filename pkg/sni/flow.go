@@ -1,7 +1,6 @@
 package sni
 
 import (
-	"log"
 	"net"
 	"time"
 )
@@ -20,7 +19,6 @@ func establishFlow(clientConn net.Conn) {
 
 	backendConn, err := net.DialTimeout("tcp", getHostPort(clientHello.ServerName), time.Second)
 	if err != nil {
-		log.Printf("Error: %s", err.Error())
 		return
 	}
 	defer backendConn.Close()

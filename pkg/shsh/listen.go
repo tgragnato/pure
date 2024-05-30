@@ -1,7 +1,7 @@
 package shsh
 
 import (
-	"log"
+	"fmt"
 	"net/http"
 )
 
@@ -11,13 +11,13 @@ func Listen(iface4 string, iface6 string) {
 	go func() {
 		err := http.ListenAndServe(iface4+":80", handler)
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 		}
 	}()
 	go func() {
 		err := http.ListenAndServe(iface6+":80", handler)
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 		}
 	}()
 }

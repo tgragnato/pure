@@ -1,7 +1,6 @@
 package dnshandlers
 
 import (
-	"log"
 	"net"
 	"strings"
 
@@ -53,7 +52,6 @@ func ParseQuery(
 
 			ips, cnames, ttl, err := dohot.DoH(q.Name, q.Qtype == dns.TypeAAAA)
 			if err != nil {
-				log.Println(q.Name + ": " + err.Error())
 				if q.Qtype == dns.TypeAAAA {
 					go errCache6.Add(q.Name)
 				} else {
@@ -61,8 +59,6 @@ func ParseQuery(
 				}
 				m.SetRcode(m, dns.RcodeNameError)
 				return
-			} else {
-				log.Println(q.Name + ": First resolution")
 			}
 
 			for _, cname := range cnames {

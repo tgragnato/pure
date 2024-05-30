@@ -2,7 +2,6 @@ package ipcache
 
 import (
 	"database/sql"
-	"log"
 	"time"
 
 	_ "github.com/jackc/pgx/v5"
@@ -11,11 +10,7 @@ import (
 
 func NewCache(duration time.Duration, v6 bool, dsn string) *Cache {
 	db, err := sql.Open("pgx", dsn)
-	if err != nil {
-		log.Println(err.Error())
-		db = nil
-	}
-	if db != nil && db.Ping() != nil {
+	if err != nil || (db != nil && db.Ping() != nil) {
 		db = nil
 	}
 

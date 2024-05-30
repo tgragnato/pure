@@ -1,7 +1,6 @@
 package ipcache
 
 import (
-	"log"
 	"net"
 	"strings"
 
@@ -30,7 +29,6 @@ func (cache *Cache) Prefetch() {
 
 	rows, err := cache.db.Query(query)
 	if err != nil {
-		log.Println(err.Error())
 		return
 	}
 	defer rows.Close()
@@ -41,7 +39,6 @@ func (cache *Cache) Prefetch() {
 		var key, value string
 		err = rows.Scan(&key, &value)
 		if err != nil {
-			log.Println(err.Error())
 			continue
 		}
 

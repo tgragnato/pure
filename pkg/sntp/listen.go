@@ -1,7 +1,7 @@
 package sntp
 
 import (
-	"log"
+	"fmt"
 	"net"
 )
 
@@ -21,7 +21,7 @@ func Listen() error {
 			if rlen > 0 && validFormat(request) {
 				go func() {
 					if _, err := listener.WriteTo(generate(request), remote); err != nil {
-						log.Println(err.Error())
+						fmt.Println(err.Error())
 					}
 				}()
 			}

@@ -3,7 +3,6 @@ package shsh
 import (
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -68,6 +67,6 @@ func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(resp.StatusCode)
 	_, err = io.Copy(w, resp.Body)
 	if err != nil {
-		log.Println(err.Error())
+		fmt.Println(err.Error())
 	}
 }

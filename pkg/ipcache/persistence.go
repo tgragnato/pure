@@ -1,7 +1,7 @@
 package ipcache
 
 import (
-	"log"
+	"fmt"
 	"net"
 	"strings"
 )
@@ -41,7 +41,7 @@ func (cache *Cache) SetPersistent(key string, data []net.IP) {
 
 	_, err := cache.db.Exec(query, key, serialize)
 	if err != nil {
-		log.Println(err.Error())
+		fmt.Println(err.Error())
 	}
 }
 
@@ -98,6 +98,6 @@ func (cache *Cache) DeletePersistent(key string) {
 
 	_, err := cache.db.Exec(query, key)
 	if err != nil {
-		log.Println(err.Error())
+		fmt.Println(err.Error())
 	}
 }
