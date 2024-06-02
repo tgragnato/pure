@@ -2,7 +2,7 @@ package nfqueue
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"math/rand"
 	"time"
 
@@ -20,7 +20,6 @@ func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) 
 		WriteTimeout: time.Second,
 	})
 	if err != nil {
-		log.Fatalln(err.Error())
 		return
 	}
 	defer nf.Close()
@@ -38,16 +37,16 @@ func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) 
 		if tcpLayer == nil {
 			err := nf.SetVerdict(id, nfqueue.NfAccept)
 			if err != nil {
-				log.Println(err.Error())
+				fmt.Println(err.Error())
 			}
 			return 0
 		}
 
 		tcp, _ := tcpLayer.(*layers.TCP)
-		if !tcp.SYN {
+		if !tcp.SYN && !(tcp.PSH && tcp.ACK) {
 			err := nf.SetVerdict(id, nfqueue.NfAccept)
 			if err != nil {
-				log.Println(err.Error())
+				fmt.Println(err.Error())
 			}
 			return 0
 		}
@@ -56,7 +55,7 @@ func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) 
 		packet.TransportLayer().(*layers.TCP).Window = uint16(windowSize)
 		err := packet.TransportLayer().(*layers.TCP).SetNetworkLayerForChecksum(packet.NetworkLayer())
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 		}
 		buffer := gopacket.NewSerializeBuffer()
 		options := gopacket.SerializeOptions{
@@ -64,12 +63,12 @@ func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) 
 			FixLengths:       true,
 		}
 		if err := gopacket.SerializePacket(buffer, options, packet); err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 		}
 		packetBytes := buffer.Bytes()
 		err = nf.SetVerdictModPacket(id, nfqueue.NfAccept, packetBytes)
 		if err != nil {
-			log.Println(err.Error())
+			fmt.Println(err.Error())
 		}
 		return 0
 	}
@@ -78,12 +77,12 @@ func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) 
 	defer cancel()
 	err = nf.RegisterWithErrorFunc(ctx, fn, func(e error) int {
 		if e != nil {
-			log.Fatalln(e.Error())
+			fmt.Println(e.Error())
 		}
 		return 0
 	})
 	if err != nil {
-		log.Println(err.Error())
+		fmt.Println(err.Error())
 	}
 	<-ctx.Done()
 }
