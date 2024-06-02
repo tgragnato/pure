@@ -26,7 +26,7 @@ func main() {
 	flag.StringVar(&iface4, "interfaceIPv4", "127.0.0.1", "Set here the IPv4 of the interface to bind to")
 	flag.StringVar(&iface6, "interfaceIPv6", "[::1]", "Set here the IPv6 of the interface to bind to")
 	flag.IntVar(&queueNum, "queueNum", 8, "The number of NFQUEUEs to attach to")
-	flag.UintVar(&windowSizeMin, "windowSizeMin", 60, "Minimum TCP Window")
+	flag.UintVar(&windowSizeMin, "windowSizeMin", 30, "Minimum TCP Window")
 	flag.UintVar(&windowSizeMax, "windowSizeMax", 90, "Maximum TCP Window")
 	flag.Parse()
 
