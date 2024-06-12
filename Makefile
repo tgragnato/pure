@@ -7,8 +7,7 @@ clean:
 	rm -f roles/firewall/files/snowflake
 	rm -f roles/firewall/files/client
 	rm -f roles/firewall/files/spamd
-	rm -f roles/services/files/magneticod
-	rm -f roles/services/files/magneticow
+	rm -f roles/services/files/magnetico
 
 dnsd: roles/firewall/files/dnsd
 
@@ -35,17 +34,10 @@ spamd: roles/firewall/files/spamd
 roles/firewall/files/spamd:
 	GOOS=linux GOARCH=amd64 go build -C cmd/spamd -o ../../roles/firewall/files/spamd
 
-magnetico: magneticod magneticow
+magnetico: roles/services/files/magnetico
 
-magneticod: roles/services/files/magneticod
-
-roles/services/files/magneticod:
-	GOOS=linux GOARCH=amd64 go build -C magnetico/cmd/magneticod --tags fts5 -o ../../../roles/services/files/magneticod
-
-magneticow: roles/services/files/magneticow
-
-roles/services/files/magneticow:
-	GOOS=linux GOARCH=amd64 go build -C magnetico/cmd/magneticow --tags fts5 -o ../../../roles/services/files/magneticow
+roles/services/files/magnetico:
+	GOOS=linux GOARCH=amd64 go build -C magnetico/. -o ../roles/services/files/magnetico
 
 grafana: roles/services/files/grafana-11.0.0.linux-amd64.tar.gz
 

@@ -7,19 +7,12 @@
     state: restarted
   listen: Restart postgresql
 
-- name: Restart magneticod
+- name: Restart magnetico
   ansible.builtin.systemd:
     daemon_reload: true
-    name: magneticod.service
+    name: magnetico.service
     state: restarted
-  listen: Restart magneticod
-
-- name: Restart magneticow
-  ansible.builtin.systemd:
-    daemon_reload: true
-    name: magneticow.service
-    state: restarted
-  listen: Restart magneticow
+  listen: Restart magnetico
 
 - name: Restart grafana
   ansible.builtin.systemd:
@@ -48,3 +41,10 @@
     name: prometheus-postgres-exporter.service
     state: restarted
   listen: Restart postgres-exporter
+
+- name: Restart smbd
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: smbd.service
+    state: restarted
+  listen: Restart smbd
