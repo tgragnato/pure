@@ -4,8 +4,8 @@
   ansible.builtin.copy:
     src: spamd
     dest: "{{ spamd_path }}"
-    owner: nobody
-    group: nogroup
+    owner: proxy
+    group: proxy
     mode: '0500'
   notify: Restart spamd
   tags: spamd

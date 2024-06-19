@@ -28,6 +28,11 @@ issues:
         - gosec
       text: "G404:"
 
+    - path: cmd/spamd/spam.go
+      linters:
+        - gosec
+      text: "G404:"
+
     - path: pkg/sni/copy.go
       linters:
         - errcheck

@@ -1,9 +1,6 @@
 package main
 
 import (
-	"context"
-	"fmt"
-	"math/rand"
 	"net"
 	"net/http"
 	"net/url"
@@ -17,6 +14,22 @@ var (
 	proxy, _   = url.Parse("socks5://[::1]:9050")
 	httpClient = &http.Client{Transport: &http.Transport{
 		Proxy: http.ProxyURL(proxy),
+		DialContext: (&net.Dialer{
+			Timeout:   time.Minute,
+			KeepAlive: time.Minute,
+			DualStack: true,
+		}).DialContext,
+		ForceAttemptHTTP2:     true,
+		MaxIdleConns:          250,
+		MaxIdleConnsPerHost:   5,
+		MaxConnsPerHost:       5,
+		IdleConnTimeout:       time.Minute,
+		TLSHandshakeTimeout:   time.Minute,
+		ExpectContinueTimeout: time.Minute,
+		ResponseHeaderTimeout: time.Minute,
+		DisableKeepAlives:     false,
+	}}
+	directHttp = &http.Client{Transport: &http.Transport{
 		DialContext: (&net.Dialer{
 			Timeout:   time.Minute,
 			KeepAlive: time.Minute,
@@ -200,6 +213,9 @@ var (
 		"Mozilla/5.0 (Windows NT 10.0; rv:128.0) Gecko/20100101 Firefox/128.0",
 		"Mozilla/5.0 (Windows NT 10.0; rv:129.0) Gecko/20100101 Firefox/129.0",
 	}
+	httpWorker = make(chan spam, len(domains))
+	stopped    = false
+	counter    = uint64(0)
 )
 
 func main() {
@@ -207,71 +223,21 @@ func main() {
 	signalCh := make(chan os.Signal, 1)
 	signal.Notify(signalCh, syscall.SIGINT, syscall.SIGTERM)
 
-	go iterate()
-	for _, domain := range freshDomains {
-		go func(domain string) {
-			for {
-				call(domain+generateRandomString(), userAgents[rand.Intn(len(userAgents))])
-			}
-		}(domain)
-		go func(domain string) {
-			for {
-				call(domain+"/track"+generateRandomString(), userAgents[rand.Intn(len(userAgents))])
-			}
-		}(domain)
-	}
-	go func() {
-		for range time.NewTicker(time.Minute).C {
-			go iterate()
-		}
-	}()
+	for !stopped {
+		select {
 
-	<-signalCh
-}
+		case <-signalCh:
+			stopped = true
 
-func iterate() {
-	items := []string{}
-	randomItems := []string{}
-	randomTracks := []string{}
-	for _, domain := range domains {
-		for _, path := range paths {
-			items = append(items, domain+path)
-			randomItems = append(randomItems, domain+generateRandomString())
-			randomTracks = append(randomTracks, domain+"/track"+generateRandomString())
+		case s := <-httpWorker:
+			if counter > 100000 {
+				s.call()
+			} else {
+				go s.call()
+			}
+
+		case httpWorker <- makeSpam():
+			time.Sleep(100 * time.Millisecond)
 		}
 	}
-	rand.Shuffle(len(items), func(i, j int) {
-		items[i], items[j] = items[j], items[i]
-	})
-	for index, url := range items {
-		go call(url, userAgents[index%len(userAgents)])
-		go call(randomItems[index], userAgents[rand.Intn(len(userAgents))])
-		go call(randomTracks[index], userAgents[rand.Intn(len(userAgents))])
-		time.Sleep(time.Minute / time.Duration(len(items)))
-	}
-}
-
-func call(url string, userAgent string) {
-	req, err := http.NewRequestWithContext(context.Background(), http.MethodGet, url, nil)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	req.Header.Set("User-Agent", userAgent)
-	resp, err := httpClient.Do(req)
-	if err != nil {
-		return
-	}
-	resp.Body.Close()
-}
-
-func generateRandomString() string {
-	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	length := rand.Intn(10) + 60
-	result := make([]byte, length)
-	for i := 0; i < length; i++ {
-		result[i] = characters[rand.Intn(len(characters))]
-	}
-
-	return fmt.Sprintf("/%s/%s#%s", result[:length-30], result[length-30:length-22], result[length-22:])
 }

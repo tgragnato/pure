@@ -8,7 +8,7 @@ AmbientCapabilities=
 CapabilityBoundingSet=
 DevicePolicy=closed
 ExecStart={{ spamd_path }}
-Group=nogroup
+Group=proxy
 LimitNOFILE=32768
 LockPersonality=yes
 MemoryDenyWriteExecute=yes
@@ -35,7 +35,7 @@ SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@resources @privileged
 UMask=777
-User=nobody
+User=proxy
 
 [Install]
 WantedBy=multi-user.target

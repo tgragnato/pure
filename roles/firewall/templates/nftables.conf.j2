@@ -43,8 +43,8 @@ table inet filter {
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
         ip protocol tcp tcp sport 1024-65535 tcp dport 443 skuid { _apt, www-data } queue num 0-3 fanout,bypass
         ip6 nexthdr tcp tcp sport 1024-65535 tcp dport 443 skuid { _apt, www-data } queue num 4-7 fanout,bypass
-        ip protocol tcp tcp sport 1024-65535 tcp dport { 443, 993 } skuid { proxy, debian-tor } queue num 0-3 fanout,bypass
-        ip6 nexthdr tcp tcp sport 1024-65535 tcp dport { 443, 993 } skuid { proxy, debian-tor } queue num 4-7 fanout,bypass
+        ip protocol tcp tcp sport 1024-65535 tcp dport { 80, 443, 993 } skuid { proxy, debian-tor } queue num 0-3 fanout,bypass
+        ip6 nexthdr tcp tcp sport 1024-65535 tcp dport { 80, 443, 993 } skuid { proxy, debian-tor } queue num 4-7 fanout,bypass
         ip protocol tcp tcp sport 1024-65535 tcp dport { 80, 443, 1024-65535 } skuid daemon queue num 0-3 fanout,bypass
         ip6 nexthdr tcp tcp sport 1024-65535 tcp dport { 80, 443, 1024-65535 } skuid daemon queue num 4-7 fanout,bypass
         udp sport 1024-65535 udp dport { 80, 443 } skuid daemon accept
