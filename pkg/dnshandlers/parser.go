@@ -90,6 +90,23 @@ func ParseQuery(
 		case dns.TypeHTTPS:
 			addHTTPS(m, q.Name, hintIPv4, hintIPv6)
 
+		case dns.TypeCNAME, dns.TypeDNAME, dns.TypeMX, dns.TypeTXT, dns.TypeSOA, dns.TypeNS, dns.TypeSVCB, dns.TypeSRV:
+			_, found6 := cache6.Get(q.Name)
+			_, found4 := cache4.Get(q.Name)
+			isApple := strings.HasPrefix(q.Name, ".apple.com.") || strings.HasPrefix(q.Name, ".icloud.com.")
+			isAppleAkamai := strings.HasPrefix(q.Name, "apple.com.akadns.net.")
+			if found4 || found6 || isApple || isAppleAkamai {
+				answer, err := dohot.Transparent(q.Name, q.Qtype, isApple)
+				if err != nil {
+					m.SetRcode(m, dns.RcodeServerFailure)
+				} else {
+					m.Answer = answer
+					m.SetRcode(m, dns.RcodeSuccess)
+				}
+			} else {
+				m.SetRcode(m, dns.RcodeRefused)
+			}
+
 		default:
 			m.SetRcode(m, dns.RcodeNotImplemented)
 		}
