@@ -4,8 +4,8 @@
   ansible.builtin.copy:
     src: magnetico
     dest: "{{ magnetico_path }}"
-    owner: daemon
-    group: daemon
+    owner: proxy
+    group: proxy
     mode: '0500'
   notify: Restart magnetico
   tags: magnetico

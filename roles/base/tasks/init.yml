@@ -81,7 +81,6 @@
     - laptop-detect
     - locales
     - logrotate
-    - smartmontools
     - tasksel
     - tasksel-data
   tags: init
@@ -105,4 +104,19 @@
     - systemd-rfkill.service
     - systemd-rfkill.socket
     - user@0.service
+  tags: init
+
+- name: Remove default system users
+  ansible.builtin.user:
+    name: "{{ item }}"
+    state: absent
+  loop:
+    - daemon
+    - bin
+    - lp
+    - mail
+    - news
+    - uucp
+    - list
+    - irc
   tags: init

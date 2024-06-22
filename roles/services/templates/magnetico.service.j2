@@ -8,7 +8,7 @@ AmbientCapabilities=
 CapabilityBoundingSet=
 DevicePolicy=closed
 ExecStart={{ magnetico_path }} --addr=[{{ wg0_ipv6 }}]:8080 --max-rps={{ magneticod_maxrps }}
-Group=daemon
+Group=proxy
 LimitNOFILE=32768
 LockPersonality=yes
 MemoryDenyWriteExecute=yes
@@ -35,7 +35,7 @@ SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@resources @privileged
 UMask=777
-User=daemon
+User=proxy
 
 [Install]
 WantedBy=multi-user.target
