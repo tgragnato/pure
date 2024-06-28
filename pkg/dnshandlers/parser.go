@@ -90,7 +90,7 @@ func ParseQuery(
 		case dns.TypeHTTPS:
 			addHTTPS(m, q.Name, hintIPv4, hintIPv6)
 
-		case dns.TypeCNAME, dns.TypeDNAME, dns.TypeMX, dns.TypeTXT, dns.TypeSOA, dns.TypeNS, dns.TypeSVCB, dns.TypeSRV:
+		case dns.TypeMX, dns.TypeTXT, dns.TypeSOA, dns.TypeNS, dns.TypeSVCB, dns.TypeSRV:
 			_, found6 := cache6.Get(q.Name)
 			_, found4 := cache4.Get(q.Name)
 			isApple := strings.HasPrefix(q.Name, ".apple.com.") || strings.HasPrefix(q.Name, ".icloud.com.")
