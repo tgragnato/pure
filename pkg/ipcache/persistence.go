@@ -8,8 +8,7 @@ import (
 
 func (cache *Cache) SetPersistent(key string, data []net.IP) {
 	if cache.db == nil ||
-		len(data) == 0 ||
-		strings.HasSuffix(key, "googlevideo.com.") {
+		len(data) == 0 {
 		return
 	}
 
