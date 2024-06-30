@@ -39,7 +39,6 @@ table inet filter {
         ct state established,related ip protocol tcp queue num 0-3 fanout,bypass
         ct state established,related ip6 nexthdr tcp queue num 4-7 fanout,bypass
         ct state established,related accept
-        ip daddr 192.168.1.254 udp sport 1024-65535 udp dport 53 skuid systemd-resolve accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
         ip protocol tcp tcp sport 1024-65535 tcp dport 443 skuid { _apt, www-data } queue num 0-3 fanout,bypass
         ip6 nexthdr tcp tcp sport 1024-65535 tcp dport 443 skuid { _apt, www-data } queue num 4-7 fanout,bypass
