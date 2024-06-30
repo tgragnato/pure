@@ -143,4 +143,14 @@
       value: 2
     - name: kernel.unprivileged_userns_clone
       value: 0
+    - name: vm.max_map_count
+      value: 262144
+    - name: vm.dirty_writeback_centisecs
+      value: 1440000
+    - name: vm.dirty_expire_centisecs
+      value: 1440000
+    - name: vm.dirty_background_ratio
+      value: 95
+    - name: vm.dirty_ratio
+      value: 95
   tags: network
