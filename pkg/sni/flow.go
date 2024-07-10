@@ -17,7 +17,16 @@ func establishFlow(clientConn net.Conn) {
 		return
 	}
 
-	backendConn, err := net.DialTimeout("tcp", getHostPort(clientHello.ServerName), time.Second)
+	d := &net.Dialer{
+		Timeout:       time.Second,
+		Deadline:      time.Now().Add(time.Second),
+		DualStack:     true,
+		FallbackDelay: time.Second / 2,
+		KeepAlive:     100 * time.Millisecond,
+	}
+	d.SetMultipathTCP(true)
+
+	backendConn, err := d.Dial("tcp", getHostPort(clientHello.ServerName))
 	if err != nil {
 		return
 	}
