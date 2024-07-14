@@ -30,6 +30,16 @@
   notify: Restart tor
   tags: tor
 
+- name: Install the tor service
+  ansible.builtin.template:
+    src: tor.service.j2
+    dest: "{{ systemd_system }}/tor@default.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart tor
+  tags: tor
+
 - name: Enable and start tor
   ansible.builtin.systemd:
     name: tor@default.service
