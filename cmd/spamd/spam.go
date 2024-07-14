@@ -29,7 +29,7 @@ func (s *spam) call() {
 	if s.proxy {
 		resp, err = httpClient.Do(req)
 	} else {
-		resp, err = directHttp.Do(req)
+		resp, err = http.DefaultClient.Do(req)
 	}
 	counter--
 	if err != nil {
@@ -86,7 +86,7 @@ func (s *spam) template() {
 }
 
 func makeSpam() spam {
-	switch rand.Intn(6) {
+	switch rand.Intn(9) {
 
 	case 0:
 		return spam{
@@ -139,6 +139,34 @@ func makeSpam() spam {
 			url:       directPrefixes[rand.Intn(len(directPrefixes))],
 			method:    http.MethodGet,
 			userAgent: userAgents[0],
+			proxy:     false,
+		}
+		s.template()
+		return s
+
+	case 6:
+		return spam{
+			url:       directPrefixes[rand.Intn(len(directPrefixes))] + paths[rand.Intn(len(paths))],
+			method:    http.MethodGet,
+			userAgent: userAgents[rand.Intn(len(userAgents))],
+			proxy:     false,
+		}
+
+	case 7:
+		s := spam{
+			url:       directPrefixes[rand.Intn(len(directPrefixes))],
+			method:    http.MethodGet,
+			userAgent: userAgents[rand.Intn(len(userAgents))],
+			proxy:     false,
+		}
+		s.random()
+		return s
+
+	case 8:
+		s := spam{
+			url:       directPrefixes[rand.Intn(len(directPrefixes))],
+			method:    http.MethodGet,
+			userAgent: userAgents[rand.Intn(len(userAgents))],
 			proxy:     false,
 		}
 		s.template()

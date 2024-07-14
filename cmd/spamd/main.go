@@ -29,36 +29,11 @@ var (
 		ResponseHeaderTimeout: time.Minute,
 		DisableKeepAlives:     false,
 	}}
-	directHttp = &http.Client{Transport: &http.Transport{
-		DialContext: (&net.Dialer{
-			Timeout:   time.Second,
-			KeepAlive: time.Minute,
-			DualStack: true,
-		}).DialContext,
-		ForceAttemptHTTP2:     true,
-		MaxIdleConns:          1000,
-		MaxIdleConnsPerHost:   5,
-		MaxConnsPerHost:       5,
-		IdleConnTimeout:       time.Minute,
-		TLSHandshakeTimeout:   time.Minute,
-		ExpectContinueTimeout: time.Minute,
-		ResponseHeaderTimeout: time.Minute,
-		DisableKeepAlives:     false,
-	}}
 	proxiedPrefixes = []string{
 		"http://162.62.134.81",
 		"http://162.62.230.106",
-		"https://allcommunitiesonline.egsro.com",
-		"https://egsro.com",
-		"https://gitlab.solutionformen.com",
 		"https://jerprint.com",
-		"https://m.egsro.com",
-		"https://mail.egsro.com",
-		"https://mail.solutionformen.com",
 		"https://panelapi.mooo.com/tr.php",
-		"https://solutionformen.com",
-		"https://www.egsro.com",
-		"https://www.solutionformen.com",
 	}
 	directPrefixes = []string{
 		"http://162.62.134.81",
