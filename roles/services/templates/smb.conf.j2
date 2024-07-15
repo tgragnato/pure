@@ -1,0 +1,34 @@
+[global]
+  workgroup = WORKGROUP
+  bind interfaces only = no
+  smb ports = 445
+  logging = systemd
+  server role = standalone server
+  obey pam restrictions = yes
+  unix password sync = no
+  map to guest = bad user
+  guest ok = no
+  read only = no
+  browsable = yes
+  writable = yes
+  valid users = {{ smb_user }}
+  write list = {{ smb_user }}
+  force group = {{ smb_user }}
+  force user = {{ smb_user }}
+  force create mode = 0664
+  force directory mode = 0775
+  host msdfs = no
+  vfs objects = btrfs fruit streams_xattr
+  fruit:aapl = yes
+  fruit:resource = xattr
+  fruit:metadata = stream
+  fruit:veto_appledouble = yes
+  fruit:wipe_intentionally_left_blank_rfork = yes
+  fruit:delete_empty_adfiles = yes
+
+{% for item in smb_paths %}
+[{{ item.name }}]
+  path = {{ item.path }}
+  fruit:time machine = {% if item.timemachine %}yes{% else %}no{% endif %}
+
+{% endfor %}

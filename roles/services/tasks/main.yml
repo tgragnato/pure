@@ -11,3 +11,9 @@
 
 - name: Install prometheus
   ansible.builtin.import_tasks: prometheus.yml
+
+- name: Install samba
+  ansible.builtin.import_tasks: samba.yml
+  when:
+    - smb_user is defined
+    - smb_paths is defined

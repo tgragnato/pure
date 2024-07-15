@@ -8,3 +8,11 @@ all:
       hosts:
         fd5d:2ddd:f4a5::1:
           hostname: puremini
+          smb_user: www-data
+          smb_paths:
+            - name: backup
+              path: /var/timemachine
+              timemachine: true
+            - name: data
+              path: /var/www
+              timemachine: false

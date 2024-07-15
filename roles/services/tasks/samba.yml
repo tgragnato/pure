@@ -1,0 +1,44 @@
+---
+
+- name: Install samba
+  ansible.builtin.apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - samba
+    - samba-vfs-modules
+  tags: samba
+
+- name: Disable unused services
+  ansible.builtin.systemd:
+    name: "{{ item }}"
+    state: stopped
+    enabled: false
+    masked: true
+  loop:
+    - nmb.service
+    - nmbd.service
+    - samba.service
+    - samba-ad-dc.service
+    - smb.service
+  tags: samba
+
+- name: Configure samba
+  ansible.builtin.template:
+    src: smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart smbd
+  tags: samba
+
+- name: Install the smbd service
+  ansible.builtin.template:
+    src: smbd.service.j2
+    dest: "{{ systemd_system }}/smbd.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart smbd
+  tags: samba
