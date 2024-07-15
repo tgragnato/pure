@@ -143,6 +143,10 @@
       value: 2
     - name: kernel.unprivileged_userns_clone
       value: 0
+    - name: kernel.kptr_restrict
+      value: 2
+    - name: kernel.yama.ptrace_scope
+      value: 2
     - name: vm.max_map_count
       value: 262144
     - name: vm.dirty_writeback_centisecs
