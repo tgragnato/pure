@@ -9,6 +9,7 @@ var whitelist = []string{
 	"d179pbpxvabqy1.cloudfront.net.",
 	"d2gwrxj8kvy81r.cloudfront.net.",
 	"d2ziyq7zksuzai.cloudfront.net.",
+	"d36jcksde1wxzq.cloudfront.net.",
 	"d3c9ouasuy8pg6.cloudfront.net.",
 	"dcoo28a3i62o.cloudfront.net.",
 	"dnfed9a4ru7oh.cloudfront.net.",
