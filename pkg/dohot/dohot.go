@@ -2,6 +2,7 @@ package dohot
 
 import (
 	"bytes"
+	"crypto/tls"
 	"errors"
 	"io"
 	"net"
@@ -17,21 +18,38 @@ var (
 	httpClient = &http.Client{Transport: &http.Transport{
 		Proxy: http.ProxyURL(proxy),
 		DialContext: (&net.Dialer{
-			Timeout:   100 * time.Millisecond,
-			KeepAlive: 30 * time.Second,
-			DualStack: true,
+			Timeout:       100 * time.Millisecond,
+			DualStack:     true,
+			FallbackDelay: 100 * time.Millisecond,
+			KeepAlive:     30 * time.Second,
 		}).DialContext,
-		ForceAttemptHTTP2:      true,
+		TLSClientConfig: &tls.Config{
+			ClientAuth:             0,
+			InsecureSkipVerify:     false,
+			SessionTicketsDisabled: true,
+			ClientSessionCache:     nil,
+			MinVersion:             tls.VersionTLS13,
+			MaxVersion:             tls.VersionTLS13,
+			CurvePreferences: []tls.CurveID{
+				tls.CurveP521,
+				tls.X25519,
+			},
+			DynamicRecordSizingDisabled: false,
+			Renegotiation:               0,
+		},
+		TLSHandshakeTimeout:    10 * time.Second,
+		DisableKeepAlives:      false,
+		DisableCompression:     false,
 		MaxIdleConns:           4,
 		MaxIdleConnsPerHost:    4,
 		MaxConnsPerHost:        4,
 		IdleConnTimeout:        90 * time.Second,
-		TLSHandshakeTimeout:    10 * time.Second,
-		ExpectContinueTimeout:  2 * time.Second,
 		ResponseHeaderTimeout:  2 * time.Second,
-		DisableKeepAlives:      false,
-		DisableCompression:     true,
+		ExpectContinueTimeout:  2 * time.Second,
 		MaxResponseHeaderBytes: 4096,
+		WriteBufferSize:        0,
+		ReadBufferSize:         0,
+		ForceAttemptHTTP2:      true,
 	}}
 )
 
