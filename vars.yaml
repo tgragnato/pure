@@ -81,7 +81,7 @@ postgresql_socketdir: /var/run/postgresql/
 postgresql_version: 15
 postgresql_socketuser: postgres
 magnetico_path: "{{ local_folder }}/bin/magnetico"
-grafana_version: 11.1.0
+grafana_version: 11.1.3
 grafana_folder: "{{ local_folder }}/grafana-v{{ grafana_version }}"
 prometheus_tsdb_retention: 10y
 prometheus_postgres_exporter: postgres_exporter
