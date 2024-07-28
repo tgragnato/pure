@@ -77,7 +77,11 @@ func (s *Spam) template() {
 		return
 	}
 	var buf bytes.Buffer
-	tmpl.Execute(&buf, struct{ Padding string }{string(addition)})
+	err = tmpl.Execute(&buf, struct{ Padding string }{string(addition)})
+	if err != nil {
+		fmt.Println(err.Error())
+		return
+	}
 	if len(buf.Bytes()) == 0 {
 		fmt.Println("empty rendered template")
 		return

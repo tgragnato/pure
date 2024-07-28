@@ -28,7 +28,12 @@ issues:
         - gosec
       text: "G404:"
 
-    - path: cmd/spamd/spam.go
+    - path: pkg/spam/builder.go
+      linters:
+        - gosec
+      text: "G404:"
+
+    - path: pkg/spam/spam.go
       linters:
         - gosec
       text: "G404:"
