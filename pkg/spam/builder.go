@@ -6,7 +6,7 @@ import (
 )
 
 func MakeSpam() Spam {
-	switch rand.Intn(11) {
+	switch rand.Intn(7) {
 
 	case 0:
 		return Spam{
@@ -30,7 +30,7 @@ func MakeSpam() Spam {
 
 	case 2:
 		s := Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))],
+			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))] + paths[rand.Intn(len(paths))],
 			method:    http.MethodGet,
 			userAgent: userAgents[rand.Intn(len(userAgents))],
 			proxy:     true,
@@ -53,17 +53,17 @@ func MakeSpam() Spam {
 	case 4:
 		s := Spam{
 			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))],
-			method:    http.MethodGet,
+			method:    http.MethodPost,
 			userAgent: userAgents[rand.Intn(len(userAgents))],
 			proxy:     true,
 			body:      nil,
 		}
-		s.insertGmail()
+		s.randomPost()
 		return s
 
 	case 5:
 		s := Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))] + "/mail/contact_me.php",
+			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))] + paths[rand.Intn(len(paths))],
 			method:    http.MethodPost,
 			userAgent: userAgents[rand.Intn(len(userAgents))],
 			proxy:     true,
@@ -73,56 +73,14 @@ func MakeSpam() Spam {
 		return s
 
 	case 6:
-		return Spam{
-			url:       directPrefixes[rand.Intn(len(directPrefixes))] + paths[rand.Intn(len(paths))],
-			method:    http.MethodGet,
-			userAgent: userAgents[0],
-			proxy:     false,
-			body:      nil,
-		}
-
-	case 7:
 		s := Spam{
-			url:       directPrefixes[rand.Intn(len(directPrefixes))],
+			url:       directPrefixes[rand.Intn(len(directPrefixes))] + paths[rand.Intn(len(paths))],
 			method:    http.MethodGet,
 			userAgent: userAgents[0],
 			proxy:     false,
 			body:      nil,
 		}
 		s.random()
-		return s
-
-	case 8:
-		s := Spam{
-			url:       directPrefixes[rand.Intn(len(directPrefixes))],
-			method:    http.MethodGet,
-			userAgent: userAgents[0],
-			proxy:     false,
-			body:      nil,
-		}
-		s.template()
-		return s
-
-	case 9:
-		s := Spam{
-			url:       directPrefixes[rand.Intn(len(directPrefixes))] + paths[rand.Intn(len(paths))],
-			method:    http.MethodGet,
-			userAgent: userAgents[0],
-			proxy:     false,
-			body:      nil,
-		}
-		s.insertIcloud()
-		return s
-
-	case 10:
-		s := Spam{
-			url:       directPrefixes[rand.Intn(len(directPrefixes))] + paths[rand.Intn(len(paths))],
-			method:    http.MethodGet,
-			userAgent: userAgents[0],
-			proxy:     false,
-			body:      nil,
-		}
-		s.insertGmail()
 		return s
 	}
 

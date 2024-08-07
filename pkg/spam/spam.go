@@ -3,12 +3,11 @@ package spam
 import (
 	"bytes"
 	"context"
-	"encoding/base64"
 	"fmt"
 	"io"
 	"math/rand"
 	"net/http"
-	"text/template"
+	"strconv"
 )
 
 type Spam struct {
@@ -62,39 +61,34 @@ func (s *Spam) random() {
 }
 
 func (s *Spam) template() {
-	text := templates[rand.Intn(len(templates))]
-
-	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789."
-	length := rand.Intn(20) + 5
+	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	length := 10
 	addition := make([]byte, length)
 	for i := 0; i < length; i++ {
 		addition[i] = characters[rand.Intn(len(characters))]
 	}
+	s.url += string(addition) + "_"
 
-	tmpl, err := template.New("template").Parse(text)
-	if err != nil {
-		fmt.Println(err.Error())
-		return
+	length = 138
+	addition = make([]byte, length)
+	for i := 0; i < length; i++ {
+		addition[i] = characters[rand.Intn(len(characters))]
 	}
-	var buf bytes.Buffer
-	err = tmpl.Execute(&buf, struct{ Padding string }{string(addition)})
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-	if len(buf.Bytes()) == 0 {
-		fmt.Println("empty rendered template")
-		return
-	}
+	s.url += string(addition) + "_"
 
-	if rand.Intn(2) == 1 {
-		s.url += "?up=" + base64.StdEncoding.EncodeToString(buf.Bytes())
-	} else {
-		s.url += "?upn=" + base64.StdEncoding.EncodeToString(buf.Bytes())
+	length = 32
+	addition = make([]byte, length)
+	for i := 0; i < length; i++ {
+		addition[i] = characters[rand.Intn(len(characters))]
 	}
-	if rand.Intn(2) == 1 {
-		s.url += "&v=0"
+	s.url += string(addition) + "_"
+
+	length = 10
+	addition = make([]byte, length)
+	for i := 0; i < length; i++ {
+		addition[i] = characters[rand.Intn(len(characters))]
 	}
+	s.url += string(addition)
 }
 
 func (s *Spam) insertIcloud() {
@@ -104,17 +98,22 @@ func (s *Spam) insertIcloud() {
 	for i := 0; i < length; i++ {
 		addition[i] = characters[rand.Intn(len(characters))]
 	}
-	s.url += "/rev/" + string(addition) + "@icloud.com/4423/18709008/kjFsTG.XhOZV6/0"
-}
+	s.url += "/rev/" + string(addition) + "@icloud.com/"
 
-func (s *Spam) insertGmail() {
-	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789."
-	length := rand.Intn(20) + 5
-	addition := make([]byte, length)
+	s.url += strconv.Itoa(rand.Intn(9999)) + "/" + strconv.Itoa(rand.Intn(99999999)) + "/"
+
+	characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	length = 6
+	addition = make([]byte, length)
 	for i := 0; i < length; i++ {
 		addition[i] = characters[rand.Intn(len(characters))]
 	}
-	s.url += "/rev/" + string(addition) + "@gmail.com/4423/18709008/kjFsTG.XhOZV6/0"
+	s.url += string(addition) + "."
+
+	for i := 0; i < length; i++ {
+		addition[i] = characters[rand.Intn(len(characters))]
+	}
+	s.url += string(addition) + "/0"
 }
 
 func (s *Spam) randomPost() {
