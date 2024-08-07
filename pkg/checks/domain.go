@@ -16,6 +16,7 @@ var whitelist = []string{
 	"gcs-eu-00002.content-storage-download.googleapis.com.",
 	"gcs-eu-00002.content-storage-upload.googleapis.com.",
 	"semrush.com.",
+	"store.core.windows.net.",
 }
 
 func CheckDomain(domain string) bool {
