@@ -15,9 +15,9 @@ func int2bytes(i int64) []byte {
 	return b
 }
 
-func generate(request []byte) []byte {
-	second := time.Now().Unix() + FROM_1900_TO_1970
-	fraction := int64(time.Now().Nanosecond()) + FROM_1900_TO_1970
+func generate(request []byte, now time.Time) []byte {
+	second := now.Unix() + FROM_1900_TO_1970
+	fraction := int64(now.Nanosecond()) + FROM_1900_TO_1970
 	response := make([]byte, 48)
 	response[0] = (request[0] & 0x38) + 4
 	response[1] = 1

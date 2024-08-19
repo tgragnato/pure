@@ -10,6 +10,10 @@ const (
 )
 
 func validFormat(request []byte) bool {
+	if len(request) != 48 {
+		return false
+	}
+
 	var l = request[0] >> 6
 	var v = (request[0] << 2) >> 5
 	var m = (request[0] << 5) >> 5

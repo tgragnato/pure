@@ -3,6 +3,7 @@ package sntp
 import (
 	"fmt"
 	"net"
+	"time"
 )
 
 func Listen() error {
@@ -20,7 +21,7 @@ func Listen() error {
 			}
 			if rlen > 0 && validFormat(request) {
 				go func() {
-					if _, err := listener.WriteTo(generate(request), remote); err != nil {
+					if _, err := listener.WriteTo(generate(request, time.Now()), remote); err != nil {
 						fmt.Println(err.Error())
 					}
 				}()
