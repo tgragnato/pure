@@ -39,7 +39,7 @@ magnetico: roles/services/files/magnetico
 roles/services/files/magnetico:
 	GOOS=linux GOARCH=amd64 go build -C magnetico/. -o ../roles/services/files/magnetico
 
-grafana: roles/services/files/grafana-11.1.3.linux-amd64.tar.gz
+grafana: roles/services/files/grafana-11.1.4.linux-amd64.tar.gz
 
-roles/services/files/grafana-11.1.3.linux-amd64.tar.gz:
-	curl https://dl.grafana.com/oss/release/grafana-11.1.3.linux-amd64.tar.gz -o roles/services/files/grafana-11.1.3.linux-amd64.tar.gz
+roles/services/files/grafana-11.1.4.linux-amd64.tar.gz:
+	curl https://dl.grafana.com/oss/release/grafana-11.1.4.linux-amd64.tar.gz -o roles/services/files/grafana-11.1.4.linux-amd64.tar.gz
