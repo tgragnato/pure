@@ -1,6 +1,6 @@
 module github.com/tgragnato/pure
 
-go 1.22
+go 1.23.0
 
 require (
 	github.com/florianl/go-nfqueue v1.3.2
