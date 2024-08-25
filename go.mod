@@ -6,6 +6,7 @@ require (
 	github.com/florianl/go-nfqueue v1.3.2
 	github.com/google/gopacket v1.1.19
 	github.com/jackc/pgx/v5 v5.6.0
+	github.com/mattn/go-sqlite3 v1.14.22
 	github.com/miekg/dns v1.1.62
 	gitlab.torproject.org/tpo/anti-censorship/geoip v0.0.0-20210928150955-7ce4b3d98d01
 )
