@@ -138,4 +138,40 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 			t.Fatalf("Expected Not Implemented, got %d", m.Rcode)
 		}
 	})
+
+	t.Run("Test prohibited domain query TXT", func(t *testing.T) {
+		m := &dns.Msg{
+			Question: []dns.Question{
+				{
+					Name:  "dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion.",
+					Qtype: dns.TypeTXT,
+				},
+			},
+		}
+		d.ParseQuery(m)
+		if len(m.Answer) != 0 {
+			t.Fatalf("Expected no answers, got %d", len(m.Answer))
+		}
+		if m.Rcode != dns.RcodeRefused {
+			t.Fatalf("Expected Refused, got %d", m.Rcode)
+		}
+	})
+
+	t.Run("Test uncached domain query MX", func(t *testing.T) {
+		m := &dns.Msg{
+			Question: []dns.Question{
+				{
+					Name:  "tgragnato.it.",
+					Qtype: dns.TypeMX,
+				},
+			},
+		}
+		d.ParseQuery(m)
+		if len(m.Answer) != 0 {
+			t.Fatalf("Expected no answers, got %d", len(m.Answer))
+		}
+		if m.Rcode != dns.RcodeRefused {
+			t.Fatalf("Expected Refused, got %d", m.Rcode)
+		}
+	})
 }

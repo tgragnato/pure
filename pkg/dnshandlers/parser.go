@@ -62,6 +62,12 @@ func (d *DnsHandlers) ParseQuery(m *dns.Msg) {
 			addHTTPS(m, q.Name, d.hintIPv4, d.hintIPv6)
 
 		case dns.TypeMX, dns.TypeTXT, dns.TypeSOA, dns.TypeNS, dns.TypeSVCB, dns.TypeSRV:
+
+			if !checks.CheckDomain(q.Name) {
+				m.SetRcode(m, dns.RcodeRefused)
+				return
+			}
+
 			_, found6 := d.getPersistent(q.Name, true)
 			_, found4 := d.getPersistent(q.Name, false)
 			isApple := strings.HasPrefix(q.Name, ".apple.com.") || strings.HasPrefix(q.Name, ".icloud.com.")
