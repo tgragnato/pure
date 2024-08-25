@@ -3,17 +3,12 @@ package main
 import (
 	"flag"
 	"log"
-	"net"
 	"os"
 	"os/signal"
 	"syscall"
-	"time"
 
 	"github.com/miekg/dns"
-	"github.com/tgragnato/pure/pkg/checks"
 	"github.com/tgragnato/pure/pkg/dnshandlers"
-	"github.com/tgragnato/pure/pkg/errcache"
-	"github.com/tgragnato/pure/pkg/ipcache"
 )
 
 func main() {
@@ -31,22 +26,9 @@ func main() {
 	flag.StringVar(&dsn, "dsn", "postgres://dnsd:dnsd@localhost:5432/dnsd?sslmode=disable", "Set here the DSN for the PostgreSQL database")
 	flag.Parse()
 
-	var (
-		cache4    = ipcache.NewCache(3600*time.Second, false, dsn)
-		cache6    = ipcache.NewCache(3600*time.Second, true, dsn)
-		geoChecks = checks.NewGeoChecks()
-		errCache4 = errcache.NewErrCache(time.Minute, false, cache4, cache6, geoChecks)
-		errCache6 = errcache.NewErrCache(time.Minute, true, cache4, cache6, geoChecks)
-	)
-
-	hintIPv4 := net.ParseIP(hint4).To4()
-	if hintIPv4 == nil {
-		log.Fatalln("Failed to parse IPv4 hint")
-	}
-
-	hintIPv6 := net.ParseIP(hint6)
-	if hintIPv6 == nil {
-		log.Fatalln("Failed to parse IPv6 hint")
+	handler, err := dnshandlers.MakeDnsHandlers(dsn, hint4, hint6)
+	if err != nil {
+		log.Fatalf("Failed to create DNS handlers: %s\n", err.Error())
 	}
 
 	signalCh := make(chan os.Signal, 1)
@@ -59,16 +41,7 @@ func main() {
 
 		switch r.Opcode {
 		case dns.OpcodeQuery:
-			dnshandlers.ParseQuery(
-				m,
-				cache4,
-				cache6,
-				errCache4,
-				errCache6,
-				geoChecks,
-				hintIPv4,
-				hintIPv6,
-			)
+			handler.ParseQuery(m)
 		}
 
 		err := w.WriteMsg(m)

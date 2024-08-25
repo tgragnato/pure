@@ -53,7 +53,7 @@ var (
 	}}
 )
 
-func DoH(qName string, ipv6 bool) ([]net.IP, []string, uint32, error) {
+func DoH(qName string, ipv6 bool) ([]net.IP, []string, error) {
 	var (
 		ips    []net.IP
 		cnames []string
@@ -69,33 +69,33 @@ func DoH(qName string, ipv6 bool) ([]net.IP, []string, uint32, error) {
 	m.SetEdns0(4096, true)
 	out, err := m.Pack()
 	if err != nil {
-		return ips, cnames, ttl, errors.New("error packing request")
+		return ips, cnames, errors.New("error packing request")
 	}
 
 	req, err := http.NewRequest("POST", "https://dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion:443/dns-query", bytes.NewReader(out))
 	if err != nil {
-		return ips, cnames, ttl, errors.New("invalid HTTP request")
+		return ips, cnames, errors.New("invalid HTTP request")
 	}
 	req.Header.Set("Accept", "application/dns-message")
 	req.Header.Set("Content-Type", "application/dns-message")
 
 	resp, err := httpClient.Do(req)
 	if err != nil {
-		return ips, cnames, ttl, errors.New("error doing HTTP request")
+		return ips, cnames, errors.New("error doing HTTP request")
 	}
 
 	buf, err := io.ReadAll(resp.Body)
 	if err != nil {
-		return ips, cnames, ttl, errors.New("error reading response body")
+		return ips, cnames, errors.New("error reading response body")
 	}
 
 	rm := new(dns.Msg)
 	if err := rm.Unpack(buf); err != nil {
-		return ips, cnames, ttl, errors.New("error unpacking response")
+		return ips, cnames, errors.New("error unpacking response")
 	}
 
 	if rm.Rcode != dns.RcodeSuccess {
-		return ips, cnames, ttl, errors.New("error code in DNS response")
+		return ips, cnames, errors.New("error code in DNS response")
 	}
 
 	for _, ansa := range rm.Answer {
@@ -118,8 +118,8 @@ func DoH(qName string, ipv6 bool) ([]net.IP, []string, uint32, error) {
 	}
 
 	if len(ips) == 0 {
-		return ips, cnames, ttl, errors.New("no IP addresses in response")
+		return ips, cnames, errors.New("no IP addresses in response")
 	}
 
-	return ips, cnames, ttl, nil
+	return ips, cnames, nil
 }
