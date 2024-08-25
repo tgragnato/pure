@@ -12,10 +12,6 @@ type GeoChecks struct {
 }
 
 func (g *GeoChecks) CheckIPs(ips []net.IP) bool {
-	if g.geo == nil {
-		g.initGeo()
-	}
-
 	for x := range ips {
 		if !ips[x].IsGlobalUnicast() {
 			return false
