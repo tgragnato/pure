@@ -27,6 +27,14 @@ var whitelistSuffix = []string{
 
 func CheckDomain(domain string) bool {
 
+	if strings.HasSuffix(domain, ".tgragnato.it.") &&
+		domain != "www.tgragnato.it" &&
+		domain != "stun.tgragnato.it" &&
+		domain != "dht.tgragnato.it" &&
+		domain != "api.tgragnato.it" {
+		return false
+	}
+
 	for _, allowed := range whitelist {
 		if domain == allowed {
 			return true
