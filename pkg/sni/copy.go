@@ -23,7 +23,9 @@ func safeCopy(dst net.Conn, src io.Reader, wg *sync.WaitGroup, ctx context.Conte
 	defer wg.Done()
 	r := &readerCtx{ctx: ctx, r: src}
 	_, err := io.Copy(dst, r)
-	dst.(*net.TCPConn).CloseWrite()
+	if tcpdst, ok := dst.(*net.TCPConn); ok {
+		tcpdst.CloseWrite()
+	}
 	if err != nil {
 		cancel()
 	}

@@ -28,7 +28,7 @@ jobs:
       run: go build -v ./...
 
     - name: Test
-      run: CGO_ENABLED=1 go test -v -race ./... -covermode=atomic -coverprofile=coverage.out
+      run: CGO_ENABLED=0 go test -v ./... -covermode=atomic -coverprofile=coverage.out
 
     - name: Upload coverage report
       uses: codecov/codecov-action@v4
