@@ -72,16 +72,6 @@ func MakeSpam() Spam {
 		s.randomPost()
 		return s
 
-	case 6:
-		s := Spam{
-			url:       directPrefixes[rand.Intn(len(directPrefixes))] + paths[rand.Intn(len(paths))],
-			method:    http.MethodGet,
-			userAgent: userAgents[0],
-			proxy:     false,
-			body:      nil,
-		}
-		s.random()
-		return s
 	}
 
 	return Spam{}

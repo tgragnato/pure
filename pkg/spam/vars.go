@@ -32,11 +32,6 @@ var (
 		"http://162.62.230.106",
 		"https://adviceglobal.com.mt",
 	}
-	directPrefixes = []string{
-		"http://142.202.189.213",
-		"http://162.62.134.81",
-		"http://162.62.230.106",
-	}
 	paths = []string{
 		"",
 		"/",
