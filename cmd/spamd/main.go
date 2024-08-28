@@ -27,7 +27,7 @@ func main() {
 			go s.Call()
 
 		case httpWorker <- spam.MakeSpam():
-			time.Sleep(time.Duration(spam.Counter/500) * time.Millisecond)
+			time.Sleep(time.Duration(spam.Counter/100) * time.Millisecond)
 		}
 	}
 }
