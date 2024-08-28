@@ -29,6 +29,22 @@ func TestCheckDomain(t *testing.T) {
 			domain: "test.tgragnato.it.",
 			want:   false,
 		},
+		{
+			domain: "dht.tgragnato.it.",
+			want:   true,
+		},
+		{
+			domain: "stun.tgragnato.it.",
+			want:   true,
+		},
+		{
+			domain: "api.tgragnato.it.",
+			want:   true,
+		},
+		{
+			domain: "www.tgragnato.it.",
+			want:   true,
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.domain, func(t *testing.T) {
