@@ -4,7 +4,7 @@ all:
       vars:
         nonfree_firmware: non-free-firmware
         forwarding: 1
-        magneticod_maxrps: 1000
+        magneticod_maxrps: 500
       hosts:
         fd5d:2ddd:f4a5::1:
           hostname: puremini
