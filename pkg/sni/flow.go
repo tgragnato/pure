@@ -1,6 +1,7 @@
 package sni
 
 import (
+	"fmt"
 	"net"
 	"time"
 )
@@ -19,15 +20,16 @@ func establishFlow(clientConn net.Conn) {
 
 	d := &net.Dialer{
 		Timeout:       time.Second,
-		Deadline:      time.Now().Add(time.Second),
+		Deadline:      time.Now().Add(time.Minute),
 		DualStack:     true,
-		FallbackDelay: time.Second / 2,
+		FallbackDelay: time.Second,
 		KeepAlive:     100 * time.Millisecond,
 	}
 	d.SetMultipathTCP(true)
 
 	backendConn, err := d.Dial("tcp", getHostPort(clientHello.ServerName))
 	if err != nil {
+		fmt.Println(err.Error())
 		return
 	}
 	defer backendConn.Close()
