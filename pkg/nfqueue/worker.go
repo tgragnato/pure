@@ -3,6 +3,7 @@ package nfqueue
 import (
 	"context"
 	"fmt"
+	"math"
 	"math/rand"
 	"time"
 
@@ -14,8 +15,8 @@ import (
 func worker(queueNum uint16, windowSizeMin uint, windowSizeMax uint, ipv6 bool) {
 	nf, err := nfqueue.Open(&nfqueue.Config{
 		NfQueue:      queueNum,
-		MaxPacketLen: 0xFFFF,
-		MaxQueueLen:  0xFF,
+		MaxPacketLen: math.MaxUint32,
+		MaxQueueLen:  math.MaxUint32,
 		Copymode:     nfqueue.NfQnlCopyPacket,
 		WriteTimeout: time.Second,
 	})
