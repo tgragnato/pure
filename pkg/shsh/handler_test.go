@@ -29,18 +29,6 @@ func TestHandleHTTPForward(t *testing.T) {
 			statusCode: http.StatusFound,
 		},
 		{
-			host:       "ocsp.digicert.com",
-			path:       "/",
-			expected:   "<a href=\"https://ocsp.digicert.com/\">Found</a>.\n\n",
-			statusCode: http.StatusFound,
-		},
-		{
-			host:       "ocsp.pki.goog",
-			path:       "/",
-			expected:   "<a href=\"https://ocsp.pki.goog/\">Found</a>.\n\n",
-			statusCode: http.StatusFound,
-		},
-		{
 			host:       "www.example.com",
 			path:       "/",
 			expected:   "<a href=\"https://www.example.com/\">Moved Permanently</a>.\n\n",

@@ -9,8 +9,5 @@
 - name: Initialize the network
   ansible.builtin.import_tasks: network.yml
 
-- name: Setup dns
-  ansible.builtin.import_tasks: dns.yml
-
 - name: Setup ntp
   ansible.builtin.import_tasks: ntp.yml

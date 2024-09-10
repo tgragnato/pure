@@ -9,14 +9,8 @@
 - name: Initialize the firewall
   ansible.builtin.import_tasks: firewall.yml
 
-- name: Install dnsd
-  ansible.builtin.import_tasks: dnsd.yml
-
 - name: Install nfguard
   ansible.builtin.import_tasks: nfguard.yml
 
 - name: Install snowflake
   ansible.builtin.import_tasks: snowflake.yml
-
-- name: Install spamd
-  ansible.builtin.import_tasks: spamd.yml

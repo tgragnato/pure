@@ -27,23 +27,9 @@
     state: restarted
   listen: Restart snowflake
 
-- name: Restart dnsd
-  ansible.builtin.systemd:
-    daemon_reload: true
-    name: dnsd.service
-    state: restarted
-  listen: Restart dnsd
-
 - name: Restart nfguard
   ansible.builtin.systemd:
     daemon_reload: true
     name: nfguard.service
     state: restarted
   listen: Restart nfguard
-
-- name: Restart spamd
-  ansible.builtin.systemd:
-    daemon_reload: true
-    name: spamd.service
-    state: restarted
-  listen: Restart spamd

@@ -40,8 +40,8 @@ func addIPv6(m *dns.Msg, qName string, ip []net.IP) {
 func addHTTPS(
 	m *dns.Msg,
 	qName string,
-	hintIPv4 net.IP,
-	hintIPv6 net.IP,
+	hintIPv4 []net.IP,
+	hintIPv6 []net.IP,
 ) {
 	https := &dns.SVCB{
 		Hdr: dns.RR_Header{
@@ -54,13 +54,7 @@ func addHTTPS(
 		Target:   ".",
 		Value: []dns.SVCBKeyValue{
 			&dns.SVCBAlpn{
-				Alpn: []string{"h2", "http/1.1"},
-			},
-			&dns.SVCBIPv4Hint{
-				Hint: []net.IP{hintIPv4},
-			},
-			&dns.SVCBIPv6Hint{
-				Hint: []net.IP{hintIPv6},
+				Alpn: []string{"h3", "h2"},
 			},
 			&dns.SVCBMandatory{
 				Code: []dns.SVCBKey{
@@ -68,6 +62,18 @@ func addHTTPS(
 				},
 			},
 		},
+	}
+
+	if len(hintIPv4) != 0 {
+		https.Value = append(https.Value, &dns.SVCBIPv4Hint{
+			Hint: hintIPv4,
+		})
+	}
+
+	if len(hintIPv6) != 0 {
+		https.Value = append(https.Value, &dns.SVCBIPv6Hint{
+			Hint: hintIPv6,
+		})
 	}
 
 	m.Answer = append(m.Answer, https)

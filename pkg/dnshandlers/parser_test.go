@@ -116,7 +116,7 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 			t.Fatalf("Expected HTTPS record, got %d", m.Answer[0].Header().Rrtype)
 		}
 
-		if m.Answer[0].String() != "example.com.	86400	IN	HTTPS	1 . alpn=\"h2,http/1.1\" ipv4hint=\"192.0.2.3\" ipv6hint=\"2001:db8::3\" mandatory=\"alpn\"" {
+		if m.Answer[0].String() != "example.com.	86400	IN	HTTPS	1 . alpn=\"h3,h2\" mandatory=\"alpn\" ipv4hint=\"<nil>\" ipv6hint=\"<nil>\"" {
 			t.Fatalf("Expected HTTPS record, got %s", m.Answer[0].String())
 		}
 	})

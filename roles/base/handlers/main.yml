@@ -12,12 +12,6 @@
   listen: Networkctl reload
   changed_when: false
 
-- name: Restart resolved
-  ansible.builtin.systemd:
-    name: systemd-resolved.service
-    state: restarted
-  listen: Restart resolved
-
 - name: Restart timesyncd
   ansible.builtin.systemd:
     name: systemd-timesyncd.service

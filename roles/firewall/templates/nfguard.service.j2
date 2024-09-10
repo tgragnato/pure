@@ -4,8 +4,8 @@ Wants=network-online.target
 After=network.target network-online.target
 
 [Service]
-AmbientCapabilities=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
-CapabilityBoundingSet=CAP_NET_ADMIN CAP_NET_BIND_SERVICE
+AmbientCapabilities=CAP_NET_BIND_SERVICE
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
 DevicePolicy=closed
 ExecStart={{ nfguard_path }} -interfaceIPv4 {{ wg0_ipv4 }} -interfaceIPv6 [{{ wg0_ipv6 }}]
 Group=proxy
@@ -26,6 +26,7 @@ ProtectProc=invisible
 ProtectSystem=strict
 RemoveIPC=yes
 Restart=on-failure
+RestrictAddressFamilies=AF_INET AF_INET6
 RestrictNamespaces=yes
 RestrictRealtime=yes
 RestrictSUIDSGID=true

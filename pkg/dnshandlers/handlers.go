@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"net"
+	"strings"
 	"time"
 
 	_ "github.com/jackc/pgx/v5"
@@ -33,6 +34,8 @@ func MakeDnsHandlers(dsn string, hint4 string, hint6 string) (*DnsHandlers, erro
 		return nil, errors.New("failed to parse IPv4 hint")
 	}
 
+	hint6 = strings.Trim(hint6, "[")
+	hint6 = strings.Trim(hint6, "]")
 	hintIPv6 := net.ParseIP(hint6)
 	if hintIPv6 == nil {
 		return nil, errors.New("failed to parse IPv6 hint")

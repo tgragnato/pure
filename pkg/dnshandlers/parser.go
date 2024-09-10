@@ -59,7 +59,14 @@ func (d *DnsHandlers) ParseQuery(m *dns.Msg) {
 			}
 
 		case dns.TypeHTTPS:
-			addHTTPS(m, q.Name, d.hintIPv4, d.hintIPv6)
+			if !checks.CheckDomain(q.Name) {
+				m.SetRcode(m, dns.RcodeRefused)
+				return
+			}
+
+			hintIPv4, _ := d.getPersistent(q.Name, true)
+			hintIPv6, _ := d.getPersistent(q.Name, false)
+			addHTTPS(m, q.Name, hintIPv4, hintIPv6)
 
 		case dns.TypeMX, dns.TypeTXT, dns.TypeSOA, dns.TypeNS, dns.TypeSVCB, dns.TypeSRV:
 

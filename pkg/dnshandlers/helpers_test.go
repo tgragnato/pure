@@ -122,8 +122,8 @@ func Test_addHTTPS(t *testing.T) {
 
 	m := new(dns.Msg)
 	qName := "example.com."
-	hintIPv4 := net.ParseIP("192.0.2.1")
-	hintIPv6 := net.ParseIP("2001:0db8:85a3:0000:0000:8a2e:0370:7334")
+	hintIPv4 := []net.IP{net.ParseIP("192.0.2.1")}
+	hintIPv6 := []net.IP{net.ParseIP("2001:0db8:85a3:0000:0000:8a2e:0370:7334")}
 
 	addHTTPS(m, qName, hintIPv4, hintIPv6)
 
@@ -138,18 +138,18 @@ func Test_addHTTPS(t *testing.T) {
 		Target:   ".",
 		Value: []dns.SVCBKeyValue{
 			&dns.SVCBAlpn{
-				Alpn: []string{"h2", "http/1.1"},
-			},
-			&dns.SVCBIPv4Hint{
-				Hint: []net.IP{hintIPv4},
-			},
-			&dns.SVCBIPv6Hint{
-				Hint: []net.IP{hintIPv6},
+				Alpn: []string{"h3", "h2"},
 			},
 			&dns.SVCBMandatory{
 				Code: []dns.SVCBKey{
 					dns.SVCB_ALPN,
 				},
+			},
+			&dns.SVCBIPv4Hint{
+				Hint: hintIPv4,
+			},
+			&dns.SVCBIPv6Hint{
+				Hint: hintIPv6,
 			},
 		},
 	}
