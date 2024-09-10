@@ -57,12 +57,8 @@ table inet filter {
     chain forward_nat {
         ct state invalid drop
         ct state established,related accept
-        tcp sport 49152-65535 tcp dport { 22, 443, 587, 993 } mark set 0x000000b4 accept
-        udp sport { 16384-16403, 49152-65535 } udp dport 1024-65535 meta mark set 0x000000b4 accept
-        ip daddr 157.240.0.0/17 tcp sport 49152-65535 tcp dport 5222 meta mark set 0x000000b4 accept
-        ip daddr { 17.249.0.0/16, 17.252.0.0/16, 17.57.144.0/22, 17.188.128.0/18, 17.188.20.0/23 } tcp sport 49152-65535 tcp dport 5223 meta mark set 0x000000b4 accept
-        ip6 daddr 2a03:2880::/32 tcp sport 49152-65535 tcp dport 5222 meta mark set 0x000000b4 accept
-        ip6 daddr { 2620:149:a44::/48, 2403:300:a42::/48, 2403:300:a51::/48, 2a01:b740:a42::/48 } tcp sport 49152-65535 tcp dport 5223 meta mark set 0x000000b4 accept
+        tcp sport 49152-65535 tcp dport { 22, 443, 587, 993, 5222, 5223 } mark set 0x000000b4 accept
+        udp sport { 16384-16403, 49152-65535 } udp dport { 443, 1024-65535 } meta mark set 0x000000b4 accept
         reject with icmpx type port-unreachable
     }
 
