@@ -1,6 +1,6 @@
 ssh_user: root
-debian_repository: https://deb.debian.org/debian
-debian_security: https://deb.debian.org/debian-security
+debian_repository: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
+debian_security: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
 systemd_prefix: /etc/systemd
 systemd_system: "{{ systemd_prefix }}/system"
 systemd_network: "{{ systemd_prefix }}/network"

@@ -1,5 +1,11 @@
 ---
 
+- name: Bootstrap apt tor transport
+  ansible.builtin.apt:
+    name: "apt-transport-tor"
+    state: present
+  tags: init
+
 - name: Set the hostname
   ansible.builtin.hostname:
     name: "{{ hostname }}"
