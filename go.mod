@@ -3,8 +3,6 @@ module github.com/tgragnato/pure
 go 1.23.0
 
 require (
-	github.com/florianl/go-nfqueue v1.3.2
-	github.com/google/gopacket v1.1.19
 	github.com/jackc/pgx/v5 v5.7.0
 	github.com/mattn/go-sqlite3 v1.14.23
 	github.com/miekg/dns v1.1.62
@@ -12,13 +10,9 @@ require (
 )
 
 require (
-	github.com/google/go-cmp v0.6.0 // indirect
 	github.com/jackc/pgpassfile v1.0.0 // indirect
 	github.com/jackc/pgservicefile v0.0.0-20240606120523-5a60cdf6a761 // indirect
 	github.com/jackc/puddle/v2 v2.2.1 // indirect
-	github.com/josharian/native v1.1.0 // indirect
-	github.com/mdlayher/netlink v1.7.2 // indirect
-	github.com/mdlayher/socket v0.5.1 // indirect
 	golang.org/x/crypto v0.27.0 // indirect
 	golang.org/x/mod v0.21.0 // indirect
 	golang.org/x/net v0.29.0 // indirect
