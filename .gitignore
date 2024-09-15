@@ -1,7 +1,5 @@
 .vscode
 venv
-roles/firewall/files/dnsd
-cmd/dnsd/dnsd
 roles/firewall/files/nfguard
 cmd/nfguard/nfguard
 roles/firewall/files/client
