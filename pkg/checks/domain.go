@@ -23,6 +23,7 @@ var whitelistSuffix = []string{
 	".bn9prdstrz04a.store.core.windows.net.",
 	".bn9prdstrz04a.trafficmanager.net.",
 	".semrush.com.",
+	".ows.farm.",
 }
 
 func CheckDomain(domain string) bool {
