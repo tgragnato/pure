@@ -1,5 +1,8 @@
 # Pure
 
+[![Ansible](https://github.com/tgragnato/pure/actions/workflows/ansible.yml/badge.svg)](https://github.com/tgragnato/pure/actions/workflows/ansible.yml)
+[![Go](https://github.com/tgragnato/pure/actions/workflows/go.yml/badge.svg)](https://github.com/tgragnato/pure/actions/workflows/go.yml)
+
 `pure` is a collection of software and tools that I use to manage my network and my storage.
 
 Directory tree:
