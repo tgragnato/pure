@@ -4,7 +4,7 @@ go 1.23.0
 
 require (
 	github.com/jackc/pgx/v5 v5.7.1
-	github.com/mattn/go-sqlite3 v1.14.23
+	github.com/mattn/go-sqlite3 v1.14.24
 	github.com/miekg/dns v1.1.62
 	gitlab.torproject.org/tpo/anti-censorship/geoip v0.0.0-20210928150955-7ce4b3d98d01
 )
