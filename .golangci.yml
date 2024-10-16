@@ -17,28 +17,3 @@ issues:
       linters:
         - gosec
       text: "G114:"
-
-    - path: pkg/sni/readonly.go
-      linters:
-        - gosec
-      text: "G402:"
-
-    - path: pkg/nfqueue/worker.go
-      linters:
-        - gosec
-      text: "G404:"
-
-    - path: pkg/spam/builder.go
-      linters:
-        - gosec
-      text: "G404:"
-
-    - path: pkg/spam/spam.go
-      linters:
-        - gosec
-      text: "G404:"
-
-    - path: pkg/sni/copy.go
-      linters:
-        - errcheck
-      text: ".CloseWrite` is not checked"
