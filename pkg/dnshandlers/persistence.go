@@ -78,7 +78,7 @@ func (d *DnsHandlers) cleanPersistent() {
 	for rows.Next() {
 		var domain string
 		err = rows.Scan(&domain)
-		if err != nil || checks.CheckDomain(domain) {
+		if err != nil || checks.CheckDomain(domain) && domain == strings.ToLower(domain) {
 			continue
 		}
 
@@ -100,7 +100,7 @@ func (d *DnsHandlers) cleanPersistent() {
 	for rows.Next() {
 		var domain string
 		err = rows.Scan(&domain)
-		if err != nil || checks.CheckDomain(domain) {
+		if err != nil || checks.CheckDomain(domain) && domain == strings.ToLower(domain) {
 			continue
 		}
 
