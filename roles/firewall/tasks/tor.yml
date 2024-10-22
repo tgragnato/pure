@@ -7,7 +7,6 @@
   loop:
     - tor
     - tor-geoipdb
-    - obfs4proxy
   tags: tor
 
 - name: Install the snowflake client
