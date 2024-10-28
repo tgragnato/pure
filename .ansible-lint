@@ -8,3 +8,6 @@ exclude_paths:
 
 use_default_rules: true
 offline: false
+
+warn_list:
+  - yaml[line-length]
