@@ -41,10 +41,3 @@
     name: prometheus-postgres-exporter.service
     state: restarted
   listen: Restart postgres-exporter
-
-- name: Restart smbd
-  ansible.builtin.systemd:
-    daemon_reload: true
-    name: smbd.service
-    state: restarted
-  listen: Restart smbd
