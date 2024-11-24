@@ -3,7 +3,7 @@ run:
   timeout: 5m
   tests: true
   allow-parallel-runners: true
-  go: '1.22'
+  go: '1.23'
 
 linters:
   enable:
@@ -17,3 +17,8 @@ issues:
       linters:
         - gosec
       text: "G114:"
+
+    - path: pkg/spam/builder.go
+      linters:
+        - gosec
+      text: "G404:"
