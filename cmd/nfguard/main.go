@@ -180,7 +180,13 @@ func main() {
 			go s.Call()
 
 		case httpWorker <- spam.MakeSpam():
-			time.Sleep(time.Duration(spam.Counter/100) * time.Millisecond)
+			if spam.Counter < 10000 {
+				time.Sleep(100 * time.Millisecond)
+			} else if spam.Counter > 100000 {
+				time.Sleep(time.Second)
+			} else {
+				time.Sleep(time.Duration(spam.Counter/100) * time.Millisecond)
+			}
 		}
 	}
 }
