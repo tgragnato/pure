@@ -22,3 +22,8 @@ issues:
       linters:
         - gosec
       text: "G404:"
+
+    - path: cmd/nfguard/main.go
+      linters:
+        - gosec
+      text: "G115:"
