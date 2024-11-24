@@ -6,11 +6,13 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/miekg/dns"
 	"github.com/tgragnato/pure/pkg/dnshandlers"
 	"github.com/tgragnato/pure/pkg/shsh"
 	"github.com/tgragnato/pure/pkg/sntp"
+	"github.com/tgragnato/pure/pkg/spam"
 )
 
 func main() {
@@ -165,5 +167,20 @@ func main() {
 
 	shsh.Listen(iface4, iface6)
 
-	<-signalCh
+	httpWorker := make(chan spam.Spam, 1)
+	stopped := false
+
+	for !stopped {
+		select {
+
+		case <-signalCh:
+			stopped = true
+
+		case s := <-httpWorker:
+			go s.Call()
+
+		case httpWorker <- spam.MakeSpam():
+			time.Sleep(time.Duration(spam.Counter/100) * time.Millisecond)
+		}
+	}
 }
