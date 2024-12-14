@@ -1,10 +1,10 @@
 .vscode
 venv
-roles/firewall/files/nfguard
 cmd/nfguard/nfguard
-roles/firewall/files/client
-roles/firewall/files/snowflake
-roles/services/files/magnetico
-roles/services/files/grafana*
 coverage.out
-roles/firewall/files/spamd
+roles/master/files/client
+roles/master/files/nfguard
+roles/master/files/snowflake
+roles/master/files/spamd
+roles/master/files/grafana*
+roles/master/files/magnetico
