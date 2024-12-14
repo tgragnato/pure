@@ -6,6 +6,9 @@
 - name: Install tor
   ansible.builtin.import_tasks: tor.yml
 
+- name: Install postgresql
+  ansible.builtin.import_tasks: postgresql.yml
+
 - name: Initialize the firewall
   ansible.builtin.import_tasks: firewall.yml
 
@@ -14,3 +17,12 @@
 
 - name: Install snowflake
   ansible.builtin.import_tasks: snowflake.yml
+
+- name: Install magnetico
+  ansible.builtin.import_tasks: magnetico.yml
+
+- name: Install grafana
+  ansible.builtin.import_tasks: grafana.yml
+
+- name: Install prometheus
+  ansible.builtin.import_tasks: prometheus.yml
