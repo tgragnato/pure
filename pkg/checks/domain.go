@@ -17,13 +17,14 @@ var whitelist = []string{
 }
 
 var whitelistSuffix = []string{
+	".azurewebsites.windows.net.",
 	".blob.core.windows.net.",
 	".blz25prdstrz09a.store.core.windows.net.",
 	".blz25prdstrz09a.trafficmanager.net.",
 	".bn9prdstrz04a.store.core.windows.net.",
 	".bn9prdstrz04a.trafficmanager.net.",
-	".semrush.com.",
 	".ows.farm.",
+	".semrush.com.",
 }
 
 func CheckDomain(domain string) bool {
