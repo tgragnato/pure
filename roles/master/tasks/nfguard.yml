@@ -21,7 +21,9 @@
     service_limit_nofile: "infinity"
     service_protect_clock: "no"
     service_restrict_address_families: "AF_INET AF_INET6"
+    service_umask: "777"
     service_user: "proxy"
+    service_working_directory: ""
   tags: nfguard
 
 - name: Install the nfguard service

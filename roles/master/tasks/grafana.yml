@@ -24,9 +24,25 @@
   notify: Restart grafana
   tags: grafana
 
+- name: Set the magnetico service facts
+  ansible.builtin.set_fact:
+    service_after: "postgresql.service"
+    service_ambient_capabilities: ""
+    service_capability_bounding_set: ""
+    service_description: "Grafana instance"
+    service_exec_start: "{{ grafana_folder }}/bin/grafana server --config={{ grafana_folder }}/conf/grafana.ini"
+    service_group: "nogroup"
+    service_limit_nofile: 32768
+    service_protect_clock: "yes"
+    service_restrict_address_families: "AF_INET AF_INET6"
+    service_umask: "0027"
+    service_user: "nobody"
+    service_working_directory: "{{ grafana_folder }}"
+  tags: grafana
+
 - name: Setup the grafana systemd service
   ansible.builtin.template:
-    src: grafana.service.j2
+    src: sandboxed.service.j2
     dest: "{{ systemd_system }}/grafana.service"
     owner: root
     group: root

@@ -34,8 +34,11 @@ RestrictSUIDSGID=true
 SystemCallArchitectures=native
 SystemCallFilter=@system-service
 SystemCallFilter=~@resources @privileged
-UMask=777
+UMask={{ service_umask }}
 User={{ service_user }}
+{% if service_working_directory and service_working_directory != "" %}
+WorkingDirectory={{ service_working_directory }}
+{% endif %}
 
 [Install]
 WantedBy=multi-user.target
