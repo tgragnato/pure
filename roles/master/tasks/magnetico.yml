@@ -25,8 +25,8 @@
 
 - name: Install the magnetico service
   ansible.builtin.template:
-    src: magnetico.service.j2
-    dest: "{{ systemd_system }}/sandboxed.service"
+    src: sandboxed.service.j2
+    dest: "{{ systemd_system }}/magnetico.service"
     owner: root
     group: root
     mode: '0644'
