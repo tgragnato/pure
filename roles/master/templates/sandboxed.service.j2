@@ -1,7 +1,7 @@
 [Unit]
 Description={{ service_description }}
 Wants=network-online.target
-After=network.target network-online.target
+After=network.target network-online.target {{ service_after }}
 
 [Service]
 AmbientCapabilities={{ service_ambient_capabilities }}
