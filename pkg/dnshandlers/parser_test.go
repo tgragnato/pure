@@ -1,11 +1,46 @@
 package dnshandlers
 
 import (
+	"database/sql"
 	"net"
 	"testing"
 
+	_ "github.com/mattn/go-sqlite3"
 	"github.com/miekg/dns"
 )
+
+func newDb(t *testing.T) *sql.DB {
+	dbConn, err := sql.Open("sqlite3", "file:"+t.Name()+"?cache=shared&mode=memory")
+	if err != nil {
+		return nil
+	}
+
+	_, err = dbConn.Exec(`
+		CREATE TABLE a (
+			key TEXT PRIMARY KEY,
+			value TEXT,
+			discovered_on TIMESTAMP,
+			last_used TIMESTAMP
+		);
+	`)
+	if err != nil {
+		return nil
+	}
+
+	_, err = dbConn.Exec(`
+		CREATE TABLE aaaa (
+			key TEXT PRIMARY KEY,
+			value TEXT,
+			discovered_on TIMESTAMP,
+			last_used TIMESTAMP
+		);
+	`)
+	if err != nil {
+		return nil
+	}
+
+	return dbConn
+}
 
 func TestDnsHandlers_ParseQuery(t *testing.T) {
 	t.Parallel()
