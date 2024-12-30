@@ -9,6 +9,9 @@
 - name: Install postgresql
   ansible.builtin.import_tasks: postgresql.yml
 
+- name: Install transmission
+  ansible.builtin.import_tasks: transmission.yml
+
 - name: Initialize the firewall
   ansible.builtin.import_tasks: firewall.yml
 

@@ -1,0 +1,31 @@
+---
+
+- name: Install transmission
+  ansible.builtin.apt:
+    name: transmission-daemon
+    state: present
+  tags: transmission
+
+- name: Stop transmission
+  ansible.builtin.systemd:
+    name: transmission-daemon
+    state: stopped
+    enabled: true
+  tags: transmission
+
+- name: Configure transmission
+  ansible.builtin.template:
+    src: settings.json.j2
+    dest: /etc/transmission-daemon/settings.json
+    owner: debian-transmission
+    group: debian-transmission
+    mode: '0600'
+  tags: transmission
+
+- name: Enable and start transmission
+  ansible.builtin.systemd:
+    name: transmission-daemon
+    state: started
+    enabled: true
+    masked: false
+  tags: transmission
