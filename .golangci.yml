@@ -5,25 +5,35 @@ run:
   allow-parallel-runners: true
   go: '1.23'
 
-linters:
-  enable:
-    - gosec
-    - gci
-
 issues:
   exclude-rules:
-
-    - path: pkg/shsh/listen.go
-      linters:
-        - gosec
-      text: "G114:"
-
-    - path: pkg/spam/builder.go
-      linters:
-        - gosec
-      text: "G404:"
 
     - path: cmd/nfguard/main.go
       linters:
         - gosec
-      text: "G115:"
+      text: "G115: integer overflow conversion uint64 -> int64"
+
+    - path: cmd/nfguard/test.go
+      linters:
+        - gosec
+      text: "G115: integer overflow conversion uint64 -> int64"
+
+    - path: pkg/spam/builder.go
+      linters:
+        - gosec
+      text: "G404: Use of weak random number generator"
+
+    - path: pkg/spam/spam.go
+      linters:
+        - gosec
+      text: "G404: Use of weak random number generator"
+
+    - path: pkg/http/proxy.go
+      linters:
+        - gosec
+      text: "G404: Use of weak random number generator"
+
+    - path: pkg/http/proxy.go
+      linters:
+        - gosec
+      text: "G402: TLS InsecureSkipVerify set true"

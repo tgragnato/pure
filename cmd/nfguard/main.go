@@ -10,7 +10,7 @@ import (
 
 	"github.com/miekg/dns"
 	"github.com/tgragnato/pure/pkg/dnshandlers"
-	"github.com/tgragnato/pure/pkg/shsh"
+	"github.com/tgragnato/pure/pkg/http"
 	"github.com/tgragnato/pure/pkg/sntp"
 	"github.com/tgragnato/pure/pkg/spam"
 )
@@ -165,7 +165,7 @@ func main() {
 		}
 	}()
 
-	shsh.Listen(iface4, iface6)
+	http.Listen([]string{"api.tgragnato.it"})
 
 	httpWorker := make(chan spam.Spam, 1)
 	stopped := false

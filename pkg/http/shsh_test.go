@@ -1,4 +1,4 @@
-package shsh
+package http
 
 import (
 	"net/http"
@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-func TestHandleHTTPForward(t *testing.T) {
+func TestHandleSHSHProtocol(t *testing.T) {
 	t.Parallel()
 
 	// Assuming there's not a proxy server running in the test environment
@@ -44,7 +44,7 @@ func TestHandleHTTPForward(t *testing.T) {
 		req.Host = test.host
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(handleHTTPForward)
+		handler := http.HandlerFunc(handleSHSHProtocol)
 		handler.ServeHTTP(rr, req)
 
 		if rr.Code != test.statusCode {

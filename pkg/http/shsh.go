@@ -1,14 +1,39 @@
-package shsh
+package http
 
 import (
 	"fmt"
 	"io"
+	"net"
 	"net/http"
+	"net/url"
 	"strings"
 	"time"
 )
 
-func handleHTTPForward(w http.ResponseWriter, r *http.Request) {
+var (
+	proxy, _   = url.Parse("socks5://[::1]:9050")
+	httpclient = &http.Client{
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   5 * time.Minute,
+				KeepAlive: time.Millisecond,
+				DualStack: true,
+			}).DialContext,
+			ForceAttemptHTTP2:     false,
+			MaxIdleConnsPerHost:   10,
+			MaxConnsPerHost:       20,
+			IdleConnTimeout:       5 * time.Minute,
+			ResponseHeaderTimeout: 2 * time.Second,
+			Proxy:                 http.ProxyURL(proxy),
+		},
+		Timeout: 5 * time.Minute,
+		CheckRedirect: func(*http.Request, []*http.Request) error {
+			return http.ErrUseLastResponse
+		},
+	}
+)
+
+func handleSHSHProtocol(w http.ResponseWriter, r *http.Request) {
 	host := strings.TrimSuffix(r.Host, ":80")
 
 	if host == "static.ess.apple.com" && r.URL.Path == "/connectivity.txt" {
