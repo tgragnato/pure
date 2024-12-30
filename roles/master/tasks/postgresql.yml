@@ -160,6 +160,8 @@
         discovered_on TIMESTAMP,
         last_used TIMESTAMP
       );
+      CREATE INDEX IF NOT EXISTS idx_a_discovered_on ON a(discovered_on);
+      CREATE INDEX IF NOT EXISTS idx_a_last_used ON a(last_used);
       ALTER TABLE a OWNER TO nfguard;
   become: true
   become_method: ansible.builtin.su
@@ -177,6 +179,8 @@
         discovered_on TIMESTAMP,
         last_used TIMESTAMP
       );
+      CREATE INDEX IF NOT EXISTS idx_aaaa_discovered_on ON aaaa(discovered_on);
+      CREATE INDEX IF NOT EXISTS idx_aaaa_last_used ON aaaa(last_used);
       ALTER TABLE aaaa OWNER TO nfguard;
   become: true
   become_method: ansible.builtin.su
