@@ -339,7 +339,7 @@ func TestAPIGateway(t *testing.T) {
 			name:       "private IP other path",
 			remoteAddr: "192.168.1.1:1234",
 			path:       "/other",
-			wantCode:   http.StatusInternalServerError,
+			wantCode:   http.StatusBadGateway,
 		},
 		{
 			name:       "private IP grafana base path",
