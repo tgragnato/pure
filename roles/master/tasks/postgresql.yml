@@ -183,6 +183,38 @@
   become_user: "{{ postgresql_socketuser }}"
   tags: postgresql
 
+- name: Ensure table http exists
+  community.postgresql.postgresql_query:
+    db: "nfguard"
+    login_unix_socket: "{{ postgresql_socketdir }}"
+    query: |
+      CREATE TABLE IF NOT EXISTS http (
+          id SERIAL PRIMARY KEY,
+          epoch BIGINT NOT NULL,
+          remote VARCHAR(45) NOT NULL,
+          country CHAR(2),
+          proto VARCHAR(10) NOT NULL,
+          host VARCHAR(255) NOT NULL,
+          method VARCHAR(10) NOT NULL,
+          request TEXT NOT NULL,
+          status INTEGER NOT NULL,
+          bytes BIGINT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_http_epoch ON http(epoch);
+      CREATE INDEX IF NOT EXISTS idx_http_remote ON http(remote);
+      CREATE INDEX IF NOT EXISTS idx_http_country ON http(country);
+      CREATE INDEX IF NOT EXISTS idx_http_proto ON http(proto);
+      CREATE INDEX IF NOT EXISTS idx_http_host ON http(host);
+      CREATE INDEX IF NOT EXISTS idx_http_method ON http(method);
+      CREATE INDEX IF NOT EXISTS idx_http_request ON http(request);
+      CREATE INDEX IF NOT EXISTS idx_http_status ON http(status);
+      CREATE INDEX IF NOT EXISTS idx_http_bytes ON http(bytes);
+      ALTER TABLE http OWNER TO nfguard;
+  become: true
+  become_method: ansible.builtin.su
+  become_user: "{{ postgresql_socketuser }}"
+  tags: postgresql
+
 - name: Ensure the postgres exporter can read the statistics
   community.postgresql.postgresql_query:
     db: "postgres"
