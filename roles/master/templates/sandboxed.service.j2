@@ -36,6 +36,9 @@ SystemCallFilter=@system-service
 SystemCallFilter=~@resources @privileged
 UMask={{ service_umask }}
 User={{ service_user }}
+{% if service_readwrite_paths and service_readwrite_paths != "" %}
+ReadWritePaths={{ service_readwrite_paths }}
+{% endif %}
 {% if service_working_directory and service_working_directory != "" %}
 WorkingDirectory={{ service_working_directory }}
 {% endif %}

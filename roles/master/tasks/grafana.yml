@@ -24,7 +24,7 @@
   notify: Restart grafana
   tags: grafana
 
-- name: Set the magnetico service facts
+- name: Set the grafana service facts
   ansible.builtin.set_fact:
     service_after: "postgresql.service"
     service_ambient_capabilities: ""
@@ -34,6 +34,7 @@
     service_group: "nogroup"
     service_limit_nofile: 32768
     service_protect_clock: "yes"
+    service_readwrite_paths: ""
     service_restrict_address_families: "AF_INET AF_INET6"
     service_umask: "0027"
     service_user: "nobody"

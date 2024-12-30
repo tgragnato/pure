@@ -16,10 +16,11 @@
     service_ambient_capabilities: ""
     service_capability_bounding_set: ""
     service_description: "Magnetico Daemon"
-    service_exec_start: "{{ magnetico_path }} --addr=[{{ wg0_ipv6 }}]:8080 --max-rps={{ magneticod_maxrps }}"
+    service_exec_start: "{{ magnetico_path }} --max-rps={{ magneticod_maxrps }}"
     service_group: "proxy"
     service_limit_nofile: 32768
     service_protect_clock: "yes"
+    service_readwrite_paths: ""
     service_restrict_address_families: "AF_INET AF_INET6"
     service_umask: "777"
     service_user: "proxy"

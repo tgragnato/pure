@@ -4,9 +4,12 @@ temp_data_lifetime = 1h
 logs = /var/log
 
 [server]
+domain = api.tgragnato.it
+root_url = https://%(domain)s/grafana/
+serve_from_sub_path = true
 protocol = https
 min_tls_version = TLS1.3
-http_addr = {{ wg0_ipv6 }}
+http_addr = ::1
 http_port = 3000
 
 [database]
