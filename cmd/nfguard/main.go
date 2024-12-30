@@ -25,7 +25,7 @@ func main() {
 
 	flag.StringVar(&iface4, "interfaceIPv4", "127.0.0.1", "Set here the IPv4 of the interface to bind to")
 	flag.StringVar(&iface6, "interfaceIPv6", "[::1]", "Set here the IPv6 of the interface to bind to")
-	flag.StringVar(&dsn, "dsn", "postgres://dnsd:dnsd@localhost:5432/dnsd?sslmode=disable", "Set here the DSN for the PostgreSQL database")
+	flag.StringVar(&dsn, "dsn", "postgres://nfguard:nfguard@localhost:5432/nfguard?sslmode=disable", "Set here the DSN for the PostgreSQL database")
 	flag.Parse()
 
 	handler, err := dnshandlers.MakeDnsHandlers(dsn, iface4, iface6)

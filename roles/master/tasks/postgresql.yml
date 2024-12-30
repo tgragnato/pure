@@ -80,7 +80,7 @@
   loop:
     - { username: "magnetico", password: "magnetico" }
     - { username: "grafana", password: "grafana" }
-    - { username: "dnsd", password: "dnsd" }
+    - { username: "nfguard", password: "nfguard" }
     - { username: "reader", password: "reader" }
     - { username: "{{ prometheus_postgres_exporter }}", password: "{{ prometheus_postgres_exporter }}" }
   tags: postgresql
@@ -99,7 +99,7 @@
   loop:
     - { name: "magnetico", owner: "magnetico" }
     - { name: "grafana", owner: "grafana" }
-    - { name: "dnsd", owner: "dnsd" }
+    - { name: "nfguard", owner: "nfguard" }
   tags: postgresql
 
 - name: Ensure grafana can use the specified schemas
@@ -115,7 +115,7 @@
   become_user: "{{ postgresql_socketuser }}"
   loop:
     - { db: "magnetico", schema: "public" }
-    - { db: "dnsd", schema: "public" }
+    - { db: "nfguard", schema: "public" }
   tags: postgresql
 
 - name: Ensure grafana can read from the tables
@@ -131,7 +131,7 @@
   become_user: "{{ postgresql_socketuser }}"
   loop:
     - "magnetico"
-    - "dnsd"
+    - "nfguard"
   tags: postgresql
 
 - name: Ensure specified PostgreSQL extensions are loaded
@@ -151,7 +151,7 @@
 
 - name: Ensure table a exists
   community.postgresql.postgresql_query:
-    db: "dnsd"
+    db: "nfguard"
     login_unix_socket: "{{ postgresql_socketdir }}"
     query: |
       CREATE TABLE IF NOT EXISTS a (
@@ -160,7 +160,7 @@
         discovered_on TIMESTAMP,
         last_used TIMESTAMP
       );
-      ALTER TABLE a OWNER TO dnsd;
+      ALTER TABLE a OWNER TO nfguard;
   become: true
   become_method: ansible.builtin.su
   become_user: "{{ postgresql_socketuser }}"
@@ -168,7 +168,7 @@
 
 - name: Ensure table aaaa exists
   community.postgresql.postgresql_query:
-    db: "dnsd"
+    db: "nfguard"
     login_unix_socket: "{{ postgresql_socketdir }}"
     query: |
       CREATE TABLE IF NOT EXISTS aaaa (
@@ -177,7 +177,7 @@
         discovered_on TIMESTAMP,
         last_used TIMESTAMP
       );
-      ALTER TABLE aaaa OWNER TO dnsd;
+      ALTER TABLE aaaa OWNER TO nfguard;
   become: true
   become_method: ansible.builtin.su
   become_user: "{{ postgresql_socketuser }}"
