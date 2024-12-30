@@ -4,11 +4,119 @@ flush ruleset
 
 table inet filter {
 
+    set greyzone4 {
+        type ipv4_addr
+        flags interval
+        elements = {
+            139.45.192.0/19,
+            156.146.53.0/24,
+            208.88.224.0/22,
+            212.102.46.0/24,
+            216.21.13.0/24,
+            74.117.176.0/21,
+        }
+    }
+
+    set greyzone6 {
+        type ipv6_addr
+        flags interval
+        elements = {
+            2607:fbe0::/32,
+            2a02:6ea0:d800::/40,
+        }
+    }
+
+    set apple4 {
+        type ipv4_addr
+        flags interval
+        elements = {
+            17.0.0.0/8,
+            57.102.0.0/16,
+            57.103.0.0/16,
+            57.112.0.0/12,
+            65.199.22.0/23,
+            139.178.128.0/18,
+            144.178.0.0/18,
+        }
+    }
+
+    set apple6 {
+        type ipv6_addr
+        flags interval
+        elements = {
+            2403:300::/32,
+            2620:149::/32,
+            2a01:b740::/32,
+            2a01:b747::/32,
+        }
+    }
+
+    set meta4 {
+        type ipv4_addr
+        flags interval
+        elements = {
+            31.13.24.0/21,
+            31.13.64.0/18,
+            45.64.40.0/22,
+            57.141.0.0/24,
+            57.141.3.0/24,
+            57.141.5.0/24,
+            57.141.7.0/24,
+            57.141.8.0/24,
+            57.141.10.0/24,
+            57.141.13.0/24,
+            57.144.0.0/14,
+            66.220.144.0/20,
+            69.63.176.0/20,
+            69.171.224.0/19,
+            74.119.76.0/22,
+            102.132.96.0/20,
+            103.4.96.0/22,
+            129.134.0.0/17,
+            157.240.0.0/17,
+            157.240.192.0/18,
+            163.70.128.0/17,
+            173.252.64.0/19,
+            173.252.96.0/19,
+            179.60.192.0/22,
+            185.60.216.0/22,
+            204.15.20.0/22,
+        }
+    }
+
+    set meta6 {
+        type ipv6_addr
+        flags interval
+        elements = {
+            2620:0:1c00::/40,
+            2a03:2880::/32,
+        }
+    }
+
+    set github4 {
+        type ipv4_addr
+        flags interval
+        elements = {
+            140.82.112.0/20,
+            143.55.64.0/20,
+            192.30.252.0/22,
+        }
+    }
+
+    set github6 {
+        type ipv6_addr
+        flags interval
+        elements = {
+            2620:112:3000::/44,
+            2a0a:a440::/29,
+        }
+    }
+
     chain input {
         type filter hook input priority 0; policy drop;
         iif lo accept
         iifname wan jump input_wan
-        iifname wg0 accept
+        iifname wg0 jump input_wg0
     }
     chain input_wan {
         ip protocol icmp accept
@@ -18,14 +126,22 @@ table inet filter {
         meta pkttype { broadcast, multicast } drop
         ct state invalid drop
         ct state established,related accept
+        tcp sport 1024-65535 tcp dport { 80, 443 } accept
         udp sport 1024-65535 udp dport { 123, {{ wg0_port }}, 1024-65535 } accept
+    }
+    chain input_wg0 {
+        ct state invalid drop
+        ct state established,related accept
+        tcp dport { 22, 53, 80, 443, 9040, 9050 } accept
+        udp dport { 53, 123 } accept
+        reject with icmpx type port-unreachable
     }
 
     chain output {
         type filter hook output priority 0; policy drop;
         oif lo accept
         oifname wan jump output_wan
-        oifname wg0 accept
+        oifname wg0 jump output_wg0
     }
     chain output_wan {
         ip protocol icmp accept
@@ -36,9 +152,14 @@ table inet filter {
         ct state invalid drop
         ct state established,related accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
-        tcp sport 1024-65535 tcp dport 443 skuid { www-data, debian-tor } accept
-        tcp sport 1024-65535 skuid proxy accept
-        udp sport 1024-65535 udp dport { 80, 443, 1024-65535 } skuid { proxy, debian-tor } accept
+        tcp sport 1024-65535 tcp dport 443 skuid { www-data, debian-tor, debian-transmission } accept
+        tcp sport 1024-65535 skuid { proxy, debian-transmission } accept
+        udp sport 1024-65535 udp dport { 80, 443, 1024-65535 } skuid { proxy, debian-tor, debian-transmission } accept
+        reject with icmpx type port-unreachable
+    }
+    chain output_wg0 {
+        ct state invalid drop
+        ct state established,related accept
         reject with icmpx type port-unreachable
     }
 
@@ -50,14 +171,26 @@ table inet filter {
         iifname wg0 oifname wg0 reject with icmpx type host-unreachable
     }
     chain forward_reverse {
+        ip daddr @meta4 reject with icmp type admin-prohibited
+        ip6 daddr @meta6 reject with icmpv6 type admin-prohibited
+        ip daddr @greyzone4 reject with icmp type admin-prohibited
+        ip6 daddr @greyzone6 reject with icmpv6 type admin-prohibited
         ct state invalid drop
         ct state established,related accept
         drop
     }
     chain forward_nat {
+        ip daddr @meta4 reject with icmp type admin-prohibited
+        ip6 daddr @meta6 reject with icmpv6 type admin-prohibited
+        ip daddr @greyzone4 reject with icmp type admin-prohibited
+        ip6 daddr @greyzone6 reject with icmpv6 type admin-prohibited
         ct state invalid drop
         ct state established,related accept
-        tcp sport 49152-65535 tcp dport { 22, 443, 587, 993, 5222, 5223 } mark set 0x000000b4 accept
+        ip daddr @github4 tcp sport 49152-65535 tcp dport 22 mark set 0x000000b4 accept
+        ip6 daddr @github6 tcp sport 49152-65535 tcp dport 22 mark set 0x000000b4 accept
+        ip daddr 204.8.99.149 tcp sport 49152-65535 tcp dport 22 mark set 0x000000b4 accept
+        ip6 daddr 2620:7:6002:0:266:37ff:feb8:3489 tcp sport 49152-65535 tcp dport 22 mark set 0x000000b4 accept
+        tcp sport 49152-65535 tcp dport { 443, 465, 587, 993 } mark set 0x000000b4 accept
         udp sport { 16384-16403, 49152-65535 } udp dport { 443, 1024-65535 } meta mark set 0x000000b4 accept
         reject with icmpx type port-unreachable
     }
@@ -67,11 +200,20 @@ table inet filter {
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 53 redirect to 53
         iifname wg0 ip daddr != {{ wg0_ipv4 }} udp dport 53 redirect to 53
         iifname wg0 ip daddr != {{ wg0_ipv4 }} tcp dport 80 redirect to 80
+        iifname wg0 ip daddr 93.40.7.94 tcp dport 443 redirect to 443
         iifname wg0 ip daddr != {{ wg0_ipv4 }} udp dport 123 redirect to 123
+        iifname wg0 ip daddr @meta4 tcp dport 443 redirect to 9040
+        iifname wg0 ip daddr @greyzone4 tcp dport 5222 redirect to 9040
+        iifname wg0 ip daddr @meta4 tcp dport 5222 redirect to 9040
+        iifname wg0 ip daddr @apple4 tcp dport 5223 redirect to 9040
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 53 redirect to 53
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} udp dport 53 redirect to 53
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 80 redirect to 80
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} udp dport 123 redirect to 123
+        iifname wg0 ip6 daddr @meta6 tcp dport 443 redirect to 9040
+        iifname wg0 ip6 daddr @greyzone6 tcp dport 443 redirect to 9040
+        iifname wg0 ip6 daddr @meta6 tcp dport 5222 redirect to 9040
+        iifname wg0 ip6 daddr @apple6 tcp dport 5223 redirect to 9040
     }
 
     chain postrouting {

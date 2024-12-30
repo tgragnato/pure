@@ -1,7 +1,9 @@
 
 SocksPort [::1]:9050 IsolateClientAddr IsolateClientProtocol IsolateDestPort IsolateDestAddr
 +SocksPort [{{ wg0_ipv6 }}]:9050 IsolateClientAddr IsolateClientProtocol IsolateDestPort IsolateDestAddr
-SocksPolicy accept ::1/128, accept {{ wg0_ipv6 }}/{{ wg0_class6 }}, reject *
+SocksPolicy accept ::1/128, accept {{ wg0_ipv6 }}/{{ wg0_class6 }}, accept {{ wg0_ipv4 }}/{{ wg0_class4 }}, reject *
+TransPort {{ wg0_ipv4 }}:9040 IsolateClientAddr IsolateClientProtocol IsolateDestPort IsolateDestAddr
++TransPort [{{ wg0_ipv6 }}]:9040 IsolateClientAddr IsolateClientProtocol IsolateDestPort IsolateDestAddr
 
 AvoidDiskWrites 1
 ClientOnly 1
