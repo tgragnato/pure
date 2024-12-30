@@ -1,27 +1,27 @@
 package spam
 
 import (
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 )
 
 func MakeSpam() Spam {
-	switch rand.Intn(7) {
+	switch rand.IntN(7) {
 
 	case 0:
 		return Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))] + paths[rand.Intn(len(paths))],
+			url:       proxiedPrefixes[rand.IntN(len(proxiedPrefixes))] + paths[rand.IntN(len(paths))],
 			method:    http.MethodGet,
-			userAgent: userAgents[rand.Intn(len(userAgents))],
+			userAgent: userAgents[rand.IntN(len(userAgents))],
 			proxy:     true,
 			body:      nil,
 		}
 
 	case 1:
 		s := Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))],
+			url:       proxiedPrefixes[rand.IntN(len(proxiedPrefixes))],
 			method:    http.MethodGet,
-			userAgent: userAgents[rand.Intn(len(userAgents))],
+			userAgent: userAgents[rand.IntN(len(userAgents))],
 			proxy:     true,
 			body:      nil,
 		}
@@ -30,9 +30,9 @@ func MakeSpam() Spam {
 
 	case 2:
 		s := Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))] + paths[rand.Intn(len(paths))],
+			url:       proxiedPrefixes[rand.IntN(len(proxiedPrefixes))] + paths[rand.IntN(len(paths))],
 			method:    http.MethodGet,
-			userAgent: userAgents[rand.Intn(len(userAgents))],
+			userAgent: userAgents[rand.IntN(len(userAgents))],
 			proxy:     true,
 			body:      nil,
 		}
@@ -41,9 +41,9 @@ func MakeSpam() Spam {
 
 	case 3:
 		s := Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))],
+			url:       proxiedPrefixes[rand.IntN(len(proxiedPrefixes))],
 			method:    http.MethodGet,
-			userAgent: userAgents[rand.Intn(len(userAgents))],
+			userAgent: userAgents[rand.IntN(len(userAgents))],
 			proxy:     true,
 			body:      nil,
 		}
@@ -52,9 +52,9 @@ func MakeSpam() Spam {
 
 	case 4:
 		s := Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))],
+			url:       proxiedPrefixes[rand.IntN(len(proxiedPrefixes))],
 			method:    http.MethodPost,
-			userAgent: userAgents[rand.Intn(len(userAgents))],
+			userAgent: userAgents[rand.IntN(len(userAgents))],
 			proxy:     true,
 			body:      nil,
 		}
@@ -63,9 +63,9 @@ func MakeSpam() Spam {
 
 	case 5:
 		s := Spam{
-			url:       proxiedPrefixes[rand.Intn(len(proxiedPrefixes))] + paths[rand.Intn(len(paths))],
+			url:       proxiedPrefixes[rand.IntN(len(proxiedPrefixes))] + paths[rand.IntN(len(paths))],
 			method:    http.MethodPost,
-			userAgent: userAgents[rand.Intn(len(userAgents))],
+			userAgent: userAgents[rand.IntN(len(userAgents))],
 			proxy:     true,
 			body:      nil,
 		}

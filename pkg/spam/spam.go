@@ -5,7 +5,7 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"math/rand"
+	"math/rand/v2"
 	"net/http"
 	"strconv"
 )
@@ -47,14 +47,14 @@ func (s *Spam) Call() {
 
 func (s *Spam) random() {
 	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-	length := rand.Intn(10) + 52
+	length := rand.IntN(10) + 52
 	addition := make([]byte, length)
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 
 	randomUrl := fmt.Sprintf("/%s/%s", addition[:length-30], addition[length-30:])
-	if rand.Intn(2) == 1 {
+	if rand.IntN(2) == 1 {
 		s.url += "/track"
 	}
 	s.url += randomUrl
@@ -65,53 +65,53 @@ func (s *Spam) template() {
 	length := 10
 	addition := make([]byte, length)
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 	s.url += string(addition) + "_"
 
 	length = 138
 	addition = make([]byte, length)
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 	s.url += string(addition) + "_"
 
 	length = 32
 	addition = make([]byte, length)
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 	s.url += string(addition) + "_"
 
 	length = 10
 	addition = make([]byte, length)
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 	s.url += string(addition)
 }
 
 func (s *Spam) insertIcloud() {
 	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789."
-	length := rand.Intn(20) + 5
+	length := rand.IntN(20) + 5
 	addition := make([]byte, length)
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 	s.url += "/rev/" + string(addition) + "@icloud.com/"
 
-	s.url += strconv.Itoa(rand.Intn(9999)) + "/" + strconv.Itoa(rand.Intn(99999999)) + "/"
+	s.url += strconv.Itoa(rand.IntN(9999)) + "/" + strconv.Itoa(rand.IntN(99999999)) + "/"
 
 	characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 	length = 6
 	addition = make([]byte, length)
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 	s.url += string(addition) + "."
 
 	for i := 0; i < length; i++ {
-		addition[i] = characters[rand.Intn(len(characters))]
+		addition[i] = characters[rand.IntN(len(characters))]
 	}
 	s.url += string(addition) + "/0"
 }
@@ -119,16 +119,16 @@ func (s *Spam) insertIcloud() {
 func (s *Spam) randomPost() {
 	characters := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 
-	name_length := rand.Intn(20) + 3
+	name_length := rand.IntN(20) + 3
 	name := make([]byte, name_length)
 	for i := 0; i < name_length; i++ {
-		name[i] = characters[rand.Intn(len(characters))]
+		name[i] = characters[rand.IntN(len(characters))]
 	}
 
-	surname_length := rand.Intn(20) + 3
+	surname_length := rand.IntN(20) + 3
 	surname := make([]byte, surname_length)
 	for i := 0; i < surname_length; i++ {
-		surname[i] = characters[rand.Intn(len(characters))]
+		surname[i] = characters[rand.IntN(len(characters))]
 	}
 
 	fullname := string(name) + " " + string(surname)
