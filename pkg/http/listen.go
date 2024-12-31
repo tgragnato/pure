@@ -2,14 +2,26 @@ package http
 
 import (
 	"crypto/tls"
+	"database/sql"
 	"fmt"
 	"net/http"
 	"time"
 
+	_ "github.com/jackc/pgx/v5"
+	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/tgragnato/pure/pkg/checks"
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func Listen(hosts []string) {
+func Listen(hosts []string, dsn string) {
+	db, err := sql.Open("pgx", dsn)
+	if err != nil || (db != nil && db.Ping() != nil) {
+		db = nil
+	}
+	writer := &logWriter{
+		geoChecks: checks.NewGeoChecks(),
+		db:        db,
+	}
 
 	manager := &autocert.Manager{
 		Prompt:     autocert.AcceptTOS,
@@ -17,9 +29,9 @@ func Listen(hosts []string) {
 		Cache:      autocert.DirCache("/var/www/acme"),
 	}
 
-	go func(manager *autocert.Manager) {
+	go func(manager *autocert.Manager, writer *logWriter) {
 		httpMux := http.NewServeMux()
-		httpMux.HandleFunc("/", handleSHSHProtocol)
+		httpMux.Handle("/", loggingMiddleware(headersMiddleware(handleSHSHProtocol()), writer))
 		srv := &http.Server{
 			Addr:              ":80",
 			Handler:           manager.HTTPHandler(httpMux),
@@ -31,11 +43,11 @@ func Listen(hosts []string) {
 		if err := srv.ListenAndServe(); err != nil {
 			fmt.Println(err.Error())
 		}
-	}(manager)
+	}(manager, writer)
 
-	go func(manager *autocert.Manager) {
+	go func(manager *autocert.Manager, writer *logWriter) {
 		httpsMux := http.NewServeMux()
-		httpsMux.Handle("/", headersMiddleware(compressMiddleware(apiGateway())))
+		httpsMux.Handle("/", loggingMiddleware(headersMiddleware(compressMiddleware(apiGateway())), writer))
 		srv := &http.Server{
 			Addr:              ":443",
 			Handler:           httpsMux,
@@ -54,6 +66,6 @@ func Listen(hosts []string) {
 		if err := srv.ListenAndServeTLS("", ""); err != nil {
 			fmt.Println(err.Error())
 		}
-	}(manager)
+	}(manager, writer)
 
 }

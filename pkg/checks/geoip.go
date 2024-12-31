@@ -36,3 +36,10 @@ func (g *GeoChecks) CheckIPs(ips []net.IP) bool {
 
 	return true
 }
+
+func (g *GeoChecks) GetCountry(ip net.IP) string {
+	if country, ok := g.geo.GetCountryByAddr(ip); ok {
+		return country
+	}
+	return ""
+}

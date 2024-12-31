@@ -44,8 +44,7 @@ func TestHandleSHSHProtocol(t *testing.T) {
 		req.Host = test.host
 
 		rr := httptest.NewRecorder()
-		handler := http.HandlerFunc(handleSHSHProtocol)
-		handler.ServeHTTP(rr, req)
+		handleSHSHProtocol().ServeHTTP(rr, req)
 
 		if rr.Code != test.statusCode {
 			t.Errorf("For host %s and path %s, expected status code %d, but got %d", test.host, test.path, test.statusCode, rr.Code)

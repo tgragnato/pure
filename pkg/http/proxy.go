@@ -1,9 +1,11 @@
 package http
 
 import (
+	"bufio"
 	"compress/flate"
 	"compress/gzip"
 	"crypto/tls"
+	"fmt"
 	"io"
 	"math/rand/v2"
 	"net"
@@ -18,10 +20,30 @@ import (
 type responseWriter struct {
 	io.Writer
 	http.ResponseWriter
+	status int
+	size   int64
 }
 
-func (w responseWriter) Write(b []byte) (int, error) {
-	return w.Writer.Write(b)
+func (w *responseWriter) WriteHeader(code int) {
+	w.status = code
+	w.ResponseWriter.WriteHeader(code)
+}
+
+func (w *responseWriter) Write(b []byte) (size int, err error) {
+	if w.Writer == nil {
+		size, err = w.ResponseWriter.Write(b)
+	} else {
+		size, err = w.Writer.Write(b)
+	}
+	w.size += int64(size)
+	return size, err
+}
+
+func (w *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
+	if hijacker, ok := w.ResponseWriter.(http.Hijacker); ok {
+		return hijacker.Hijack()
+	}
+	return nil, nil, fmt.Errorf("underlying ResponseWriter does not support Hijack")
 }
 
 func gzipMiddleware(next http.Handler) http.Handler {
@@ -35,7 +57,7 @@ func gzipMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		defer gz.Close()
-		gzr := responseWriter{Writer: gz, ResponseWriter: w}
+		gzr := &responseWriter{Writer: gz, ResponseWriter: w}
 		next.ServeHTTP(gzr, r)
 	})
 }
@@ -51,7 +73,7 @@ func flateMiddleware(next http.Handler) http.Handler {
 			return
 		}
 		defer fl.Close()
-		flr := responseWriter{Writer: fl, ResponseWriter: w}
+		flr := &responseWriter{Writer: fl, ResponseWriter: w}
 		next.ServeHTTP(flr, r)
 	})
 }
@@ -91,7 +113,7 @@ func headersMiddleware(next http.Handler) http.Handler {
 		}
 
 		if w.Header().Get("Content-Security-Policy") == "" {
-			w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; object-src 'none'; upgrade-insecure-requests;")
+			w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;")
 		}
 
 		if w.Header().Get("Set-Cookie") == "" {

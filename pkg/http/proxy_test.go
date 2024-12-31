@@ -380,3 +380,115 @@ func TestAPIGateway(t *testing.T) {
 		})
 	}
 }
+
+func TestResponseWriterWriteHeader(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name     string
+		code     int
+		wantCode int
+	}{
+		{
+			name:     "success code",
+			code:     http.StatusOK,
+			wantCode: http.StatusOK,
+		},
+		{
+			name:     "error code",
+			code:     http.StatusBadRequest,
+			wantCode: http.StatusBadRequest,
+		},
+		{
+			name:     "redirect code",
+			code:     http.StatusFound,
+			wantCode: http.StatusFound,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			rec := httptest.NewRecorder()
+			w := &responseWriter{ResponseWriter: rec}
+			w.WriteHeader(tt.code)
+
+			if w.status != tt.wantCode {
+				t.Errorf("responseWriter.status = %v, want %v", w.status, tt.wantCode)
+			}
+			if rec.Code != tt.wantCode {
+				t.Errorf("ResponseWriter.Code = %v, want %v", rec.Code, tt.wantCode)
+			}
+		})
+	}
+}
+
+func TestResponseWriterWrite(t *testing.T) {
+	t.Parallel()
+
+	tests := []struct {
+		name        string
+		input       []byte
+		customWrite bool
+		wantSize    int
+		wantErr     bool
+	}{
+		{
+			name:        "default writer",
+			input:       []byte("test content"),
+			customWrite: false,
+			wantSize:    12,
+			wantErr:     false,
+		},
+		{
+			name:        "custom writer",
+			input:       []byte("custom content"),
+			customWrite: true,
+			wantSize:    14,
+			wantErr:     false,
+		},
+		{
+			name:        "empty input",
+			input:       []byte{},
+			customWrite: false,
+			wantSize:    0,
+			wantErr:     false,
+		},
+	}
+
+	for _, tt := range tests {
+		tt := tt
+		t.Run(tt.name, func(t *testing.T) {
+			t.Parallel()
+			rec := httptest.NewRecorder()
+			var w *responseWriter
+			if tt.customWrite {
+				w = &responseWriter{
+					ResponseWriter: rec,
+					Writer:         rec.Body,
+				}
+			} else {
+				w = &responseWriter{
+					ResponseWriter: rec,
+				}
+			}
+
+			size, err := w.Write(tt.input)
+
+			if (err != nil) != tt.wantErr {
+				t.Errorf("responseWriter.Write() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+			if size != tt.wantSize {
+				t.Errorf("responseWriter.Write() size = %v, want %v", size, tt.wantSize)
+			}
+			if int64(size) != w.size {
+				t.Errorf("responseWriter.size = %v, want %v", w.size, size)
+			}
+			if got := rec.Body.String(); got != string(tt.input) {
+				t.Errorf("Written content = %v, want %v", got, string(tt.input))
+			}
+		})
+	}
+}
