@@ -68,8 +68,8 @@ func (d *DnsHandlers) ParseQuery(m *dns.Msg) {
 				return
 			}
 
-			hintIPv4, _ := d.getPersistent(qName, true)
-			hintIPv6, _ := d.getPersistent(qName, false)
+			hintIPv4, _ := d.getPersistent(qName, false)
+			hintIPv6, _ := d.getPersistent(qName, true)
 			addHTTPS(m, q.Name, hintIPv4, hintIPv6)
 
 		case dns.TypeMX, dns.TypeTXT, dns.TypeSOA, dns.TypeNS, dns.TypeSVCB, dns.TypeSRV:
