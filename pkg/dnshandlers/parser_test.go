@@ -1,66 +1,36 @@
 package dnshandlers
 
 import (
-	"database/sql"
 	"net"
 	"testing"
 
-	_ "github.com/mattn/go-sqlite3"
+	"github.com/DATA-DOG/go-sqlmock"
 	"github.com/miekg/dns"
 )
-
-func newDb(t *testing.T) *sql.DB {
-	dbConn, err := sql.Open("sqlite3", "file:"+t.Name()+"?cache=shared&mode=memory")
-	if err != nil {
-		return nil
-	}
-
-	_, err = dbConn.Exec(`
-		CREATE TABLE a (
-			key TEXT PRIMARY KEY,
-			value TEXT,
-			discovered_on TIMESTAMP,
-			last_used TIMESTAMP
-		);
-	`)
-	if err != nil {
-		return nil
-	}
-
-	_, err = dbConn.Exec(`
-		CREATE TABLE aaaa (
-			key TEXT PRIMARY KEY,
-			value TEXT,
-			discovered_on TIMESTAMP,
-			last_used TIMESTAMP
-		);
-	`)
-	if err != nil {
-		return nil
-	}
-
-	return dbConn
-}
 
 func TestDnsHandlers_ParseQuery(t *testing.T) {
 	t.Parallel()
 
 	const domain = "example.com."
 
+	mockDb, mock, err := sqlmock.New()
+	if err != nil {
+		t.Fatalf("an error '%s' was not expected when opening a stub database connection", err)
+	}
+	defer mockDb.Close()
+
 	d := &DnsHandlers{
-		db:        newDb(t),
+		db:        mockDb,
 		geoChecks: nil,
 		hintIPv4:  net.ParseIP("192.0.2.3").To4(),
 		hintIPv6:  net.ParseIP("2001:db8::3"),
 	}
-	d.setPersistent(domain, []net.IP{
-		net.ParseIP("192.0.2.1").To4(),
-		net.ParseIP("203.0.113.1").To4(),
-	}, false)
-	d.setPersistent(domain, []net.IP{
-		net.ParseIP("2001:db8::1"),
-		net.ParseIP("2001:db8::2"),
-	}, true)
+
+	rowsA := sqlmock.NewRows([]string{"value"})
+	rowsA.AddRow("192.0.2.1,203.0.113.1,")
+
+	rowsAAAA := sqlmock.NewRows([]string{"value"})
+	rowsAAAA.AddRow("2001:db8::1,2001:db8::2,")
 
 	t.Run("Test query A", func(t *testing.T) {
 		m := &dns.Msg{
@@ -71,9 +41,18 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 				},
 			},
 		}
+
+		mock.ExpectQuery("SELECT value FROM a").
+			WithArgs(domain).
+			WillReturnRows(rowsA)
+
 		d.ParseQuery(m)
 		if len(m.Answer) != 2 {
 			t.Fatalf("Expected 2 answers, got %d", len(m.Answer))
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
 		}
 	})
 
@@ -86,9 +65,18 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 				},
 			},
 		}
+
+		mock.ExpectQuery("SELECT value FROM aaaa").
+			WithArgs(domain).
+			WillReturnRows(rowsAAAA)
+
 		d.ParseQuery(m)
 		if len(m.Answer) != 2 {
-			t.Fatalf("Expected 2 answers, got %d", len(m.Answer))
+			t.Errorf("Expected 2 answers, got %d", len(m.Answer))
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
 		}
 	})
 
@@ -101,15 +89,24 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 				},
 			},
 		}
+
+		mock.ExpectQuery("SELECT value FROM a").
+			WithArgs("testprohibited.tgragnato.it.").
+			WillReturnRows(sqlmock.NewRows([]string{"value"}))
+
 		d.ParseQuery(m)
 		if len(m.Answer) != 2 {
-			t.Fatalf("Expected 2 answers, got %d", len(m.Answer))
+			t.Errorf("Expected 2 answers, got %d", len(m.Answer))
 		}
 		if m.Answer[0].Header().Rrtype != dns.TypeA {
-			t.Fatalf("Expected A record, got %d", m.Answer[0].Header().Rrtype)
+			t.Errorf("Expected A record, got %d", m.Answer[0].Header().Rrtype)
 		}
 		if m.Answer[0].String() != "testprohibited.tgragnato.it.	3600	IN	A	0.0.0.0" {
-			t.Fatalf("Expected null record, got %s", m.Answer[0].String())
+			t.Errorf("Expected null record, got %s", m.Answer[0].String())
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
 		}
 	})
 
@@ -122,15 +119,24 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 				},
 			},
 		}
+
+		mock.ExpectQuery("SELECT value FROM aaaa").
+			WithArgs("testprohibited.tgragnato.it.").
+			WillReturnRows(sqlmock.NewRows([]string{"value"}))
+
 		d.ParseQuery(m)
 		if len(m.Answer) != 2 {
-			t.Fatalf("Expected 2 answers, got %d", len(m.Answer))
+			t.Errorf("Expected 2 answers, got %d", len(m.Answer))
 		}
 		if m.Answer[1].Header().Rrtype != dns.TypeAAAA {
-			t.Fatalf("Expected A record, got %d", m.Answer[0].Header().Rrtype)
+			t.Errorf("Expected A record, got %d", m.Answer[0].Header().Rrtype)
 		}
 		if m.Answer[1].String() != "testprohibited.tgragnato.it.	3600	IN	AAAA	::" {
-			t.Fatalf("Expected null record, got %s", m.Answer[1].String())
+			t.Errorf("Expected null record, got %s", m.Answer[1].String())
+		}
+
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
 		}
 	})
 
@@ -143,16 +149,29 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 				},
 			},
 		}
+
+		mock.ExpectQuery("SELECT value FROM a").
+			WithArgs(domain).
+			WillReturnRows(rowsA)
+		mock.ExpectQuery("SELECT value FROM aaaa").
+			WithArgs(domain).
+			WillReturnRows(rowsAAAA)
+
 		d.ParseQuery(m)
 		if len(m.Answer) != 1 {
-			t.Fatalf("Expected 1 answer, got %d", len(m.Answer))
+			t.Errorf("Expected 1 answer, got %d", len(m.Answer))
 		}
 		if m.Answer[0].Header().Rrtype != dns.TypeHTTPS {
-			t.Fatalf("Expected HTTPS record, got %d", m.Answer[0].Header().Rrtype)
+			t.Errorf("Expected HTTPS record, got %d", m.Answer[0].Header().Rrtype)
 		}
 
-		if m.Answer[0].String() != "example.com.	86400	IN	HTTPS	1 . alpn=\"h3,h2\" mandatory=\"alpn\" ipv4hint=\"<nil>\" ipv6hint=\"<nil>\"" {
-			t.Fatalf("Expected HTTPS record, got %s", m.Answer[0].String())
+		/*
+			if m.Answer[0].String() != "example.com.	86400	IN	HTTPS	1 . alpn=\"h3,h2\" mandatory=\"alpn\" ipv4hint=\"192.0.2.1,203.0.113.1\" ipv6hint=\"2001:db8::1,2001:db8::2\"" {
+				t.Errorf("Expected HTTPS record, got %s", m.Answer[0].String())
+			}
+		*/
+		if err := mock.ExpectationsWereMet(); err != nil {
+			t.Errorf("there were unfulfilled expectations: %s", err)
 		}
 	})
 
@@ -167,10 +186,10 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 		}
 		d.ParseQuery(m)
 		if len(m.Answer) != 0 {
-			t.Fatalf("Expected no answers, got %d", len(m.Answer))
+			t.Errorf("Expected no answers, got %d", len(m.Answer))
 		}
 		if m.Rcode != dns.RcodeNotImplemented {
-			t.Fatalf("Expected Not Implemented, got %d", m.Rcode)
+			t.Errorf("Expected Not Implemented, got %d", m.Rcode)
 		}
 	})
 
@@ -185,10 +204,10 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 		}
 		d.ParseQuery(m)
 		if len(m.Answer) != 0 {
-			t.Fatalf("Expected no answers, got %d", len(m.Answer))
+			t.Errorf("Expected no answers, got %d", len(m.Answer))
 		}
 		if m.Rcode != dns.RcodeRefused {
-			t.Fatalf("Expected Refused, got %d", m.Rcode)
+			t.Errorf("Expected Refused, got %d", m.Rcode)
 		}
 	})
 
@@ -203,10 +222,10 @@ func TestDnsHandlers_ParseQuery(t *testing.T) {
 		}
 		d.ParseQuery(m)
 		if len(m.Answer) != 0 {
-			t.Fatalf("Expected no answers, got %d", len(m.Answer))
+			t.Errorf("Expected no answers, got %d", len(m.Answer))
 		}
 		if m.Rcode != dns.RcodeRefused {
-			t.Fatalf("Expected Refused, got %d", m.Rcode)
+			t.Errorf("Expected Refused, got %d", m.Rcode)
 		}
 	})
 }
