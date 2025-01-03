@@ -11,16 +11,16 @@ scrape_configs:
   - job_name: "node_exporter"
     static_configs:
       - targets: ["localhost:9100"]
-    
+
+{% if forwarding %}
   - job_name: "postgres"
     static_configs:
       - targets: ["localhost:9187"]
 
   - job_name: "magnetico"
     static_configs:
-      - targets: ["[{{ wg0_ipv6 }}]:8080"]
+      - targets: ["localhost:8080"]
 
-{% if forwarding %}
   - job_name: "tor"
     static_configs:
       - targets: ["localhost:9035"]
