@@ -4,6 +4,26 @@ flush ruleset
 
 table inet filter {
 
+    set continent4 {
+        type ipv4_addr
+        flags interval
+        elements = {
+{% for cidr in continent4 %}
+            {{ cidr }},
+{% endfor %}
+        }
+    }
+
+    set continent6 {
+        type ipv6_addr
+        flags interval
+        elements = {
+{% for cidr in continent6 %}
+            {{ cidr }},
+{% endfor %}
+        }
+    }
+
     set greyzone4 {
         type ipv4_addr
         flags interval
@@ -175,6 +195,8 @@ table inet filter {
         ip6 daddr @meta6 reject with icmpv6 type admin-prohibited
         ip daddr @greyzone4 reject with icmp type admin-prohibited
         ip6 daddr @greyzone6 reject with icmpv6 type admin-prohibited
+        ip daddr @continent4 reject with icmp type admin-prohibited
+        ip6 daddr @continent6 reject with icmpv6 type admin-prohibited
         ct state invalid drop
         ct state established,related accept
         drop
@@ -184,6 +206,8 @@ table inet filter {
         ip6 daddr @meta6 reject with icmpv6 type admin-prohibited
         ip daddr @greyzone4 reject with icmp type admin-prohibited
         ip6 daddr @greyzone6 reject with icmpv6 type admin-prohibited
+        ip daddr @continent4 reject with icmp type admin-prohibited
+        ip6 daddr @continent6 reject with icmpv6 type admin-prohibited
         ct state invalid drop
         ct state established,related accept
         ip daddr @github4 tcp sport 49152-65535 tcp dport 22 mark set 0x000000b4 accept
@@ -203,7 +227,8 @@ table inet filter {
         iifname wg0 ip daddr 93.40.7.94 tcp dport 443 redirect to 443
         iifname wg0 ip daddr != {{ wg0_ipv4 }} udp dport 123 redirect to 123
         iifname wg0 ip daddr @meta4 tcp dport 443 redirect to 9040
-        iifname wg0 ip daddr @greyzone4 tcp dport 5222 redirect to 9040
+        iifname wg0 ip daddr @greyzone4 tcp dport 443 redirect to 9040
+        iifname wg0 ip daddr @continent4 tcp dport 443 redirect to 9040
         iifname wg0 ip daddr @meta4 tcp dport 5222 redirect to 9040
         iifname wg0 ip daddr @apple4 tcp dport 5223 redirect to 9040
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} tcp dport 53 redirect to 53
@@ -212,6 +237,7 @@ table inet filter {
         iifname wg0 ip6 daddr != {{ wg0_ipv6 }} udp dport 123 redirect to 123
         iifname wg0 ip6 daddr @meta6 tcp dport 443 redirect to 9040
         iifname wg0 ip6 daddr @greyzone6 tcp dport 443 redirect to 9040
+        iifname wg0 ip6 daddr @continent6 tcp dport 443 redirect to 9040
         iifname wg0 ip6 daddr @meta6 tcp dport 5222 redirect to 9040
         iifname wg0 ip6 daddr @apple6 tcp dport 5223 redirect to 9040
     }
