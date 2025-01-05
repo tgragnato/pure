@@ -99,22 +99,20 @@ func compressMiddleware(next http.Handler) http.Handler {
 
 func headersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Access-Control-Allow-Origin", "https://tgragnato.it")
+		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
+		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;")
 		w.Header().Set("Expect-Ct", "max-age=86400, enforce")
+		w.Header().Set("Expires", "Thu, 19 Nov 1981 08:52:00 GMT")
 		w.Header().Set("Permissions-Policy", "interest-cohort=(), accelerometer=(), autoplay=(), camera=(), clipboard-read=(), clipboard-write=(), document-domain=(), encrypted-media=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), gamepad=(), vibrate=(), vr=(), xr-spatial-tracking=()")
+		w.Header().Set("Pragma", "no-cache")
 		w.Header().Set("Referrer-Policy", "strict-origin-when-cross-origin")
-		w.Header().Set("Server", "Apache/2.4.25 (RedStar4.0) OpenSSL/1.0.1e-fips")
+		w.Header().Set("Server", "Apache/2.4.25 (RedStar4.0) OpenSSL/1.0.1e-fips PHP/5.6.2")
 		w.Header().Set("Strict-Transport-Security", "max-age=31536000; includeSubDomains; preload")
 		w.Header().Set("X-Content-Type-Options", "nosniff")
 		w.Header().Set("X-Frame-Options", "DENY")
+		w.Header().Set("X-Powered-By", "PHP/5.6.2")
 		w.Header().Set("X-XSS-Protection", "1; mode=block")
-
-		if w.Header().Get("Access-Control-Allow-Origin") == "" {
-			w.Header().Set("Access-Control-Allow-Origin", "https://tgragnato.it")
-		}
-
-		if w.Header().Get("Content-Security-Policy") == "" {
-			w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;")
-		}
 
 		if w.Header().Get("Set-Cookie") == "" {
 			characters := []rune("0123456789abcdefghijklmnopqrstuvwxyz")
@@ -130,13 +128,19 @@ func headersMiddleware(next http.Handler) http.Handler {
 }
 
 func stripProxiedHeaders(resp *http.Response) error {
+	resp.Header.Del("Access-Control-Allow-Origin")
+	resp.Header.Del("Cache-Control")
+	resp.Header.Del("Content-Security-Policy")
 	resp.Header.Del("Expect-Ct")
+	resp.Header.Del("Expires")
 	resp.Header.Del("Permissions-Policy")
+	resp.Header.Del("Pragma")
 	resp.Header.Del("Referrer-Policy")
 	resp.Header.Del("Server")
 	resp.Header.Del("Strict-Transport-Security")
 	resp.Header.Del("X-Content-Type-Options")
 	resp.Header.Del("X-Frame-Options")
+	resp.Header.Del("X-Powered-By")
 	resp.Header.Del("X-XSS-Protection")
 	return nil
 }

@@ -124,7 +124,6 @@ func TestCompressMiddleware(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			req := httptest.NewRequest("GET", "http://example.com", nil)
@@ -182,50 +181,58 @@ func TestHeadersMiddleware(t *testing.T) {
 	})
 
 	tests := []struct {
-		name               string
-		existingHeaders    map[string]string
-		expectedHeaders    map[string]string
-		expectedCookieLen  uint64
-		expectedCSPPresent bool
-		expectedCORSOrigin string
+		name              string
+		existingHeaders   map[string]string
+		expectedHeaders   map[string]string
+		expectedCookieLen uint64
 	}{
 		{
-			name:            "default headers",
-			existingHeaders: map[string]string{},
+			name: "default headers",
 			expectedHeaders: map[string]string{
+				"Access-Control-Allow-Origin": "https://tgragnato.it",
+				"Cache-Control":               "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+				"Content-Security-Policy":     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;",
 				"Expect-Ct":                   "max-age=86400, enforce",
+				"Expires":                     "Thu, 19 Nov 1981 08:52:00 GMT",
 				"Permissions-Policy":          "interest-cohort=(), accelerometer=(), autoplay=(), camera=(), clipboard-read=(), clipboard-write=(), document-domain=(), encrypted-media=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), gamepad=(), vibrate=(), vr=(), xr-spatial-tracking=()",
+				"Pragma":                      "no-cache",
 				"Referrer-Policy":             "strict-origin-when-cross-origin",
-				"Server":                      "Apache/2.4.25 (RedStar4.0) OpenSSL/1.0.1e-fips",
+				"Server":                      "Apache/2.4.25 (RedStar4.0) OpenSSL/1.0.1e-fips PHP/5.6.2",
 				"Strict-Transport-Security":   "max-age=31536000; includeSubDomains; preload",
 				"X-Content-Type-Options":      "nosniff",
 				"X-Frame-Options":             "DENY",
+				"X-Powered-By":                "PHP/5.6.2",
 				"X-XSS-Protection":            "1; mode=block",
-				"Access-Control-Allow-Origin": "https://tgragnato.it",
 			},
-			expectedCookieLen:  26,
-			expectedCSPPresent: true,
+			expectedCookieLen: 26,
 		},
 		{
-			name: "with existing headers",
+			name: "with existing cookie header",
 			existingHeaders: map[string]string{
-				"Access-Control-Allow-Origin": "https://example.com",
-				"Content-Security-Policy":     "default-src 'none'",
-				"Set-Cookie":                  "existingcookie=value",
+				"Set-Cookie": "existingcookie=value",
 			},
 			expectedHeaders: map[string]string{
-				"Access-Control-Allow-Origin": "https://example.com",
-				"Content-Security-Policy":     "default-src 'none'",
+				"Access-Control-Allow-Origin": "https://tgragnato.it",
+				"Cache-Control":               "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+				"Content-Security-Policy":     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;",
+				"Expect-Ct":                   "max-age=86400, enforce",
+				"Expires":                     "Thu, 19 Nov 1981 08:52:00 GMT",
+				"Permissions-Policy":          "interest-cohort=(), accelerometer=(), autoplay=(), camera=(), clipboard-read=(), clipboard-write=(), document-domain=(), encrypted-media=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), gamepad=(), vibrate=(), vr=(), xr-spatial-tracking=()",
+				"Pragma":                      "no-cache",
+				"Referrer-Policy":             "strict-origin-when-cross-origin",
+				"Server":                      "Apache/2.4.25 (RedStar4.0) OpenSSL/1.0.1e-fips PHP/5.6.2",
+				"Strict-Transport-Security":   "max-age=31536000; includeSubDomains; preload",
+				"X-Content-Type-Options":      "nosniff",
+				"X-Frame-Options":             "DENY",
+				"X-Powered-By":                "PHP/5.6.2",
+				"X-XSS-Protection":            "1; mode=block",
 				"Set-Cookie":                  "existingcookie=value",
 			},
-			expectedCookieLen:  0,
-			expectedCSPPresent: true,
-			expectedCORSOrigin: "https://example.com",
+			expectedCookieLen: 0,
 		},
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -253,16 +260,6 @@ func TestHeadersMiddleware(t *testing.T) {
 				if uint64(len(sessID)) != tt.expectedCookieLen {
 					t.Errorf("Expected session ID length to be %d, got %d", tt.expectedCookieLen, len(sessID))
 				}
-			}
-
-			csp := rec.Header().Get("Content-Security-Policy")
-			if tt.expectedCSPPresent && csp == "" {
-				t.Error("Expected Content-Security-Policy header to be present")
-			}
-
-			cors := rec.Header().Get("Access-Control-Allow-Origin")
-			if tt.expectedCORSOrigin != "" && cors != tt.expectedCORSOrigin {
-				t.Errorf("Expected Access-Control-Allow-Origin to be %s, got %s", tt.expectedCORSOrigin, cors)
 			}
 		})
 	}
@@ -357,7 +354,6 @@ func TestAPIGateway(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 
@@ -407,7 +403,6 @@ func TestResponseWriterWriteHeader(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			rec := httptest.NewRecorder()
@@ -458,7 +453,6 @@ func TestResponseWriterWrite(t *testing.T) {
 	}
 
 	for _, tt := range tests {
-		tt := tt
 		t.Run(tt.name, func(t *testing.T) {
 			t.Parallel()
 			rec := httptest.NewRecorder()
