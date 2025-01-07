@@ -1,4 +1,4 @@
-all: dnsd nfguard snowflake client magnetico grafana spamd
+all: dnsd nfguard snowflake client magnetico grafana
 	ansible-playbook --ask-vault-password -i inventory.yaml playbook.yaml
 
 clean:
