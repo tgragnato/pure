@@ -5,5 +5,5 @@ APT::AutoRemove::Suggests-Important "false";
 Acquire::AllowDowngradeToInsecureRepositories "false";
 Acquire::AllowInsecureRepositories "false";
 Acquire::http::AllowRedirect "false";
-Acquire::tor::proxy "{{ tor_proxy_addr }}";
+Acquire::tor::proxy "{{ base_tor_proxy_addr }}";
 APT::Sandbox::Seccomp "true";

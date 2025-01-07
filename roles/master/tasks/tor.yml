@@ -1,5 +1,9 @@
 ---
 
+- name: Load tor defaults
+  ansible.builtin.include_vars: "{{ role_path }}/defaults/tor.yml"
+  tags: tor
+
 - name: Install tor
   ansible.builtin.apt:
     name: "{{ item }}"
@@ -12,7 +16,7 @@
 - name: Install the snowflake client
   ansible.builtin.copy:
     src: client
-    dest: "{{ client_path }}"
+    dest: "{{ master_client_path }}"
     owner: debian-tor
     group: debian-tor
     mode: '0750'

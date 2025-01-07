@@ -12,7 +12,7 @@
 
 - name: Cleanup postgresql.conf
   ansible.builtin.lineinfile:
-    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    path: "/etc/postgresql/{{ master_postgresql_version }}/main/postgresql.conf"
     regexp: "{{ item }}"
     state: absent
   loop:
@@ -24,7 +24,7 @@
 
 - name: Tune the postgresql.conf parameters
   ansible.builtin.lineinfile:
-    path: "/etc/postgresql/{{ postgresql_version }}/main/postgresql.conf"
+    path: "/etc/postgresql/{{ master_postgresql_version }}/main/postgresql.conf"
     regexp: '^{{ item.key }}\s'
     line: "{{ item.key }} = {{ item.value }}"
     state: present
@@ -64,7 +64,7 @@
 
 - name: Enable and start postgresql
   ansible.builtin.systemd:
-    name: "postgresql@{{ postgresql_version }}-main.service"
+    name: "postgresql@{{ master_postgresql_version }}-main.service"
     enabled: true
     state: started
   tags: postgresql
@@ -73,16 +73,16 @@
   community.postgresql.postgresql_user:
     name: "{{ item.username }}"
     password: "{{ item.password | default(omit) }}"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   loop:
     - { username: "magnetico", password: "magnetico" }
     - { username: "grafana", password: "grafana" }
     - { username: "nfguard", password: "nfguard" }
     - { username: "reader", password: "reader" }
-    - { username: "{{ prometheus_postgres_exporter }}", password: "{{ prometheus_postgres_exporter }}" }
+    - { username: "{{ master_prometheus_postgres_exporter }}", password: "{{ master_prometheus_postgres_exporter }}" }
   tags: postgresql
 
 - name: Ensure specified PostgreSQL databases are present
@@ -92,10 +92,10 @@
     lc_collate: "C.UTF-8"
     lc_ctype: "C.UTF-8"
     encoding: "UTF-8"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   loop:
     - { name: "magnetico", owner: "magnetico" }
     - { name: "grafana", owner: "grafana" }
@@ -109,10 +109,10 @@
     type: "schema"
     objs: "{{ item.schema }}"
     roles: "reader"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   loop:
     - { db: "magnetico", schema: "public" }
     - { db: "nfguard", schema: "public" }
@@ -125,10 +125,10 @@
     type: "table"
     objs: "ALL_IN_SCHEMA"
     roles: "reader"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   loop:
     - "magnetico"
     - "nfguard"
@@ -141,10 +141,10 @@
     cascade: true
     version: latest
     schema: public
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   loop:
     - { name: "pg_trgm", db: "magnetico" }
   tags: postgresql
@@ -152,7 +152,7 @@
 - name: Ensure table a exists
   community.postgresql.postgresql_query:
     db: "nfguard"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
     query: |
       CREATE TABLE IF NOT EXISTS a (
         key VARCHAR(255) PRIMARY KEY,
@@ -165,13 +165,13 @@
       ALTER TABLE a OWNER TO nfguard;
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   tags: postgresql
 
 - name: Ensure table aaaa exists
   community.postgresql.postgresql_query:
     db: "nfguard"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
     query: |
       CREATE TABLE IF NOT EXISTS aaaa (
         key VARCHAR(255) PRIMARY KEY,
@@ -184,13 +184,13 @@
       ALTER TABLE aaaa OWNER TO nfguard;
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   tags: postgresql
 
 - name: Ensure table http exists
   community.postgresql.postgresql_query:
     db: "nfguard"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
     query: |
       CREATE TABLE IF NOT EXISTS http (
           id SERIAL PRIMARY KEY,
@@ -216,17 +216,17 @@
       ALTER TABLE http OWNER TO nfguard;
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   tags: postgresql
 
 - name: Ensure the postgres exporter can read the statistics
   community.postgresql.postgresql_query:
     db: "postgres"
-    login_unix_socket: "{{ postgresql_socketdir }}"
+    login_unix_socket: "{{ master_postgresql_socketdir }}"
     query: |
-      ALTER USER {{ prometheus_postgres_exporter }} SET SEARCH_PATH TO postgres_exporter,pg_catalog;
-      GRANT CONNECT ON DATABASE postgres TO {{ prometheus_postgres_exporter }};
+      ALTER USER {{ master_prometheus_postgres_exporter }} SET SEARCH_PATH TO postgres_exporter,pg_catalog;
+      GRANT CONNECT ON DATABASE postgres TO {{ master_prometheus_postgres_exporter }};
   become: true
   become_method: ansible.builtin.su
-  become_user: "{{ postgresql_socketuser }}"
+  become_user: "{{ master_postgresql_socketuser }}"
   tags: postgresql

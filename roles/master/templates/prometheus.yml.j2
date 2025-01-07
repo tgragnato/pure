@@ -12,7 +12,6 @@ scrape_configs:
     static_configs:
       - targets: ["localhost:9100"]
 
-{% if forwarding %}
   - job_name: "postgres"
     static_configs:
       - targets: ["localhost:9187"]
@@ -29,4 +28,3 @@ scrape_configs:
     metrics_path: "/internal/metrics"
     static_configs:
       - targets: ["localhost:9999"]
-{% endif %}

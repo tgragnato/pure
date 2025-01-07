@@ -37,7 +37,7 @@
 - name: Restart postgresql
   ansible.builtin.systemd:
     daemon_reload: true
-    name: "postgresql@{{ postgresql_version }}-main.service"
+    name: "postgresql@{{ master_postgresql_version }}-main.service"
     state: restarted
   listen: Restart postgresql
 

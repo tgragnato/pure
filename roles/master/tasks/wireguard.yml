@@ -1,5 +1,9 @@
 ---
 
+- name: Load wireguard defaults
+  ansible.builtin.include_vars: "{{ role_path }}/defaults/wireguard.yml"
+  tags: wireguard
+
 - name: Check systemd-networkd
   ansible.builtin.systemd:
     name: systemd-networkd

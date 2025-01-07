@@ -2,13 +2,13 @@
 
 - name: Check if folder exist for grafana
   ansible.builtin.stat:
-    path: "{{ grafana_folder }}"
+    path: "{{ master_grafana_folder }}"
   register: grafana_installed
   tags: grafana
 
 - name: Extract the standalone archive
   ansible.builtin.unarchive:
-    src: "grafana-{{ grafana_version }}.linux-amd64.tar.gz"
+    src: "grafana-{{ master_grafana_version }}.linux-amd64.tar.gz"
     dest: "{{ local_folder }}"
     remote_src: false
   when: not grafana_installed.stat.exists
@@ -17,7 +17,7 @@
 - name: Setup grafana
   ansible.builtin.template:
     src: grafana.ini.j2
-    dest: "{{ grafana_folder }}/conf/grafana.ini"
+    dest: "{{ master_grafana_folder }}/conf/grafana.ini"
     owner: root
     group: root
     mode: '0644'
@@ -30,7 +30,7 @@
     service_ambient_capabilities: ""
     service_capability_bounding_set: ""
     service_description: "Grafana instance"
-    service_exec_start: "{{ grafana_folder }}/bin/grafana server --config={{ grafana_folder }}/conf/grafana.ini"
+    service_exec_start: "{{ master_grafana_folder }}/bin/grafana server --config={{ master_grafana_folder }}/conf/grafana.ini"
     service_group: "nogroup"
     service_limit_nofile: 32768
     service_protect_clock: "yes"
@@ -38,7 +38,7 @@
     service_restrict_address_families: "AF_INET AF_INET6"
     service_umask: "0027"
     service_user: "nobody"
-    service_working_directory: "{{ grafana_folder }}"
+    service_working_directory: "{{ master_grafana_folder }}"
   tags: grafana
 
 - name: Setup the grafana systemd service

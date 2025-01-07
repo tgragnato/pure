@@ -1,5 +1,13 @@
 ---
 
+- name: Load continent4 defaults
+  ansible.builtin.include_vars: "{{ role_path }}/defaults/continent4.yml"
+  tags: firewall
+
+- name: Load continent6 defaults
+  ansible.builtin.include_vars: "{{ role_path }}/defaults/continent6.yml"
+  tags: firewall
+
 - name: Install nftables
   ansible.builtin.apt:
     name: nftables

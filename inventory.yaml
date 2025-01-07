@@ -2,10 +2,7 @@ all:
   children:
     baremetal:
       vars:
-        forwarding: 1
-        magneticod_maxrps: 500
-        nonfree_firmware: non-free-firmware
-        tor_proxy_addr: socks5h://apt:apt@[::1]:9050
+        base_forwarding: 1
       hosts:
         fd5d:2ddd:f4a5::1:
           hostname: puremini

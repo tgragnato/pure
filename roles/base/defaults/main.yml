@@ -1,0 +1,11 @@
+---
+
+base_debian_repository: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
+base_debian_security: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
+
+base_ntp_servers: ntp1.inrim.it ntp2.inrim.it time.euro.apple.com time.asia.apple.com time.apple.com
+base_ntp_fallback: time.cloudflare.com ntp1.fortiguard.com ntp2.fortiguard.com ntp.checkpoint.com ntp2.checkpoint.com
+
+base_forwarding: 0
+
+base_tor_proxy_addr: socks5h://apt:apt@[::1]:9050
