@@ -1,5 +1,9 @@
 ---
 
+- name: Load tor defaults
+  ansible.builtin.include_vars: "{{ role_path }}/defaults/tor.yml"
+  tags: snowflake
+
 - name: Install snowflake
   ansible.builtin.copy:
     src: snowflake
