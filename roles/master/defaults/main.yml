@@ -6,6 +6,8 @@ master_wg0_class4: 24
 master_wg0_ipv6: 'fd5d:2ddd:f4a5::1'
 master_wg0_class6: 120
 
+master_wg0_port: 443
+
 master_nfguard_path: "{{ local_folder }}/bin/nfguard"
 
 master_postgresql_socketdir: /var/run/postgresql/
