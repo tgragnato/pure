@@ -173,9 +173,9 @@ table inet filter {
         ct state established,related accept
         udp sport 1024-65535 udp dport 123 skuid systemd-timesync accept
         ip daddr != @continent4 ip daddr != @greyzone4 tcp sport 1024-65535 tcp dport 443 skuid www-data accept
-        ip daddr != @greyzone4 tcp sport 1024-65535 tcp dport 443 skuid { debian-tor, debian-transmission } accept
+        ip daddr != @greyzone4 tcp sport 1024-65535 tcp dport 443 skuid { proxy, debian-tor, debian-transmission } accept
         ip6 daddr != @continent6 ip6 daddr != @greyzone6 tcp sport 1024-65535 tcp dport 443 skuid www-data accept
-        ip6 daddr != @greyzone6 tcp sport 1024-65535 tcp dport 443 skuid { debian-tor, debian-transmission } accept
+        ip6 daddr != @greyzone6 tcp sport 1024-65535 tcp dport 443 skuid { proxy, debian-tor, debian-transmission } accept
         tcp sport 1024-65535 tcp dport 1024-65535 skuid { proxy, debian-transmission } accept
         udp sport 1024-65535 udp dport { 80, 443, 1024-65535 } skuid { proxy, debian-tor, debian-transmission } accept
         reject with icmpx type port-unreachable
