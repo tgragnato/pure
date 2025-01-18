@@ -117,12 +117,15 @@
     name: "{{ item }}"
     state: absent
   loop:
-    - daemon
     - bin
+    - caddy
+    - daemon
+    - irc
+    - list
+    - loki
     - lp
     - mail
     - news
+    - systemd-resolve
     - uucp
-    - list
-    - irc
   tags: init
