@@ -75,3 +75,10 @@
     name: prometheus-postgres-exporter.service
     state: restarted
   listen: Restart postgres-exporter
+
+- name: Restart pyroscope
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: pyroscope.service
+    state: restarted
+  listen: Restart pyroscope

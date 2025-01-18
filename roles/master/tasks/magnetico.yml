@@ -16,7 +16,7 @@
     service_ambient_capabilities: ""
     service_capability_bounding_set: ""
     service_description: "Magnetico Daemon"
-    service_exec_start: "{{ master_magnetico_path }} --max-rps={{ master_magneticod_maxrps }}"
+    service_exec_start: "{{ master_magnetico_path }} --max-rps={{ master_magneticod_maxrps }} --pyroscope=http://127.0.0.1:4040"
     service_group: "proxy"
     service_limit_nofile: 32768
     service_protect_clock: "yes"

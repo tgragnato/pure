@@ -22,3 +22,7 @@ master_grafana_folder: "{{ local_folder }}/grafana-v{{ master_grafana_version }}
 
 master_prometheus_tsdb_retention: 10y
 master_prometheus_postgres_exporter: postgres_exporter
+
+master_pyroscope_version: 1.12.0
+master_pyroscope_folder: "{{ local_folder }}/pyroscope-v{{ master_pyroscope_version }}"
+master_pyroscope_datapath: /var/lib/pyroscope

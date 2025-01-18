@@ -1,0 +1,85 @@
+---
+
+- name: Ensure the pyroscope group exists
+  ansible.builtin.group:
+    name: pyroscope
+    system: true
+    state: present
+  tags: pyroscope
+
+- name: Ensure the pyroscope user exists
+  ansible.builtin.user:
+    name: pyroscope
+    group: pyroscope
+    system: true
+    shell: /bin/false
+    home: "{{ master_pyroscope_datapath }}"
+    state: present
+  tags: pyroscope
+
+- name: Check if folder exist for pyroscope
+  ansible.builtin.stat:
+    path: "{{ master_pyroscope_folder }}"
+  register: pyroscope_installed
+  tags: pyroscope
+
+- name: Ensure the pyroscope app directory exists
+  ansible.builtin.file:
+    path: "{{ master_pyroscope_folder }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  tags: pyroscope
+
+- name: Extract the standalone archive
+  ansible.builtin.unarchive:
+    src: "pyroscope_{{ master_pyroscope_version }}_linux_amd64.tar.gz"
+    dest: "{{ master_pyroscope_folder }}"
+    remote_src: false
+  when: not pyroscope_installed.stat.exists
+  tags: pyroscope
+
+- name: Setup pyroscope
+  ansible.builtin.template:
+    src: pyroscope.yml.j2
+    dest: "{{ master_pyroscope_folder }}/pyroscope.yml"
+    owner: root
+    group: root
+    mode: '0644'
+  tags: pyroscope
+
+- name: Set the pyroscope service facts
+  ansible.builtin.set_fact:
+    service_after: ""
+    service_ambient_capabilities: ""
+    service_capability_bounding_set: ""
+    service_description: "Pyroscope instance"
+    service_exec_start: "{{ master_pyroscope_folder }}/pyroscope --config.file={{ master_pyroscope_folder }}/pyroscope.yml"
+    service_group: "pyroscope"
+    service_limit_nofile: 32768
+    service_protect_clock: "yes"
+    service_readwrite_paths: "{{ master_pyroscope_datapath }}"
+    service_restrict_address_families: "AF_INET AF_INET6 AF_NETLINK"
+    service_umask: "0027"
+    service_user: "pyroscope"
+    service_working_directory: "{{ master_pyroscope_datapath }}"
+  tags: pyroscope
+
+- name: Setup the grafana systemd service
+  ansible.builtin.template:
+    src: sandboxed.service.j2
+    dest: "{{ systemd_system }}/pyroscope.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart pyroscope
+  tags: pyroscope
+
+- name: Enable and start pyroscope
+  ansible.builtin.systemd:
+    name: pyroscope.service
+    state: started
+    enabled: true
+    masked: false
+  tags: pyroscope

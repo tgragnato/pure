@@ -29,3 +29,6 @@
 
 - name: Install prometheus
   ansible.builtin.import_tasks: prometheus.yml
+
+- name: Install pyroscope
+  ansible.builtin.import_tasks: pyroscope.yml
