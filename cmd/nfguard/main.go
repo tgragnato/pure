@@ -5,9 +5,11 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 	"time"
 
+	"github.com/grafana/pyroscope-go"
 	"github.com/miekg/dns"
 	"github.com/tgragnato/pure/pkg/dnshandlers"
 	"github.com/tgragnato/pure/pkg/http"
@@ -21,12 +23,45 @@ func main() {
 		iface4 string
 		iface6 string
 		dsn    string
+		pyro   string
 	)
 
 	flag.StringVar(&iface4, "interfaceIPv4", "127.0.0.1", "Set here the IPv4 of the interface to bind to")
 	flag.StringVar(&iface6, "interfaceIPv6", "[::1]", "Set here the IPv6 of the interface to bind to")
 	flag.StringVar(&dsn, "dsn", "postgres://nfguard:nfguard@localhost:5432/nfguard?sslmode=disable", "Set here the DSN for the PostgreSQL database")
+	flag.StringVar(&pyro, "pyroscope", "http://localhost:4040", "Set here the address of the Pyroscope server")
 	flag.Parse()
+
+	if pyro != "" {
+		runtime.SetMutexProfileFraction(5)
+		runtime.SetBlockProfileRate(5)
+
+		profile, err := pyroscope.Start(pyroscope.Config{
+			ApplicationName: "nfguard.tgragnato.it",
+			ServerAddress:   pyro,
+			Logger:          nil,
+			Tags:            map[string]string{"hostname": os.Getenv("HOSTNAME")},
+			ProfileTypes: []pyroscope.ProfileType{
+				pyroscope.ProfileCPU,
+				pyroscope.ProfileAllocObjects,
+				pyroscope.ProfileAllocSpace,
+				pyroscope.ProfileInuseObjects,
+				pyroscope.ProfileInuseSpace,
+				pyroscope.ProfileGoroutines,
+				pyroscope.ProfileMutexCount,
+				pyroscope.ProfileMutexDuration,
+				pyroscope.ProfileBlockCount,
+				pyroscope.ProfileBlockDuration,
+			},
+		})
+		if err == nil && profile != nil {
+			defer func() {
+				if err := profile.Stop(); err != nil {
+					log.Println("failed to stop profiler:", err.Error())
+				}
+			}()
+		}
+	}
 
 	handler, err := dnshandlers.MakeDnsHandlers(dsn, iface4, iface6)
 	if err != nil {
