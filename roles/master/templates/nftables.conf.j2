@@ -224,6 +224,7 @@ table inet filter {
 
     chain prerouting {
         type nat hook prerouting priority 0;
+        iifname wan udp dport { 1-66, 69-122, 124-442, 444-545, 548-1023, 1337, 6881, 6969 } redirect to 25401
         iifname wg0 ip daddr != {{ master_wg0_ipv4 }} tcp dport 53 redirect to 53
         iifname wg0 ip daddr != {{ master_wg0_ipv4 }} udp dport 53 redirect to 53
         iifname wg0 ip daddr != {{ master_wg0_ipv4 }} tcp dport 80 redirect to 80
