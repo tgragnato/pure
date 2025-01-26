@@ -21,13 +21,11 @@ type DnsHandlers struct {
 	muIPv6    bool
 }
 
-func MakeDnsHandlers(dsn string, hint4 string, hint6 string) (*DnsHandlers, error) {
+func MakeDnsHandlers(dsn string, hint4 string, hint6 string, geoChecks *checks.GeoChecks) (*DnsHandlers, error) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil || (db != nil && db.Ping() != nil) {
 		return nil, err
 	}
-
-	geoChecks := checks.NewGeoChecks()
 
 	hintIPv4 := net.ParseIP(hint4).To4()
 	if hintIPv4 == nil {

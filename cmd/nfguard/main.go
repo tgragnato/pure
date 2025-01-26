@@ -11,6 +11,7 @@ import (
 
 	"github.com/grafana/pyroscope-go"
 	"github.com/miekg/dns"
+	"github.com/tgragnato/pure/pkg/checks"
 	"github.com/tgragnato/pure/pkg/dnshandlers"
 	"github.com/tgragnato/pure/pkg/http"
 	"github.com/tgragnato/pure/pkg/sntp"
@@ -63,7 +64,9 @@ func main() {
 		}
 	}
 
-	handler, err := dnshandlers.MakeDnsHandlers(dsn, iface4, iface6)
+	geoChecks := checks.NewGeoChecks()
+
+	handler, err := dnshandlers.MakeDnsHandlers(dsn, iface4, iface6, geoChecks)
 	if err != nil {
 		log.Fatalf("Failed to create DNS handlers: %s\n", err.Error())
 	}
@@ -200,7 +203,7 @@ func main() {
 		}
 	}()
 
-	http.Listen([]string{"api.tgragnato.it"}, dsn)
+	http.Listen([]string{"api.tgragnato.it"}, dsn, geoChecks)
 
 	httpWorker := make(chan spam.Spam, 1)
 	stopped := false

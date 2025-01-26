@@ -13,13 +13,13 @@ import (
 	"golang.org/x/crypto/acme/autocert"
 )
 
-func Listen(hosts []string, dsn string) {
+func Listen(hosts []string, dsn string, geoChecks *checks.GeoChecks) {
 	db, err := sql.Open("pgx", dsn)
 	if err != nil || (db != nil && db.Ping() != nil) {
 		db = nil
 	}
 	writer := &logWriter{
-		geoChecks: checks.NewGeoChecks(),
+		geoChecks: geoChecks,
 		db:        db,
 	}
 
@@ -47,7 +47,7 @@ func Listen(hosts []string, dsn string) {
 
 	go func(manager *autocert.Manager, writer *logWriter) {
 		httpsMux := http.NewServeMux()
-		httpsMux.Handle("/", loggingMiddleware(headersMiddleware(compressMiddleware(apiGateway())), writer))
+		httpsMux.Handle("/", loggingMiddleware(headersMiddleware(apiGateway()), writer))
 		srv := &http.Server{
 			Addr:              ":443",
 			Handler:           httpsMux,
