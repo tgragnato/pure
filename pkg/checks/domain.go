@@ -6,6 +6,7 @@ var whitelist = []string{
 	"apple-finance.query.yahoo.com.",
 	"d1612au5bhln8.cloudfront.net.",
 	"d179pbpxvabqy1.cloudfront.net.",
+	"d291qr298x8l79.cloudfront.net.",
 	"d2gwrxj8kvy81r.cloudfront.net.",
 	"d2ki1uyufn7sj9.cloudfront.net.",
 	"d2ziyq7zksuzai.cloudfront.net.",
