@@ -27,10 +27,10 @@ magnetico: roles/master/files/magnetico
 roles/master/files/magnetico:
 	GOOS=linux GOARCH=amd64 go build -C magnetico/. -o ../roles/master/files/magnetico
 
-grafana: roles/master/files/grafana-11.4.0.linux-amd64.tar.gz
+grafana: roles/master/files/grafana-11.5.0.linux-amd64.tar.gz
 
-roles/master/files/grafana-11.4.0.linux-amd64.tar.gz:
-	curl https://dl.grafana.com/oss/release/grafana-11.4.0.linux-amd64.tar.gz -o roles/master/files/grafana-11.4.0.linux-amd64.tar.gz
+roles/master/files/grafana-11.5.0.linux-amd64.tar.gz:
+	curl https://dl.grafana.com/oss/release/grafana-11.5.0.linux-amd64.tar.gz -o roles/master/files/grafana-11.5.0.linux-amd64.tar.gz
 
 pyroscope: roles/master/files/pyroscope_1.12.0_linux_amd64.tar.gz
 
