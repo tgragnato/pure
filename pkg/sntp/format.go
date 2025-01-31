@@ -10,7 +10,7 @@ const (
 )
 
 func validFormat(request []byte) bool {
-	if len(request) != 48 {
+	if len(request) == 0 {
 		return false
 	}
 
