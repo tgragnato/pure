@@ -46,9 +46,9 @@ func MakeDnsHandlers(dsn string, hint4 string, hint6 string, geoChecks *checks.G
 		hintIPv6:  hintIPv6,
 	}
 
-	d.cleanPersistent()
-	go d.crossPrefetch()
 	go func() {
+		d.cleanPersistent()
+		d.crossPrefetch()
 		for range time.NewTicker(time.Minute).C {
 			go d.selfPrefetch(false)
 			go d.selfPrefetch(true)
