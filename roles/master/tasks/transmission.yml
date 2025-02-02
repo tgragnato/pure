@@ -8,23 +8,33 @@
 
 - name: Stop transmission
   ansible.builtin.systemd:
-    name: transmission-daemon
+    name: transmission-daemon.service
     state: stopped
     enabled: true
   tags: transmission
 
 - name: Configure transmission
   ansible.builtin.template:
-    src: settings.json.j2
+    src: transmission.json.j2
     dest: /etc/transmission-daemon/settings.json
     owner: debian-transmission
     group: debian-transmission
     mode: '0600'
   tags: transmission
 
+- name: Install the transmission service
+  ansible.builtin.template:
+    src: transmission.service.j2
+    dest: "{{ systemd_system }}/transmission-daemon.service"
+    owner: root
+    group: root
+    mode: '0644'
+  tags: transmission
+
 - name: Enable and start transmission
   ansible.builtin.systemd:
-    name: transmission-daemon
+    daemon_reload: true
+    name: transmission-daemon.service
     state: started
     enabled: true
     masked: false

@@ -1,0 +1,46 @@
+[Unit]
+Description=Transmission BitTorrent Daemon
+Wants=network-online.target
+After=network.target network-online.target 
+
+[Service]
+AmbientCapabilities=
+CapabilityBoundingSet=CAP_SYS_ADMIN
+DevicePolicy=closed
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStart=/usr/bin/transmission-daemon -f --log-error
+ExecStop=/bin/kill -s STOP $MAINPID
+Group=debian-transmission
+IPAddressDeny=link-local multicast {{ master_wg0_ipv4 }}/{{ master_wg0_class4 }} {{ master_wg0_ipv6 }}/{{ master_wg0_class6 }}
+LimitNOFILE=infinity
+LockPersonality=true
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+PrivateDevices=true
+PrivateTmp=true
+ProcSubset=pid
+ProtectClock=True
+ProtectControlGroups=true
+ProtectHome=true
+ProtectHostname=true
+ProtectKernelLogs=true
+ProtectKernelModules=true
+ProtectKernelTunables=true
+ProtectProc=invisible
+ProtectSystem=strict
+ReadWritePaths=/var/lib/transmission-daemon /etc/transmission-daemon
+RemoveIPC=true
+Restart=on-failure
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+SystemCallArchitectures=native
+SystemCallFilter=@system-service quotactl
+Type=notify
+UMask=777
+User=debian-transmission
+WorkingDirectory=/var/lib/transmission-daemon
+
+[Install]
+WantedBy=multi-user.target
