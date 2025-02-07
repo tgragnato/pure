@@ -8,6 +8,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/andybalholm/brotli"
 )
 
 func TestGzipMiddleware(t *testing.T) {
@@ -112,13 +114,19 @@ func TestCompressMiddleware(t *testing.T) {
 			wantContent:    "test content",
 		},
 		{
+			name:           "brotli encoding",
+			acceptEncoding: "br",
+			wantEncoding:   "br",
+			wantContent:    "test content",
+		},
+		{
 			name:           "no encoding",
 			acceptEncoding: "",
 			wantContent:    "test content",
 		},
 		{
 			name:           "unsupported encoding",
-			acceptEncoding: "br",
+			acceptEncoding: "zstd",
 			wantContent:    "test content",
 		},
 	}
@@ -134,10 +142,13 @@ func TestCompressMiddleware(t *testing.T) {
 
 			compressMiddleware(handler).ServeHTTP(rec, req)
 
-			var content []byte
-			var err error
+			var (
+				content []byte
+				err     error
+			)
 
 			switch tt.wantEncoding {
+
 			case "gzip":
 				if rec.Header().Get("Content-Encoding") != "gzip" {
 					t.Error("Expected Content-Encoding to be gzip")
@@ -149,6 +160,7 @@ func TestCompressMiddleware(t *testing.T) {
 				}
 				defer reader.Close()
 				content, err = io.ReadAll(reader)
+
 			case "deflate":
 				if rec.Header().Get("Content-Encoding") != "deflate" {
 					t.Error("Expected Content-Encoding to be deflate")
@@ -156,6 +168,13 @@ func TestCompressMiddleware(t *testing.T) {
 				reader := flate.NewReader(rec.Body)
 				defer reader.Close()
 				content, err = io.ReadAll(reader)
+
+			case "br":
+				if rec.Header().Get("Content-Encoding") != "br" {
+					t.Error("Expected Content-Encoding to be br")
+				}
+				content, err = io.ReadAll(brotli.NewReader(rec.Body))
+
 			default:
 				content, err = io.ReadAll(rec.Body)
 			}

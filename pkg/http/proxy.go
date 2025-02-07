@@ -15,6 +15,8 @@ import (
 	"sort"
 	"strings"
 	"time"
+
+	"github.com/andybalholm/brotli"
 )
 
 type responseWriter struct {
@@ -44,6 +46,35 @@ func (w *responseWriter) Hijack() (net.Conn, *bufio.ReadWriter, error) {
 		return hijacker.Hijack()
 	}
 	return nil, nil, fmt.Errorf("underlying ResponseWriter does not support Hijack")
+}
+
+func (w *responseWriter) Flush() {
+	if w.Writer != nil {
+		if flusher, ok := w.Writer.(interface{ Flush() }); ok {
+			flusher.Flush()
+		}
+	}
+	if w.ResponseWriter != nil {
+		if flusher, ok := w.ResponseWriter.(http.Flusher); ok {
+			flusher.Flush()
+		}
+	}
+}
+
+func brotliMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		r.Header.Del("Accept-Encoding")
+		w.Header().Set("Vary", "Accept-Encoding")
+		w.Header().Set("Content-Encoding", "br")
+		br := brotli.NewWriterLevel(w, brotli.BestCompression)
+		if br == nil {
+			http.Error(w, "brotli.NewWriterLevel is nil", http.StatusInternalServerError)
+			return
+		}
+		defer br.Close()
+		brw := &responseWriter{Writer: br, ResponseWriter: w}
+		next.ServeHTTP(brw, r)
+	})
 }
 
 func gzipMiddleware(next http.Handler) http.Handler {
@@ -84,6 +115,11 @@ func compressMiddleware(next http.Handler) http.Handler {
 		for index := range encodings {
 			encodings[index] = strings.TrimSpace(encodings[index])
 			encodings[index] = strings.ToLower(encodings[index])
+		}
+		sort.Strings(encodings)
+		if i := sort.SearchStrings(encodings, "br"); i < len(encodings) && encodings[i] == "br" {
+			brotliMiddleware(next).ServeHTTP(w, r)
+			return
 		}
 		if i := sort.SearchStrings(encodings, "gzip"); i < len(encodings) && encodings[i] == "gzip" {
 			gzipMiddleware(next).ServeHTTP(w, r)
@@ -155,6 +191,14 @@ func apiGateway() http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if host, _, err := net.SplitHostPort(r.RemoteAddr); err != nil || !net.ParseIP(host).IsPrivate() {
 			http.Redirect(w, r, "https://tgragnato.it"+r.URL.RequestURI(), http.StatusFound)
+			return
+		}
+
+		if strings.HasPrefix(r.URL.Path, "/data") {
+			http.StripPrefix(
+				"/data",
+				compressMiddleware(http.FileServer(http.Dir("/var/www"))),
+			).ServeHTTP(w, r)
 			return
 		}
 
