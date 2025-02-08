@@ -1,0 +1,28 @@
+---
+
+- name: Read moduli file
+  ansible.builtin.slurp:
+    src: /etc/ssh/moduli
+  register: moduli_content
+  tags: ssh
+
+- name: Filter and write strong DH moduli
+  ansible.builtin.copy:
+    content: "{{ moduli_content.content | b64decode | split('\n') | select('match', '^\\s*\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+[8-9][0-9]{3,}\\s+.*$') | join('\n') }}"
+    dest: /etc/ssh/moduli
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart ssh
+  tags: ssh
+
+- name: Setup sshd_config
+  ansible.builtin.template:
+    src: sshd_config.j2
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: '0644'
+    validate: '/usr/sbin/sshd -t -f %s'
+  notify: Restart ssh
+  tags: ssh

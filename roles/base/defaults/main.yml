@@ -9,3 +9,29 @@ base_ntp_fallback: time.cloudflare.com ntp1.fortiguard.com ntp2.fortiguard.com n
 base_forwarding: 0
 
 base_tor_proxy_addr: socks5h://apt:apt@[::1]:9050
+
+base_ssh_casignaturealgorithms:
+  - ecdsa-sha2-nistp521
+  - ssh-ed25519
+base_ssh_ciphers:
+  - aes256-gcm@openssh.com
+  - chacha20-poly1305@openssh.com
+base_ssh_hostkeyalgorithms:
+  - ssh-ed25519-cert-v01@openssh.com
+  - ecdsa-sha2-nistp521-cert-v01@openssh.com
+  - ecdsa-sha2-nistp521
+  - ssh-ed25519
+base_ssh_kexalgorithms:
+  - sntrup761x25519-sha512@openssh.com
+  - sntrup761x25519-sha512
+  - ecdh-sha2-nistp521
+  - diffie-hellman-group-exchange-sha256
+  - diffie-hellman-group18-sha512
+  - diffie-hellman-group14-sha256
+  - curve25519-sha256@libssh.org
+  - curve25519-sha256
+base_ssh_macs:
+  - umac-128-etm@openssh.com
+  - hmac-sha2-512-etm@openssh.com
+  - umac-128@openssh.com
+  - hmac-sha2-512

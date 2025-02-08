@@ -1,0 +1,31 @@
+
+AcceptEnv LANG LC_*
+AddressFamily any
+AllowAgentForwarding no
+AllowTcpForwarding yes
+CASignatureAlgorithms {{ base_ssh_casignaturealgorithms | join(',') }}
+Ciphers {{ base_ssh_ciphers | join(',') }}
+Compression yes
+GatewayPorts no
+GSSAPIAuthentication no
+HostbasedAuthentication no
+HostKeyAlgorithms {{ base_ssh_hostkeyalgorithms | join(',') }}
+IgnoreRhosts yes
+IgnoreUserKnownHosts no
+KbdInteractiveAuthentication no
+KerberosAuthentication no
+KexAlgorithms {{ base_ssh_kexalgorithms | join(',') }}
+MACs {{ base_ssh_macs | join(',') }}
+PasswordAuthentication yes
+PermitEmptyPasswords no
+PermitRootLogin yes
+PermitTunnel no
+PermitUserEnvironment no
+Port 22
+PrintMotd no
+PubkeyAuthentication yes
+RekeyLimit 256M 1h
+Subsystem sftp /usr/lib/openssh/sftp-server
+UseDNS no
+UsePAM no
+X11Forwarding no

@@ -17,3 +17,9 @@
     name: systemd-timesyncd.service
     state: restarted
   listen: Restart ntp
+
+- name: Restart ssh
+  ansible.builtin.systemd:
+    name: ssh.service
+    state: restarted
+  listen: Restart ssh
