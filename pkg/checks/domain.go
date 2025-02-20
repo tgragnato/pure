@@ -16,10 +16,13 @@ var whitelist = []string{
 	"dnfed9a4ru7oh.cloudfront.net.",
 	"gcs-eu-00002.content-storage-download.googleapis.com.",
 	"gcs-eu-00002.content-storage-upload.googleapis.com.",
+	"tmaproduction.blob.core.windows.net.",
 }
 
 var whitelistSuffix = []string{
 	".azurewebsites.windows.net.",
+	".bl5prdstrz14a.store.core.windows.net.",
+	".bl5prdstrz14a.trafficmanager.net.",
 	".blob.core.windows.net.",
 	".blz25prdstrz09a.store.core.windows.net.",
 	".blz25prdstrz09a.trafficmanager.net.",
