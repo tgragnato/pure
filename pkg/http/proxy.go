@@ -4,17 +4,13 @@ import (
 	"bufio"
 	"compress/flate"
 	"compress/gzip"
-	"crypto/tls"
 	"fmt"
 	"io"
 	"math/rand/v2"
 	"net"
 	"net/http"
-	"net/http/httputil"
-	"net/url"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/andybalholm/brotli"
 )
@@ -135,7 +131,7 @@ func compressMiddleware(next http.Handler) http.Handler {
 
 func headersMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "https://tgragnato.it")
+		//w.Header().Set("Access-Control-Allow-Origin", "https://tgragnato.it")
 		w.Header().Set("Cache-Control", "no-store, no-cache, must-revalidate, post-check=0, pre-check=0")
 		w.Header().Set("Content-Security-Policy", "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;")
 		w.Header().Set("Cross-Origin-Embedder-Policy", "require-corp")
@@ -185,73 +181,4 @@ func stripProxiedHeaders(resp *http.Response) error {
 	resp.Header.Del("X-Powered-By")
 	resp.Header.Del("X-XSS-Protection")
 	return nil
-}
-
-func apiGateway() http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if host, _, err := net.SplitHostPort(r.RemoteAddr); err != nil || !net.ParseIP(host).IsPrivate() {
-			http.Redirect(w, r, "https://tgragnato.it"+r.URL.RequestURI(), http.StatusFound)
-			return
-		}
-
-		if strings.HasPrefix(r.URL.Path, "/data") {
-			http.StripPrefix(
-				"/data",
-				compressMiddleware(http.FileServer(http.Dir("/var/www"))),
-			).ServeHTTP(w, r)
-			return
-		}
-
-		if strings.HasPrefix(r.URL.Path, "/transmission") {
-			if strings.HasPrefix(r.URL.Path, "/transmission/web/") || r.URL.Path == "/transmission/rpc" {
-				proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-					Scheme: "http",
-					Host:   "127.0.0.1:9091",
-				})
-				proxy.Transport = &http.Transport{
-					ExpectContinueTimeout: time.Second,
-					ForceAttemptHTTP2:     false,
-					IdleConnTimeout:       time.Minute,
-					ResponseHeaderTimeout: time.Second,
-				}
-				proxy.ModifyResponse = stripProxiedHeaders
-				proxy.ServeHTTP(w, r)
-				return
-			}
-
-			http.Redirect(w, r, "https://api.tgragnato.it/transmission/web/", http.StatusFound)
-			return
-		}
-
-		if strings.HasPrefix(r.URL.Path, "/grafana") {
-			proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-				Scheme: "https",
-				Host:   "[::1]:3000",
-			})
-			proxy.Transport = &http.Transport{
-				ExpectContinueTimeout: time.Second,
-				ForceAttemptHTTP2:     true,
-				IdleConnTimeout:       time.Minute,
-				ResponseHeaderTimeout: time.Second,
-				TLSClientConfig:       &tls.Config{InsecureSkipVerify: true},
-				TLSHandshakeTimeout:   time.Second,
-			}
-			proxy.ModifyResponse = stripProxiedHeaders
-			proxy.ServeHTTP(w, r)
-			return
-		}
-
-		proxy := httputil.NewSingleHostReverseProxy(&url.URL{
-			Scheme: "http",
-			Host:   "[::1]:8080",
-		})
-		proxy.Transport = &http.Transport{
-			ExpectContinueTimeout: time.Second,
-			ForceAttemptHTTP2:     false,
-			IdleConnTimeout:       time.Minute,
-			ResponseHeaderTimeout: time.Second,
-		}
-		proxy.ModifyResponse = stripProxiedHeaders
-		proxy.ServeHTTP(w, r)
-	})
 }

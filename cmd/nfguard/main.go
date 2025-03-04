@@ -203,7 +203,7 @@ func main() {
 		}
 	}()
 
-	http.Listen([]string{"api.tgragnato.it"}, dsn, geoChecks)
+	http.Listen([]string{iface4, iface6}, dsn, geoChecks)
 
 	httpWorker := make(chan spam.Spam, 1)
 	stopped := false

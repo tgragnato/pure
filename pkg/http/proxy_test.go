@@ -208,7 +208,7 @@ func TestHeadersMiddleware(t *testing.T) {
 		{
 			name: "default headers",
 			expectedHeaders: map[string]string{
-				"Access-Control-Allow-Origin":  "https://tgragnato.it",
+				//"Access-Control-Allow-Origin":  "https://tgragnato.it",
 				"Cache-Control":                "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
 				"Content-Security-Policy":      "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;",
 				"Cross-Origin-Embedder-Policy": "require-corp",
@@ -234,21 +234,21 @@ func TestHeadersMiddleware(t *testing.T) {
 				"Set-Cookie": "existingcookie=value",
 			},
 			expectedHeaders: map[string]string{
-				"Access-Control-Allow-Origin": "https://tgragnato.it",
-				"Cache-Control":               "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
-				"Content-Security-Policy":     "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;",
-				"Expect-Ct":                   "max-age=86400, enforce",
-				"Expires":                     "Thu, 19 Nov 1981 08:52:00 GMT",
-				"Permissions-Policy":          "interest-cohort=(), accelerometer=(), autoplay=(), camera=(), clipboard-read=(), clipboard-write=(), document-domain=(), encrypted-media=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), gamepad=(), vibrate=(), vr=(), xr-spatial-tracking=()",
-				"Pragma":                      "no-cache",
-				"Referrer-Policy":             "strict-origin-when-cross-origin",
-				"Server":                      "Apache/2.4.25 (RedStar4.0) OpenSSL/1.0.1e-fips PHP/5.6.2",
-				"Strict-Transport-Security":   "max-age=31536000; includeSubDomains; preload",
-				"X-Content-Type-Options":      "nosniff",
-				"X-Frame-Options":             "DENY",
-				"X-Powered-By":                "PHP/5.6.2",
-				"X-XSS-Protection":            "1; mode=block",
-				"Set-Cookie":                  "existingcookie=value",
+				//"Access-Control-Allow-Origin": "https://tgragnato.it",
+				"Cache-Control":             "no-store, no-cache, must-revalidate, post-check=0, pre-check=0",
+				"Content-Security-Policy":   "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' blob:; img-src 'self' data:; worker-src 'self' blob:; object-src 'none'; upgrade-insecure-requests;",
+				"Expect-Ct":                 "max-age=86400, enforce",
+				"Expires":                   "Thu, 19 Nov 1981 08:52:00 GMT",
+				"Permissions-Policy":        "interest-cohort=(), accelerometer=(), autoplay=(), camera=(), clipboard-read=(), clipboard-write=(), document-domain=(), encrypted-media=(), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), midi=(), payment=(), usb=(), gamepad=(), vibrate=(), vr=(), xr-spatial-tracking=()",
+				"Pragma":                    "no-cache",
+				"Referrer-Policy":           "strict-origin-when-cross-origin",
+				"Server":                    "Apache/2.4.25 (RedStar4.0) OpenSSL/1.0.1e-fips PHP/5.6.2",
+				"Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+				"X-Content-Type-Options":    "nosniff",
+				"X-Frame-Options":           "DENY",
+				"X-Powered-By":              "PHP/5.6.2",
+				"X-XSS-Protection":          "1; mode=block",
+				"Set-Cookie":                "existingcookie=value",
 			},
 			expectedCookieLen: 0,
 		},
@@ -321,81 +321,6 @@ func TestStripProxiedHeaders(t *testing.T) {
 		if resp.Header.Get(header) != "" {
 			t.Errorf("Expected header %s to be stripped", header)
 		}
-	}
-}
-
-func TestAPIGateway(t *testing.T) {
-	t.Parallel()
-
-	tests := []struct {
-		name       string
-		remoteAddr string
-		path       string
-		wantCode   int
-		wantLoc    string
-	}{
-		{
-			name:       "non-private IP redirect",
-			remoteAddr: "8.8.8.8:1234",
-			path:       "/test",
-			wantCode:   http.StatusFound,
-			wantLoc:    "https://tgragnato.it/test",
-		},
-		{
-			name:       "private IP transmission base path",
-			remoteAddr: "192.168.1.1:1234",
-			path:       "/transmission",
-			wantCode:   http.StatusFound,
-			wantLoc:    "https://api.tgragnato.it/transmission/web/",
-		},
-		{
-			name:       "private IP transmission subpath",
-			remoteAddr: "192.168.1.1:1234",
-			path:       "/transmission/rpc",
-			wantCode:   http.StatusBadGateway,
-		},
-		{
-			name:       "private IP other path",
-			remoteAddr: "192.168.1.1:1234",
-			path:       "/other",
-			wantCode:   http.StatusBadGateway,
-		},
-		{
-			name:       "private IP grafana base path",
-			remoteAddr: "192.168.1.1:1234",
-			path:       "/grafana/",
-			wantCode:   http.StatusBadGateway,
-		},
-		{
-			name:       "invalid remote addr",
-			remoteAddr: "invalid",
-			path:       "/test",
-			wantCode:   http.StatusFound,
-			wantLoc:    "https://tgragnato.it/test",
-		},
-	}
-
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			t.Parallel()
-
-			req := httptest.NewRequest("GET", "http://example.com"+tt.path, nil)
-			req.RemoteAddr = tt.remoteAddr
-			rec := httptest.NewRecorder()
-
-			handler := apiGateway()
-			handler.ServeHTTP(rec, req)
-
-			if rec.Code != tt.wantCode {
-				t.Errorf("Expected status code %d, got %d", tt.wantCode, rec.Code)
-			}
-
-			if tt.wantLoc != "" {
-				if got := rec.Header().Get("Location"); got != tt.wantLoc {
-					t.Errorf("Expected Location header %s, got %s", tt.wantLoc, got)
-				}
-			}
-		})
 	}
 }
 
