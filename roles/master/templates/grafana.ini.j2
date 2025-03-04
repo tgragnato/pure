@@ -4,12 +4,11 @@ temp_data_lifetime = 1h
 logs = /var/log
 
 [server]
-domain = api.tgragnato.it
-root_url = https://%(domain)s/grafana/
-serve_from_sub_path = true
-protocol = https
-min_tls_version = TLS1.3
-http_addr = ::1
+domain = {{ master_wg0_ipv6 }}
+root_url = http://%(domain)s:3000/
+serve_from_sub_path = false
+protocol = http
+http_addr = {{ master_wg0_ipv6 }}
 http_port = 3000
 
 [database]
@@ -26,7 +25,7 @@ type = database
 admin_user = grafana
 admin_password = grafana
 disable_gravatar = true
-cookie_secure = true
+cookie_secure = false
 cookie_samesite = strict
 content_security_policy = false
 
