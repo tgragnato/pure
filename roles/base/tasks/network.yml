@@ -149,6 +149,8 @@
       value: 2
     - name: kernel.yama.ptrace_scope
       value: 2
+    - name: user.max_user_namespaces
+      value: 0
     - name: vm.max_map_count
       value: 262144
     - name: vm.dirty_writeback_centisecs
