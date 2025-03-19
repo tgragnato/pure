@@ -7,7 +7,7 @@ require (
 	github.com/andybalholm/brotli v1.1.1
 	github.com/grafana/pyroscope-go v1.2.1
 	github.com/jackc/pgx/v5 v5.7.2
-	github.com/miekg/dns v1.1.63
+	github.com/miekg/dns v1.1.64
 	gitlab.torproject.org/tpo/anti-censorship/geoip v0.0.0-20210928150955-7ce4b3d98d01
 )
 
