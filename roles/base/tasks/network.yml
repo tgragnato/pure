@@ -8,7 +8,17 @@
     masked: false
   tags: network
 
-- name: Install network profiles
+- name: Install en.network profile
+  ansible.builtin.template:
+    src: "en.network.j2"
+    dest: "{{ systemd_network }}/en.network"
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Networkctl reload
+  tags: network
+
+- name: Install bond network profile
   ansible.builtin.template:
     src: "{{ item }}.j2"
     dest: "{{ systemd_network }}/{{ item }}"
@@ -16,9 +26,9 @@
     group: root
     mode: '0644'
   loop:
-    - en.network
     - wan.netdev
     - wan.network
+  when: not base_ipv4_address is defined and not base_ipv6_address is defined
   notify: Networkctl reload
   tags: network
 

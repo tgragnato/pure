@@ -2,4 +2,41 @@
 Name=en*
 
 [Network]
+{% if not base_ipv4_address is defined and not base_ipv6_address is defined %}
 Bond=wan
+{% endif %}
+DHCP=no
+LLMNR=no
+MulticastDNS=no
+{% if base_ipv4_address is defined and base_ipv4_gateway is defined %}
+Address={{ base_ipv4_address }}
+Gateway={{ base_ipv4_gateway }}
+{% endif %}
+{% if base_ipv6_address is defined and base_ipv6_gateway is defined %}
+Address={{ base_ipv6_address }}
+Gateway={{ base_ipv6_gateway }}
+{% endif %}
+{% if base_dns_servers is defined %}
+{% for dns_server in base_dns_servers %}
+DNS={{ dns_server }}
+{% endfor %}
+{% endif %}
+
+[DHCPv4]
+SendHostname=no
+UseDNS=no
+UseNTP=no
+UseSIP=no
+UseHostname=no
+UseDomains=no
+UseTimezone=no
+
+[DHCPv6]
+UseDNS=no
+UseNTP=no
+UseHostname=no
+UseDomains=no
+
+[IPv6AcceptRA]
+UseDNS=no
+UseDomains=no
