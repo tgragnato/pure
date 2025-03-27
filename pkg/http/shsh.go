@@ -42,7 +42,7 @@ func handleSHSHProtocol() http.Handler {
 			return
 		}
 
-		if strings.HasPrefix(host, ".tgragnato.it") {
+		if strings.HasSuffix(host, ".tgragnato.it") {
 			http.FileServer(http.Dir("/var/www")).ServeHTTP(w, r)
 			return
 		}
