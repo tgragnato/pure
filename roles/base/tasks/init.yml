@@ -120,6 +120,7 @@
     - bin
     - caddy
     - daemon
+    - debian
     - irc
     - list
     - loki
