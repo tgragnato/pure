@@ -1,6 +1,0 @@
-[submodule "snowflake"]
-	path = snowflake
-	url = https://github.com/tgragnato/snowflake
-[submodule "magnetico"]
-	path = magnetico
-	url = https://github.com/tgragnato/magnetico
