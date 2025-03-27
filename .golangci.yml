@@ -1,39 +1,61 @@
+version: "2"
+
 run:
   concurrency: 4
-  timeout: 5m
   tests: true
   allow-parallel-runners: true
   go: '1.24'
 
-issues:
-  exclude-rules:
+linters:
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
 
-    - path: cmd/nfguard/main.go
-      linters:
-        - gosec
-      text: "G115: integer overflow conversion uint64 -> int64"
+    rules:
 
-    - path: cmd/nfguard/test.go
-      linters:
-        - gosec
-      text: "G115: integer overflow conversion uint64 -> int64"
+      - linters:
+          - gosec
+        path: cmd/nfguard/main.go
+        text: 'G115: integer overflow conversion uint64 -> int64'
 
-    - path: pkg/spam/builder.go
-      linters:
-        - gosec
-      text: "G404: Use of weak random number generator"
+      - linters:
+          - gosec
+        path: cmd/nfguard/test.go
+        text: 'G115: integer overflow conversion uint64 -> int64'
 
-    - path: pkg/spam/spam.go
-      linters:
-        - gosec
-      text: "G404: Use of weak random number generator"
+      - linters:
+          - gosec
+        path: pkg/spam/builder.go
+        text: 'G404: Use of weak random number generator'
 
-    - path: pkg/http/proxy.go
-      linters:
-        - gosec
-      text: "G404: Use of weak random number generator"
+      - linters:
+          - gosec
+        path: pkg/spam/spam.go
+        text: 'G404: Use of weak random number generator'
 
-    - path: pkg/http/proxy.go
-      linters:
-        - gosec
-      text: "G402: TLS InsecureSkipVerify set true"
+      - linters:
+          - gosec
+        path: pkg/http/proxy.go
+        text: 'G404: Use of weak random number generator'
+
+      - linters:
+          - gosec
+        path: pkg/http/proxy.go
+        text: 'G402: TLS InsecureSkipVerify set true'
+
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
