@@ -7,29 +7,31 @@ clean:
 	rm -f roles/master/files/client
 	rm -f roles/master/files/magnetico
 
+pure_path := $(dir $(realpath $(lastword $(MAKEFILE_LIST))))
+
 nfguard: roles/master/files/nfguard
 	ansible-playbook -i inventory.yaml playbook.yaml --tags nfguard
 
 roles/master/files/nfguard:
-	GOOS=linux GOARCH=amd64 go build -C cmd/nfguard -o ../../roles/master/files/nfguard
+	GOOS=linux GOARCH=amd64 go build -C cmd/nfguard -o $(pure_path)/roles/master/files/nfguard
 
 snowflake: roles/master/files/snowflake
 	ansible-playbook -i inventory.yaml playbook.yaml --tags snowflake
 
 roles/master/files/snowflake:
-	GOOS=linux GOARCH=amd64 go build -C snowflake/proxy -o ../../roles/master/files/snowflake
+	GOOS=linux GOARCH=amd64 go build -C snowflake/proxy -o $(pure_path)/roles/master/files/snowflake
 
 client: roles/master/files/client
 	ansible-playbook -i inventory.yaml playbook.yaml --tags tor
 
 roles/master/files/client:
-	GOOS=linux GOARCH=amd64 go build -C snowflake/client -o ../../roles/master/files/client
+	GOOS=linux GOARCH=amd64 go build -C snowflake/client -o $(pure_path)/roles/master/files/client
 
 magnetico: roles/master/files/magnetico
 	ansible-playbook -i inventory.yaml playbook.yaml --tags magnetico
 
 roles/master/files/magnetico:
-	GOOS=linux GOARCH=amd64 go build -C magnetico/. -o ../roles/master/files/magnetico
+	GOOS=linux GOARCH=amd64 go build -C magnetico/. -o $(pure_path)/roles/master/files/magnetico
 
 grafana: roles/master/files/grafana-11.5.0.linux-amd64.tar.gz
 	ansible-playbook -i inventory.yaml playbook.yaml --tags grafana
