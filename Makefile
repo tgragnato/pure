@@ -39,8 +39,8 @@ grafana: roles/master/files/grafana-11.6.0.linux-amd64.tar.gz
 roles/master/files/grafana-11.6.0.linux-amd64.tar.gz:
 	curl https://dl.grafana.com/oss/release/grafana-11.6.0.linux-amd64.tar.gz -o roles/master/files/grafana-11.6.0.linux-amd64.tar.gz
 
-pyroscope: roles/master/files/pyroscope_1.12.0_linux_amd64.tar.gz
+pyroscope: roles/master/files/pyroscope_1.13.1_linux_amd64.tar.gz
 	ansible-playbook -i inventory.yaml playbook.yaml --tags pyroscope
 
-roles/master/files/pyroscope_1.12.0_linux_amd64.tar.gz:
-	curl -L https://github.com/grafana/pyroscope/releases/download/v1.12.0/pyroscope_1.12.0_linux_amd64.tar.gz -o roles/master/files/pyroscope_1.12.0_linux_amd64.tar.gz
+roles/master/files/pyroscope_1.13.1_linux_amd64.tar.gz:
+	curl -L https://github.com/grafana/pyroscope/releases/download/v1.13.1/pyroscope_1.13.1_linux_amd64.tar.gz -o roles/master/files/pyroscope_1.13.1_linux_amd64.tar.gz

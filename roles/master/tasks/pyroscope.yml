@@ -66,7 +66,7 @@
     service_working_directory: "{{ master_pyroscope_datapath }}"
   tags: pyroscope
 
-- name: Setup the grafana systemd service
+- name: Setup the pyroscope systemd service
   ansible.builtin.template:
     src: sandboxed.service.j2
     dest: "{{ systemd_system }}/pyroscope.service"
