@@ -6,20 +6,3 @@ all:
       hosts:
         fd5d:2ddd:f4a5::1:
           hostname: puremini
-    cloud:
-      vars:
-        base_forwarding: 0
-        base_debian_repository: https://deb.debian.org/debian
-        base_debian_security: https://deb.debian.org/debian-security
-        base_ipv4_address: "195.231.60.85/24"
-        base_ipv4_gateway: "195.231.60.1"
-        base_ipv6_address: "2a00:6d42:1242:1355::1/56"
-        base_ipv6_gateway: "2a00:6d42:1242:1300::1"
-        base_dns_servers:
-          - "62.149.190.150"
-          - "217.61.55.10"
-          - "2a00:6d40:2:2094::f:1"
-          - "2a00:6d42:3:201e::f:1"
-      hosts:
-        195.231.60.85:
-          hostname: purecloud01
