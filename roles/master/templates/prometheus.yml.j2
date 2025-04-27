@@ -18,7 +18,7 @@ scrape_configs:
 
   - job_name: "magnetico"
     static_configs:
-      - targets: ["localhost:8080"]
+      - targets: ["{{ master_wg0_ipv6 }}:8080"]
 
   - job_name: "tor"
     static_configs:
