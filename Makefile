@@ -33,11 +33,11 @@ magnetico: roles/master/files/magnetico
 roles/master/files/magnetico:
 	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -C magnetico/. -o $(pure_path)/roles/master/files/magnetico
 
-grafana: roles/master/files/grafana-11.6.1.linux-amd64.tar.gz
+grafana: roles/master/files/grafana-12.0.0.linux-amd64.tar.gz
 	ansible-playbook -i inventory.yaml playbook.yaml --tags grafana
 
-roles/master/files/grafana-11.6.1.linux-amd64.tar.gz:
-	curl https://dl.grafana.com/oss/release/grafana-11.6.1.linux-amd64.tar.gz -o roles/master/files/grafana-11.6.1.linux-amd64.tar.gz
+roles/master/files/grafana-12.0.0.linux-amd64.tar.gz:
+	curl https://dl.grafana.com/oss/release/grafana-12.0.0.linux-amd64.tar.gz -o roles/master/files/grafana-12.0.0.linux-amd64.tar.gz
 
 pyroscope: roles/master/files/pyroscope_1.13.1_linux_amd64.tar.gz
 	ansible-playbook -i inventory.yaml playbook.yaml --tags pyroscope
