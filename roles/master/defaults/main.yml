@@ -17,7 +17,7 @@ master_postgresql_socketuser: postgres
 master_magnetico_path: "{{ local_folder }}/bin/magnetico"
 master_magneticod_maxrps: 500
 
-master_grafana_version: 12.0.0
+master_grafana_version: 12.0.1
 master_grafana_folder: "{{ local_folder }}/grafana-v{{ master_grafana_version }}"
 
 master_prometheus_tsdb_retention: 10y
