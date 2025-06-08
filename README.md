@@ -2,6 +2,7 @@
 
 [![Ansible](https://github.com/tgragnato/pure/actions/workflows/ansible.yml/badge.svg)](https://github.com/tgragnato/pure/actions/workflows/ansible.yml)
 [![Go](https://github.com/tgragnato/pure/actions/workflows/go.yml/badge.svg)](https://github.com/tgragnato/pure/actions/workflows/go.yml)
+[![Codecov](https://codecov.io/gh/tgragnato/pure/graph/badge.svg)](https://codecov.io/gh/tgragnato/pure)
 
 `pure` is a collection of software and tools that I use to manage my network and my storage.
 
