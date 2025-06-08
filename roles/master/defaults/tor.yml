@@ -1,10 +1,10 @@
 ---
 
 master_tor_bridges:
-  - "snowflake 192.0.2.4:443 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA sqsqueue=https://sqs.us-east-1.amazonaws.com/893902434899/snowflake-broker sqscreds=eyJhd3MtYWNjZXNzLWtleS1pZCI6IkFLSUE1QUlGNFdKSlhTN1lIRUczIiwiYXdzLXNlY3JldC1rZXkiOiI3U0RNc0pBNHM1RitXZWJ1L3pMOHZrMFFXV0lsa1c2Y1dOZlVsQ0tRIn0= ice=stun:stun.tgragnato.it:3478,stun:stun.nextcloud.com:443,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn"
-  - "snowflake 192.0.2.3:443 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 sqsqueue=https://sqs.us-east-1.amazonaws.com/893902434899/snowflake-broker sqscreds=eyJhd3MtYWNjZXNzLWtleS1pZCI6IkFLSUE1QUlGNFdKSlhTN1lIRUczIiwiYXdzLXNlY3JldC1rZXkiOiI3U0RNc0pBNHM1RitXZWJ1L3pMOHZrMFFXV0lsa1c2Y1dOZlVsQ0tRIn0= ice=stun:stun.tgragnato.it:3478,stun:stun.nextcloud.com:443,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn"
-  - "snowflake 192.0.2.4:443 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.tgragnato.it:3478,stun:stun.nextcloud.com:443,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn"
-  - "snowflake 192.0.2.3:443 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.tgragnato.it:3478,stun:stun.nextcloud.com:443,stun.l.google.com:19302 utls-imitate=hellorandomizedalpn"
+  - "snowflake 192.0.2.4:443 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA sqsqueue=https://sqs.us-east-1.amazonaws.com/893902434899/snowflake-broker sqscreds=eyJhd3MtYWNjZXNzLWtleS1pZCI6IkFLSUE1QUlGNFdKSlhTN1lIRUczIiwiYXdzLXNlY3JldC1rZXkiOiI3U0RNc0pBNHM1RitXZWJ1L3pMOHZrMFFXV0lsa1c2Y1dOZlVsQ0tRIn0= ice=stun:stun.tgragnato.it:3478,stun:stun.nextcloud.com:443,stun.l.google.com:19302,stun:stun.nextcloud.com:443 utls-imitate=hellorandomizedalpn"
+  - "snowflake 192.0.2.3:443 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 sqsqueue=https://sqs.us-east-1.amazonaws.com/893902434899/snowflake-broker sqscreds=eyJhd3MtYWNjZXNzLWtleS1pZCI6IkFLSUE1QUlGNFdKSlhTN1lIRUczIiwiYXdzLXNlY3JldC1rZXkiOiI3U0RNc0pBNHM1RitXZWJ1L3pMOHZrMFFXV0lsa1c2Y1dOZlVsQ0tRIn0= ice=stun:stun.tgragnato.it:3478,stun:stun.nextcloud.com:443,stun.l.google.com:19302,stun:stun.nextcloud.com:443 utls-imitate=hellorandomizedalpn"
+  - "snowflake 192.0.2.4:443 8838024498816A039FCBBAB14E6F40A0843051FA fingerprint=8838024498816A039FCBBAB14E6F40A0843051FA url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302,stun:stun.nextcloud.com:443 utls-imitate=hellorandomizedalpn"
+  - "snowflake 192.0.2.3:443 2B280B23E1107BB62ABFC40DDCC8824814F80A72 fingerprint=2B280B23E1107BB62ABFC40DDCC8824814F80A72 url=https://1098762253.rsc.cdn77.org/ fronts=www.cdn77.com,www.phpmyadmin.net ice=stun:stun.tgragnato.it:3478,stun.l.google.com:19302,stun:stun.nextcloud.com:443 utls-imitate=hellorandomizedalpn"
   - "93.55.235.232:443 CDD296D8C38EAA6A94242FCF03293E0D6EC4A0D0"
   - "82.54.183.125:443 729C827A1A1E5DEB310A3BA5EDE2EE2120CCADB4"
   - "5.89.140.132:443 B8D94C8036FEE5253E32CA3158E916466191C407"
@@ -16,6 +16,13 @@ master_tor_bridges:
   - "[2406:8c00:0:3401:133:18:168:48]:443 6D7F2BF7725395EB3AF30715799ECF4E161061BD"
   - "[2a00:6d41:200:2::e7]:443 8BB55A3AFBB7E5D9EB83215DEC8F219E68DF9B6D"
   - "[2a03:90c0:1b5:ffff::72:1]:443 AF69EADAF6905DB800955204587B5A77C5F24DBF"
+  - "[2a00:1838:37:497::2697]:443 D8476A2B13EE8D37F44EDACEB9E188DAF04DB27E"
+  - "[2605:e440:45::2:3f0]:443 55C2230D7D8992B1E2C86F871D997D3FDB162BEC"
+  - "[2a00:f940:2:1:2::82e]:443 31B464C3B0D04BD9BF864B9FD9560A9696A5FE33"
+  - "[2605:e440:45::2:3de]:443 5BA3DB9F7A4B9CA92790CB294ADA378C52F435EF"
+  - "[2a13:d207:0:40e::1]:443 E4C6E31D745BE31F9E150F3BEEE19235D9629FC9"
+  - "[2001:b011:4011:5e0e:701f:9583:c5e3:cf5d]:443 5B3717548167BC0BEC44B4F1E6E9D64D548C633A"
+  - "[2001:b030:2422::7234]:443 35449EB3D025CC24601FB43884F9699367D677CF"
 
 master_client_path: /usr/bin/snowflake-client
 master_snowflake_path: "{{ local_folder }}/bin/snowflake"
