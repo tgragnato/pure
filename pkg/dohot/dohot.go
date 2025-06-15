@@ -37,29 +37,29 @@ var (
 			DynamicRecordSizingDisabled: false,
 			Renegotiation:               0,
 		},
-		TLSHandshakeTimeout:    10 * time.Second,
+		TLSHandshakeTimeout:    time.Second,
 		DisableKeepAlives:      false,
 		DisableCompression:     false,
 		MaxIdleConns:           4,
 		MaxIdleConnsPerHost:    4,
 		MaxConnsPerHost:        4,
 		IdleConnTimeout:        90 * time.Second,
-		ResponseHeaderTimeout:  2 * time.Second,
-		ExpectContinueTimeout:  2 * time.Second,
+		ResponseHeaderTimeout:  time.Second,
+		ExpectContinueTimeout:  time.Second,
 		MaxResponseHeaderBytes: 4096,
 		WriteBufferSize:        0,
 		ReadBufferSize:         0,
 		ForceAttemptHTTP2:      true,
 	}}
+	endpoints = []string{
+		"https://dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion:443/dns-query",
+		"https://extended.dns.mullvad.net/dns-query",
+		"https://dns.digitale-gesellschaft.ch/dns-query",
+		"https://wikimedia-dns.org/dns-query",
+	}
 )
 
-func DoH(qName string, ipv6 bool) ([]net.IP, []string, error) {
-	var (
-		ips    []net.IP
-		cnames []string
-		ttl    uint32
-	)
-
+func inFlight(qName string, ipv6 bool, endpoint string) (ips []net.IP, cnames []string, err error) {
 	m := new(dns.Msg)
 	if ipv6 {
 		m.SetQuestion(qName, dns.TypeAAAA)
@@ -69,10 +69,10 @@ func DoH(qName string, ipv6 bool) ([]net.IP, []string, error) {
 	m.SetEdns0(4096, true)
 	out, err := m.Pack()
 	if err != nil {
-		return ips, cnames, errors.New("error packing request")
+		return []net.IP{}, []string{}, errors.New("error packing request")
 	}
 
-	req, err := http.NewRequest("POST", "https://dns4torpnlfs2ifuz2s2yf3fc7rdmsbhm6rw75euj35pac6ap25zgqad.onion:443/dns-query", bytes.NewReader(out))
+	req, err := http.NewRequest("POST", endpoint, bytes.NewReader(out))
 	if err != nil {
 		return ips, cnames, errors.New("invalid HTTP request")
 	}
@@ -102,14 +102,8 @@ func DoH(qName string, ipv6 bool) ([]net.IP, []string, error) {
 		switch ansb := ansa.(type) {
 		case *dns.A:
 			ips = append(ips, ansb.A)
-			if ttl < ansb.Hdr.Ttl {
-				ttl = ansb.Hdr.Ttl
-			}
 		case *dns.AAAA:
 			ips = append(ips, ansb.AAAA)
-			if ttl < ansb.Hdr.Ttl {
-				ttl = ansb.Hdr.Ttl
-			}
 		case *dns.CNAME:
 			cnames = append(cnames, ansb.Target)
 		case *dns.DNAME:
@@ -120,6 +114,16 @@ func DoH(qName string, ipv6 bool) ([]net.IP, []string, error) {
 	if len(ips) == 0 {
 		return ips, cnames, errors.New("no IP addresses in response")
 	}
+	return
+}
 
-	return ips, cnames, nil
+func DoH(qName string, ipv6 bool) ([]net.IP, []string, error) {
+	for _, endpoint := range endpoints {
+		ips, cnames, err := inFlight(qName, ipv6, endpoint)
+		if err == nil {
+			return ips, cnames, nil
+		}
+	}
+
+	return []net.IP{}, []string{}, errors.New("all DoHoT endpoints failed")
 }
