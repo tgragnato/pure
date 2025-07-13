@@ -3,7 +3,7 @@
 - name: Check if folder exist for grafana
   ansible.builtin.stat:
     path: "{{ master_grafana_folder }}"
-  register: grafana_installed
+  register: master_grafana_installed
   tags: grafana
 
 - name: Extract the standalone archive
@@ -11,7 +11,7 @@
     src: "grafana-{{ master_grafana_version }}.linux-amd64.tar.gz"
     dest: "{{ local_folder }}"
     remote_src: false
-  when: not grafana_installed.stat.exists
+  when: not master_grafana_installed.stat.exists
   tags: grafana
 
 - name: Setup grafana
@@ -26,20 +26,20 @@
 
 - name: Set the grafana service facts
   ansible.builtin.set_fact:
-    service_after: "postgresql.service"
-    service_ambient_capabilities: ""
-    service_capability_bounding_set: ""
-    service_description: "Grafana instance"
-    service_exec_start: "{{ master_grafana_folder }}/bin/grafana server --config={{ master_grafana_folder }}/conf/grafana.ini"
-    service_group: "nogroup"
-    service_limit_nofile: 32768
-    service_memory_deny_write_execute: "false"
-    service_protect_clock: "true"
-    service_readwrite_paths: ""
-    service_restrict_address_families: "AF_INET AF_INET6"
-    service_umask: "0027"
-    service_user: "nobody"
-    service_working_directory: "{{ master_grafana_folder }}"
+    master_service_after: "postgresql.service"
+    master_service_ambient_capabilities: ""
+    master_service_capability_bounding_set: ""
+    master_service_description: "Grafana instance"
+    master_service_exec_start: "{{ master_grafana_folder }}/bin/grafana server --config={{ master_grafana_folder }}/conf/grafana.ini"
+    master_service_group: "nogroup"
+    master_service_limit_nofile: 32768
+    master_service_memory_deny_write_execute: "false"
+    master_service_protect_clock: "true"
+    master_service_readwrite_paths: ""
+    master_service_restrict_address_families: "AF_INET AF_INET6"
+    master_service_umask: "0027"
+    master_service_user: "nobody"
+    master_service_working_directory: "{{ master_grafana_folder }}"
   tags: grafana
 
 - name: Setup the grafana systemd service
