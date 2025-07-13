@@ -3,12 +3,12 @@
 - name: Read moduli file
   ansible.builtin.slurp:
     src: /etc/ssh/moduli
-  register: moduli_content
+  register: base_moduli_content
   tags: ssh
 
 - name: Filter and write strong DH moduli
   ansible.builtin.copy:
-    content: "{{ moduli_content.content | b64decode | split('\n') | select('match', '^\\s*\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+[8-9][0-9]{3,}\\s+.*$') | join('\n') }}"
+    content: "{{ base_moduli_content.content | b64decode | split('\n') | select('match', '^\\s*\\S+\\s+\\S+\\s+\\S+\\s+\\S+\\s+[8-9][0-9]{3,}\\s+.*$') | join('\n') }}"
     dest: /etc/ssh/moduli
     owner: root
     group: root
