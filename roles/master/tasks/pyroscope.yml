@@ -58,7 +58,8 @@
     service_exec_start: "{{ master_pyroscope_folder }}/pyroscope --config.file={{ master_pyroscope_folder }}/pyroscope.yml"
     service_group: "pyroscope"
     service_limit_nofile: 32768
-    service_protect_clock: "yes"
+    service_memory_deny_write_execute: "true"
+    service_protect_clock: "true"
     service_readwrite_paths: "{{ master_pyroscope_datapath }}"
     service_restrict_address_families: "AF_INET AF_INET6 AF_NETLINK"
     service_umask: "0027"

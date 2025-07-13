@@ -33,7 +33,8 @@
     service_exec_start: "{{ master_grafana_folder }}/bin/grafana server --config={{ master_grafana_folder }}/conf/grafana.ini"
     service_group: "nogroup"
     service_limit_nofile: 32768
-    service_protect_clock: "yes"
+    service_memory_deny_write_execute: "false"
+    service_protect_clock: "true"
     service_readwrite_paths: ""
     service_restrict_address_families: "AF_INET AF_INET6"
     service_umask: "0027"

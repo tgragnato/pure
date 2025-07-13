@@ -19,7 +19,8 @@
     service_exec_start: "{{ master_magnetico_path }} --max-rps={{ master_magneticod_maxrps }} --pyroscope=http://127.0.0.1:4040 --addr=[{{ master_wg0_ipv6 }}]:8080 --indexer-addr=:25401"
     service_group: "proxy"
     service_limit_nofile: 32768
-    service_protect_clock: "yes"
+    service_memory_deny_write_execute: "true"
+    service_protect_clock: "true"
     service_readwrite_paths: ""
     service_restrict_address_families: "AF_INET AF_INET6"
     service_umask: "777"

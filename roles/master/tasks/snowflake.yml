@@ -23,7 +23,8 @@
     service_exec_start: "{{ master_snowflake_path }} -unsafe-logging -nat-type-force-unrestricted -ephemeral-ports-range 1024:65535 -metrics"
     service_group: "proxy"
     service_limit_nofile: 32768
-    service_protect_clock: "yes"
+    service_memory_deny_write_execute: "true"
+    service_protect_clock: "true"
     service_readwrite_paths: ""
     service_restrict_address_families: "AF_INET AF_INET6"
     service_umask: "777"
