@@ -42,11 +42,6 @@ func handleSHSHProtocol() http.Handler {
 			return
 		}
 
-		if strings.HasSuffix(host, ".tgragnato.it") {
-			http.FileServer(http.Dir("/var/www")).ServeHTTP(w, r)
-			return
-		}
-
 		if host != "updates-http.cdn-apple.com" &&
 			host != "gs.apple.com" &&
 			host != "static.ess.apple.com" &&
