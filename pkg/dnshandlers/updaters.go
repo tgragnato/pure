@@ -35,6 +35,43 @@ func (d *DnsHandlers) crossPrefetch() {
 	}
 }
 
+func (d *DnsHandlers) domainPrefetch() {
+	query := `
+		WITH domains AS (
+			SELECT 
+				a.key,
+				reverse(
+					split_part(reverse(a.key), '.', 1) || '.' ||
+					split_part(reverse(a.key), '.', 2) || '.' ||
+					split_part(reverse(a.key), '.', 3)
+				) AS domain
+			FROM a
+		)
+		SELECT domain
+		FROM domains
+		WHERE NOT EXISTS (SELECT 1 FROM a WHERE a.key = domain);
+	`
+	rows, err := d.db.Query(query)
+	if err != nil {
+		return
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var key string
+		err = rows.Scan(&key)
+		if err != nil {
+			continue
+		}
+
+		ips, _, err := dohot.DoH(key, true)
+		if err != nil {
+			continue
+		}
+		d.setPersistent(key, ips, true)
+	}
+}
+
 func (d *DnsHandlers) selfPrefetch(ipv6 bool) {
 	var query string
 
