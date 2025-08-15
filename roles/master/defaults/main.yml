@@ -11,7 +11,7 @@ master_wg0_port: 443
 master_nfguard_path: "{{ local_folder }}/bin/nfguard"
 
 master_postgresql_socketdir: /var/run/postgresql/
-master_postgresql_version: 15
+master_postgresql_version: 17
 master_postgresql_socketuser: postgres
 
 master_magnetico_path: "{{ local_folder }}/bin/magnetico"
