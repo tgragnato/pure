@@ -1,14 +1,15 @@
 ---
 
-base_debian_repository: tor+http://2s4yqjx5ul6okpp3f2gaunr2syex5jgbfpfvhxxbbjwnrsvbk5v3qbid.onion/debian
-base_debian_security: tor+http://5ajw6aqf3ep7sijnscdzw77t7xq4xjpsy335yb2wiwgouo7yfxtjlmid.onion/debian-security
+base_systemd_prefix: /etc/systemd
+base_systemd_system: "{{ base_systemd_prefix }}/system"
+base_systemd_network: "{{ base_systemd_prefix }}/network"
+base_local_folder: /usr/local
+
+base_debian_repository: https://deb.debian.org/debian
+base_debian_security: https://deb.debian.org/debian-security
 
 base_ntp_servers: ntp1.inrim.it ntp2.inrim.it time.euro.apple.com time.asia.apple.com time.apple.com
 base_ntp_fallback: time.cloudflare.com ntp1.fortiguard.com ntp2.fortiguard.com ntp.checkpoint.com ntp2.checkpoint.com
-
-base_forwarding: 0
-
-base_tor_proxy_addr: socks5h://apt:apt@[::1]:9050
 
 base_ssh_casignaturealgorithms:
   - ecdsa-sha2-nistp521
@@ -35,3 +36,16 @@ base_ssh_macs:
   - hmac-sha2-512-etm@openssh.com
   - umac-128@openssh.com
   - hmac-sha2-512
+
+base_postgresql_socketdir: /var/run/postgresql/
+base_postgresql_version: 17
+base_postgresql_socketuser: postgres
+base_prometheus_postgres_exporter: postgres_exporter
+
+base_resolve_ipv6: "2606:4700:4700::1112#security.cloudflare-dns.com 2606:4700:4700::1002#security.cloudflare-dns.com"
+base_resolve_ipv4: "1.1.1.2#security.cloudflare-dns.com 1.0.0.2#security.cloudflare-dns.com"
+
+base_k0s_version: "v1.34.3+k0s.0"
+base_k0s_config_path: /etc/k0s/k0s.yaml
+base_k0s_datastore_endpoint: "postgres://kine:kine@localhost:5432/kine?sslmode=disable"
+base_k0s_binary_path: "{{ base_local_folder }}/bin/k0s"

@@ -1,15 +1,4 @@
 .DS_Store
 .vscode
-cmd/nfguard/nfguard
 coverage.out
-roles/master/files/client
-roles/master/files/grafana*
-roles/master/files/magnetico
-roles/master/files/nfguard
-roles/master/files/pyroscope*
-roles/master/files/snowflake
-roles/master/files/spamd
 venv
-*.mmdb
-magnetico
-snowflake

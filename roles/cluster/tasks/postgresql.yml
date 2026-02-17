@@ -1,0 +1,100 @@
+---
+
+- name: Create namespace postgresql
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: postgresql
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster
+
+- name: ConfigMap pgbouncer config
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: ConfigMap
+      metadata:
+        name: pgbouncer-config
+        namespace: postgresql
+      data:
+        pgbouncer.ini: |
+          [databases]
+          * = host=127.0.0.1 port=5432
+          [pgbouncer]
+          listen_addr = *
+          listen_port = 6432
+          auth_type = trust
+          auth_file = /etc/pgbouncer/userlist.txt
+          pool_mode = session
+        userlist.txt: |
+          "magnetico" "magnetico"
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  notify: Restart PgBouncer
+  tags: cluster
+
+- name: DaemonSet PgBouncer
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: pgbouncer
+        namespace: postgresql
+      spec:
+        selector:
+          matchLabels:
+            app: pgbouncer
+        template:
+          metadata:
+            labels:
+              app: pgbouncer
+          spec:
+            hostNetwork: true
+            nodeSelector: {}
+            tolerations:
+              - key: node-role.kubernetes.io/control-plane
+                operator: Exists
+                effect: NoSchedule
+            containers:
+              - name: pgbouncer
+                image: "{{ cluster_pgbouncer_image }}"
+                args:
+                  - /etc/pgbouncer/pgbouncer.ini
+                ports:
+                  - containerPort: 6432
+                    name: pgbouncer
+                volumeMounts:
+                  - name: config
+                    mountPath: /etc/pgbouncer
+                    readOnly: true
+            volumes:
+              - name: config
+                configMap:
+                  name: pgbouncer-config
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster
+
+- name: Service PgBouncer
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: pgbouncer
+        namespace: postgresql
+      spec:
+        selector:
+          app: pgbouncer
+        ports:
+          - port: 5432
+            targetPort: 6432
+            name: pgbouncer
+        type: ClusterIP
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster

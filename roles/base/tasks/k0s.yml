@@ -1,0 +1,183 @@
+---
+
+- name: Ensure k0s binary directory exists
+  ansible.builtin.file:
+    path: "{{ base_k0s_binary_path | dirname }}"
+    state: directory
+    mode: '0755'
+  tags: k0s
+
+- name: Download k0s binary
+  ansible.builtin.get_url:
+    url: "https://github.com/k0sproject/k0s/releases/download/{{ base_k0s_version }}/k0s-{{ base_k0s_version }}-{{ 'arm64' if ansible_architecture == 'aarch64' else 'amd64' }}"
+    dest: "{{ base_k0s_binary_path }}"
+    mode: '0755'
+    force: false
+  tags: k0s
+
+- name: Ensure k0s config directory exists
+  ansible.builtin.file:
+    path: "{{ base_k0s_config_path | dirname }}"
+    state: directory
+    mode: '0755'
+  tags: k0s
+
+- name: Ensure CNI directories exist under /var/lib/k0s
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - /var/lib/k0s/cni/net.d
+    - /var/lib/k0s/cni/bin
+  tags: k0s
+
+- name: Ensure /etc/cni exists
+  ansible.builtin.file:
+    path: /etc/cni
+    state: directory
+    mode: '0755'
+  tags: k0s
+
+- name: Stat /etc/cni/net.d
+  ansible.builtin.stat:
+    path: /etc/cni/net.d
+  register: _etc_cni_net_d
+  tags: k0s
+
+- name: Remove /etc/cni/net.d when it is a directory
+  ansible.builtin.file:
+    path: /etc/cni/net.d
+    state: absent
+  when: _etc_cni_net_d.stat.exists and _etc_cni_net_d.stat.isdir
+  tags: k0s
+
+- name: Symlink /etc/cni/net.d → /var/lib/k0s/cni/net.d
+  ansible.builtin.file:
+    src: /var/lib/k0s/cni/net.d
+    dest: /etc/cni/net.d
+    state: link
+  tags: k0s
+
+- name: Slurp /etc/k0s/containerd.toml for k0s_managed check
+  ansible.builtin.slurp:
+    src: /etc/k0s/containerd.toml
+  register: _containerd_toml_slurp
+  failed_when: false
+  changed_when: false
+  tags: k0s
+
+- name: Remove custom containerd.toml so k0s recreates k0s-managed config on next start
+  ansible.builtin.file:
+    path: /etc/k0s/containerd.toml
+    state: absent
+  when: _containerd_toml_slurp.content is defined and ('k0s_managed=true' not in (_containerd_toml_slurp.content | b64decode))
+  notify: Restart k0s
+  tags: k0s
+
+- name: Ensure /etc/k0s/containerd.d exists
+  ansible.builtin.file:
+    path: /etc/k0s/containerd.d
+    state: directory
+    mode: '0755'
+  tags: k0s
+
+- name: Deploy containerd drop-in for CNI bin_dir
+  ansible.builtin.template:
+    src: 10-cni-bin.toml.j2
+    dest: /etc/k0s/containerd.d/10-cni-bin.toml
+    owner: root
+    group: root
+    mode: '0644'
+  notify: Restart k0s
+  tags: k0s
+
+- name: Deploy k0s configuration
+  ansible.builtin.template:
+    src: k0s.yaml.j2
+    dest: "{{ base_k0s_config_path }}"
+    owner: root
+    group: root
+    mode: '0640'
+  notify: Restart k0s
+  tags: k0s
+
+- name: Deploy k0s systemd unit
+  ansible.builtin.template:
+    src: k0s.service.j2
+    dest: "{{ base_systemd_system }}/k0s.service"
+    owner: root
+    group: root
+    mode: '0644'
+  notify:
+    - Restart k0s
+  tags: k0s
+
+- name: Reload systemd and start k0s
+  ansible.builtin.systemd:
+    name: k0s.service
+    state: started
+    enabled: true
+    daemon_reload: true
+  tags: k0s
+
+- name: Wait for Calico DaemonSet to be created by k0s
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: DaemonSet
+    name: calico-node
+    namespace: kube-system
+    kubeconfig: /var/lib/k0s/pki/admin.conf
+  register: _calico_ds_wait
+  until: _calico_ds_wait.resources | length > 0
+  retries: 30
+  delay: 10
+  changed_when: false
+  tags: k0s
+
+- name: Patch Calico DaemonSet cni-bin-dir volume to /var/lib/k0s/cni/bin
+  kubernetes.core.k8s_json_patch:
+    api_version: apps/v1
+    kind: DaemonSet
+    name: calico-node
+    namespace: kube-system
+    kubeconfig: /var/lib/k0s/pki/admin.conf
+    patch:
+      - op: replace
+        path: /spec/template/spec/volumes/4/hostPath/path
+        value: /var/lib/k0s/cni/bin
+  tags: k0s
+
+- name: Get Calico DaemonSet to check install-cni env
+  kubernetes.core.k8s_info:
+    api_version: apps/v1
+    kind: DaemonSet
+    name: calico-node
+    namespace: kube-system
+    kubeconfig: /var/lib/k0s/pki/admin.conf
+  register: _calico_ds
+  tags: k0s
+
+- name: Patch Calico DaemonSet install-cni env for API server URL (no brackets)
+  kubernetes.core.k8s_json_patch:
+    api_version: apps/v1
+    kind: DaemonSet
+    name: calico-node
+    namespace: kube-system
+    kubeconfig: /var/lib/k0s/pki/admin.conf
+    patch:
+      - op: add
+        path: /spec/template/spec/initContainers/0/env/0
+        value:
+          name: KUBERNETES_SERVICE_PORT
+          value: "443"
+      - op: add
+        path: /spec/template/spec/initContainers/0/env/0
+        value:
+          name: KUBERNETES_SERVICE_HOST
+          value: "10.96.0.1"
+  when: >-
+    _calico_ds.resources[0].spec.template.spec.initContainers[0].env
+    | selectattr('name', 'equalto', 'KUBERNETES_SERVICE_HOST')
+    | map(attribute='value') | first | default('') != '10.96.0.1'
+  tags: k0s

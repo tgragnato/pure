@@ -1,0 +1,43 @@
+---
+
+- name: Create namespace snowflake
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: snowflake
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster
+
+- name: DaemonSet snowflake
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: snowflake
+        namespace: snowflake
+      spec:
+        selector:
+          matchLabels:
+            app: snowflake
+        template:
+          metadata:
+            labels:
+              app: snowflake
+          spec:
+            hostNetwork: true
+            containers:
+              - name: snowflake
+                image: "{{ cluster_snowflake_image }}"
+                args:
+                  - -unsafe-logging
+                  - -nat-type-force-unrestricted
+                  - -ephemeral-ports-range
+                  - "1024:65535"
+                resources: {}
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster

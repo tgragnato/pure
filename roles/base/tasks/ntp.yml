@@ -9,7 +9,7 @@
 - name: Setup timesyncd.conf
   ansible.builtin.template:
     src: timesyncd.conf.j2
-    dest: "{{ systemd_prefix }}/timesyncd.conf"
+    dest: "{{ base_systemd_prefix }}/timesyncd.conf"
     owner: root
     group: root
     mode: '0644'

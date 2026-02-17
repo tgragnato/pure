@@ -1,7 +1,0 @@
----
-
-ssh_user: root
-systemd_prefix: /etc/systemd
-systemd_system: "{{ systemd_prefix }}/system"
-systemd_network: "{{ systemd_prefix }}/network"
-local_folder: /usr/local

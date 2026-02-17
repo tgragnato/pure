@@ -11,7 +11,7 @@
 - name: Install en.network profile
   ansible.builtin.template:
     src: "en.network.j2"
-    dest: "{{ systemd_network }}/en.network"
+    dest: "{{ base_systemd_network }}/en.network"
     owner: root
     group: root
     mode: '0644'
@@ -21,14 +21,13 @@
 - name: Install bond network profile
   ansible.builtin.template:
     src: "{{ item }}.j2"
-    dest: "{{ systemd_network }}/{{ item }}"
+    dest: "{{ base_systemd_network }}/{{ item }}"
     owner: root
     group: root
     mode: '0644'
   loop:
     - wan.netdev
     - wan.network
-  when: not base_ipv4_address is defined and not base_ipv6_address is defined
   notify: Networkctl reload
   tags: network
 
@@ -38,27 +37,26 @@
     path: "{{ item }}"
   loop:
     - /etc/network
-    - /etc/sysctl.d
   tags: network
 
-- name: Remove comments from /etc/sysctl.conf
-  ansible.builtin.lineinfile:
-    path: /etc/sysctl.conf
-    regexp: '^#'
-    state: absent
+- name: Load br_netfilter module at boot
+  ansible.builtin.copy:
+    dest: /etc/modules-load.d/br_netfilter.conf
+    content: "br_netfilter\n"
+    mode: "0644"
   tags: network
 
-- name: Remove empty lines from /etc/sysctl.conf
-  ansible.builtin.lineinfile:
-    path: /etc/sysctl.conf
-    regexp: '^\s*$'
-    state: absent
+- name: Load br_netfilter module now
+  ansible.builtin.command: modprobe br_netfilter
+  changed_when: false
   tags: network
 
-- name: Setting sysctl.conf
+- name: Setting sysctl (persisted to /etc/sysctl.d/99-pure.conf for systemd-sysctl)
   ansible.posix.sysctl:
     name: "{{ item.name }}"
     value: "{{ item.value }}"
+    sysctl_set: true
+    sysctl_file: /etc/sysctl.d/99-pure.conf
   failed_when: false
   loop:
     - name: kernel.printk
@@ -92,9 +90,13 @@
     - name: kernel.unprivileged_bpf_disabled
       value: 1
     - name: net.ipv4.ip_forward
-      value: "{{ base_forwarding }}"
+      value: "1"
     - name: net.ipv6.conf.all.forwarding
-      value: "{{ base_forwarding }}"
+      value: "1"
+    - name: net.bridge.bridge-nf-call-iptables
+      value: "1"
+    - name: net.bridge.bridge-nf-call-ip6tables
+      value: "1"
     - name: net.ipv4.conf.all.accept_redirects
       value: 0
     - name: net.ipv6.conf.all.accept_redirects

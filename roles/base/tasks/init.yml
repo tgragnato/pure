@@ -50,6 +50,7 @@
   loop:
     - aptitude
     - btrfs-progs
+    - ca-certificates
     - gdisk
     - hardening-runtime
     - htop
@@ -127,6 +128,5 @@
     - lp
     - mail
     - news
-    - systemd-resolve
     - uucp
   tags: init

@@ -23,3 +23,22 @@
     name: ssh.service
     state: restarted
   listen: Restart ssh
+
+- name: Restart postgresql
+  ansible.builtin.systemd:
+    name: "postgresql@{{ base_postgresql_version }}-main.service"
+    state: restarted
+  listen: Restart postgresql
+
+- name: Restart k0s
+  ansible.builtin.systemd:
+    daemon_reload: true
+    name: k0s.service
+    state: restarted
+  listen: Restart k0s
+
+- name: Restart systemd-resolved
+  ansible.builtin.systemd:
+    name: systemd-resolved
+    state: restarted
+  listen: Restart systemd-resolved

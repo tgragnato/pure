@@ -1,0 +1,10 @@
+---
+
+cluster_kubeconfig: /var/lib/k0s/pki/admin.conf
+
+cluster_pgbouncer_image: ghcr.io/cloudnative-pg/pgbouncer:1.25.1
+
+cluster_snowflake_image: ghcr.io/tgragnato/snowflake:latest
+
+cluster_magnetico_image: ghcr.io/tgragnato/magnetico:next
+cluster_magnetico_max_rps: 100

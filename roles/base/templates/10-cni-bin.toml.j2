@@ -1,0 +1,4 @@
+# k0s containerd drop-in: CNI bin_dir override (/opt not usable on this host)
+# Merged by k0s into /run/k0s/containerd-cri.toml. Requires containerd.toml to be k0s-managed.
+[plugins."io.containerd.grpc.v1.cri".cni]
+  bin_dir = "/var/lib/k0s/cni/bin"

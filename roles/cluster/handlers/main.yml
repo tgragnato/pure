@@ -1,0 +1,15 @@
+---
+
+- name: Restart PgBouncer
+  ansible.builtin.command:
+    argv:
+      - k0s
+      - kubectl
+      - rollout
+      - restart
+      - daemonset/pgbouncer
+      - -n
+      - postgresql
+  environment:
+    KUBECONFIG: "{{ cluster_kubeconfig }}"
+  tags: cluster

@@ -12,5 +12,14 @@
 - name: Setup ntp
   ansible.builtin.import_tasks: ntp.yml
 
+- name: Setup resolved
+  ansible.builtin.import_tasks: resolve.yml
+
 - name: Setup ssh
   ansible.builtin.import_tasks: ssh.yml
+
+- name: Install postgresql
+  ansible.builtin.import_tasks: postgresql.yml
+
+- name: Install k0s
+  ansible.builtin.import_tasks: k0s.yml

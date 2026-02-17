@@ -1,0 +1,21 @@
+apiVersion: k0s.k0sproject.io/v1beta1
+kind: ClusterConfig
+metadata:
+  name: k0s
+spec:
+  api:
+    extraArgs:
+      service-node-port-range: "1024-65535"
+  network:
+    provider: calico
+    calico:
+      envVars:
+        FELIX_IPTABLESBACKEND: "NFT"
+    kubeProxy:
+      mode: nftables
+  storage:
+    type: kine
+    kine:
+      dataSource: "{{ base_k0s_datastore_endpoint }}"
+  telemetry:
+    enabled: false

@@ -3,3 +3,4 @@
 collections:
   - ansible.posix
   - community.postgresql
+  - kubernetes.core

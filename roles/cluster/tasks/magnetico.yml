@@ -1,0 +1,72 @@
+---
+
+- name: Create namespace magnetico
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Namespace
+      metadata:
+        name: magnetico
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster
+
+- name: DaemonSet magnetico
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: DaemonSet
+      metadata:
+        name: magnetico
+        namespace: magnetico
+      spec:
+        selector:
+          matchLabels:
+            app: magnetico
+        template:
+          metadata:
+            labels:
+              app: magnetico
+          spec:
+            containers:
+              - name: magnetico
+                image: "{{ cluster_magnetico_image }}"
+                imagePullPolicy: Always
+                args:
+                  - "--max-rps={{ cluster_magnetico_max_rps }}"
+                  - "--addr=:8080"
+                  - "--indexer-addr=:25401"
+                  - "--database=postgres://magnetico:magnetico@pgbouncer.postgresql.svc.cluster.local:5432/magnetico?sslmode=disable"
+                ports:
+                  - containerPort: 25401
+                    name: indexer
+                    protocol: UDP
+                  - containerPort: 8080
+                    name: http
+                    protocol: TCP
+                resources: {}
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster
+
+- name: Service magnetico
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: magnetico
+        namespace: magnetico
+      spec:
+        type: NodePort
+        selector:
+          app: magnetico
+        ports:
+          - port: 25401
+            targetPort: 25401
+            nodePort: 25401
+            name: indexer
+            protocol: UDP
+    kubeconfig: "{{ cluster_kubeconfig }}"
+  tags: cluster

@@ -1,0 +1,10 @@
+---
+
+- name: Expose host PostgreSQL as Service
+  ansible.builtin.import_tasks: postgresql.yml
+
+- name: Snowflake DaemonSet
+  ansible.builtin.import_tasks: snowflake.yml
+
+- name: Magnetico DaemonSet
+  ansible.builtin.import_tasks: magnetico.yml
