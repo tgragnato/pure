@@ -12,4 +12,5 @@
       - postgresql
   environment:
     KUBECONFIG: "{{ cluster_kubeconfig }}"
+  changed_when: false
   tags: cluster

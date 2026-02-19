@@ -42,14 +42,14 @@
 - name: Stat /etc/cni/net.d
   ansible.builtin.stat:
     path: /etc/cni/net.d
-  register: _etc_cni_net_d
+  register: base_etc_cni_net_d
   tags: k0s
 
 - name: Remove /etc/cni/net.d when it is a directory
   ansible.builtin.file:
     path: /etc/cni/net.d
     state: absent
-  when: _etc_cni_net_d.stat.exists and _etc_cni_net_d.stat.isdir
+  when: base_etc_cni_net_d.stat.exists and base_etc_cni_net_d.stat.isdir
   tags: k0s
 
 - name: Symlink /etc/cni/net.d → /var/lib/k0s/cni/net.d
@@ -62,7 +62,7 @@
 - name: Slurp /etc/k0s/containerd.toml for k0s_managed check
   ansible.builtin.slurp:
     src: /etc/k0s/containerd.toml
-  register: _containerd_toml_slurp
+  register: base_containerd_toml_slurp
   failed_when: false
   changed_when: false
   tags: k0s
@@ -71,7 +71,7 @@
   ansible.builtin.file:
     path: /etc/k0s/containerd.toml
     state: absent
-  when: _containerd_toml_slurp.content is defined and ('k0s_managed=true' not in (_containerd_toml_slurp.content | b64decode))
+  when: base_containerd_toml_slurp.content is defined and ('k0s_managed=true' not in (base_containerd_toml_slurp.content | b64decode))
   notify: Restart k0s
   tags: k0s
 
@@ -128,8 +128,8 @@
     name: calico-node
     namespace: kube-system
     kubeconfig: /var/lib/k0s/pki/admin.conf
-  register: _calico_ds_wait
-  until: _calico_ds_wait.resources | length > 0
+  register: base_calico_ds_wait
+  until: base_calico_ds_wait.resources | length > 0
   retries: 30
   delay: 10
   changed_when: false
@@ -155,7 +155,7 @@
     name: calico-node
     namespace: kube-system
     kubeconfig: /var/lib/k0s/pki/admin.conf
-  register: _calico_ds
+  register: base_calico_ds
   tags: k0s
 
 - name: Patch Calico DaemonSet install-cni env for API server URL (no brackets)
@@ -177,7 +177,7 @@
           name: KUBERNETES_SERVICE_HOST
           value: "10.96.0.1"
   when: >-
-    _calico_ds.resources[0].spec.template.spec.initContainers[0].env
+    base_calico_ds.resources[0].spec.template.spec.initContainers[0].env
     | selectattr('name', 'equalto', 'KUBERNETES_SERVICE_HOST')
     | map(attribute='value') | first | default('') != '10.96.0.1'
   tags: k0s
