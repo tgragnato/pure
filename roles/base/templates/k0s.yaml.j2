@@ -4,8 +4,15 @@ metadata:
   name: k0s
 spec:
   api:
+    address: "127.0.0.1"
+    port: 6443
     extraArgs:
       service-node-port-range: "1024-65535"
+  kubelet:
+    extraArgs:
+      address: "127.0.0.1"
+      anonymous-auth: "false"
+      read-only-port: "0"
   network:
     provider: calico
     calico:
